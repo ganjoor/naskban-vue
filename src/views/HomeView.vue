@@ -29,8 +29,8 @@ watchEffect(async () => {
 
   <div class="flex-container">
     <div class="pdf" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="pdf.id"><img :src="pdf.extenalCoverImageUrl" :alt="pdf.title" width="200" loading="lazy" /> </a>
-      <a :href="pdf.id">{{ pdf.title }} <small v-if="pdf.authorsLine.length > 1">({{ pdf.authorsLine }})</small></a>
+      <a :href="pdf.externalPDFFileUrl"><img :src="pdf.extenalCoverImageUrl" :alt="pdf.title" width="200" loading="lazy" /> </a>
+      <a :href="pdf.externalPDFFileUrl">{{ pdf.title }} <small v-if="pdf.authorsLine.length > 1">({{ pdf.authorsLine }})</small></a>
     </div>
   </div>
 </template>
