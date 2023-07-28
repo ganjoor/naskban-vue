@@ -16,22 +16,17 @@ watchEffect(async () => {
   // this effect will run immediately and then
   // re-run whenever pageNumber.value changes
   const url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
-  loading.value = true;
+  loading.value = true
   pdfs.value = await (await fetch(url)).json()
-  loading.value = false;
+  loading.value = false
 })
-
 </script>
 
 <template>
   <h3>تازه‌ترین کتاب‌های افزوده شده</h3>
-  
+
   <div class="q-pa-lg flex flex-center">
-    <q-spinner-hourglass
-        v-if="loading"
-        color="green"
-        size="4em"
-      />
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
       v-model="pageNumber"
       v-if="!loading"
@@ -47,10 +42,25 @@ watchEffect(async () => {
     />
   </div>
 
-  <div class="flex-container">
-    <div class="pdf" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="pdf.externalPDFFileUrl"><img :src="pdf.extenalCoverImageUrl" :alt="pdf.title" width="200" loading="lazy" /> </a>
-      <a :href="pdf.externalPDFFileUrl">{{ pdf.title }} <small v-if="pdf.authorsLine.length > 1">({{ pdf.authorsLine }})</small></a>
+  <div class="row justify-center">
+    <div class="pdf flex q-ma-sm" v-for="pdf in pdfs" :key="pdf.id">
+      <a :href="pdf.externalPDFFileUrl">
+        <q-card class="fit">
+          <q-img
+            :src="pdf.extenalCoverImageUrl"
+            spinner-color="white"
+            style="width: 200px"
+            class="rounded-borders"
+          >
+          </q-img>
+          <q-card-section class="text-h6">
+            <a :href="pdf.externalPDFFileUrl">{{ pdf.title }} </a>
+          </q-card-section>
+          <q-card-section class="text-subtitle2" v-if="pdf.authorsLine.length > 1">
+            {{ pdf.authorsLine }}
+          </q-card-section>
+        </q-card>
+      </a>
     </div>
   </div>
 </template>
@@ -65,10 +75,10 @@ a {
   flex-wrap: wrap;
   align-content: center;
 }
-h3{
+h3 {
   text-align: center;
 }
-.pdf{
+.pdf {
   text-align: center;
   max-width: 200px;
 }
