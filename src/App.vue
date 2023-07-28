@@ -1,19 +1,13 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import {  RouterView } from 'vue-router'
+import AppHeader from './components/AppHeader.vue';
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
+    <img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125" />
     <div class="wrapper">
-      <HelloWorld msg="نسک‌بان" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+      <AppHeader msg="نسک‌بان" />
     </div>
   </header>
 
@@ -21,10 +15,6 @@ import HelloWorld from './components/HelloWorld.vue'
 </template>
 
 <style scoped>
-* {
-  direction: rtl;
-  font-family: "Vazirmatn";
-}
 
 header {
   line-height: 1.5;

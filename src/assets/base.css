@@ -56,6 +56,8 @@
   box-sizing: border-box;
   margin: 0;
   font-weight: normal;
+  direction: rtl;
+  font-family: "Vazirmatn";
 }
 
 body {
