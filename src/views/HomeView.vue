@@ -8,12 +8,13 @@ import { ref, watchEffect } from 'vue'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 
+const pageNumber = ref(20)
 const pdfs = ref(null)
 
 watchEffect(async () => {
   // this effect will run immediately and then
-  // re-run whenever currentBranch.value changes
-  const url = `${API_URL}?PageNumber=20&PageSize=20`
+  // re-run whenever pageNumber.value changes
+  const url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
   pdfs.value = await (await fetch(url)).json()
 })
 
@@ -21,10 +22,15 @@ watchEffect(async () => {
 
 <template>
   <h3>تازه‌ترین کتاب‌های افزوده شده</h3>
+  <div>
+    <button @click="pageNumber++">بعدی</button>
+    <button @click="pageNumber--">قبلی</button>
+  </div>
+
   <div class="flex-container">
     <div class="pdf" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="pdf.id"><img :src="pdf.extenalCoverImageUrl" :alt="pdf.title" /> </a>
-      <a :href="pdf.id">{{ pdf.title }}</a>
+      <a :href="pdf.id"><img :src="pdf.extenalCoverImageUrl" :alt="pdf.title" width="200" loading="lazy" /> </a>
+      <a :href="pdf.id">{{ pdf.title }} <small v-if="pdf.authorsLine.length > 1">({{ pdf.authorsLine }})</small></a>
     </div>
   </div>
 </template>
@@ -37,12 +43,13 @@ a {
 .flex-container {
   display: flex;
   flex-wrap: wrap;
+  align-content: center;
 }
 h3{
   text-align: center;
 }
 .pdf{
   text-align: center;
-  max-width: 300px;
+  max-width: 200px;
 }
 </style>
