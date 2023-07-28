@@ -8,6 +8,7 @@ import { ref, watchEffect } from 'vue'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 
+const loading = ref(false)
 const pageNumber = ref(20)
 const pdfs = ref(null)
 
@@ -15,16 +16,35 @@ watchEffect(async () => {
   // this effect will run immediately and then
   // re-run whenever pageNumber.value changes
   const url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
+  loading.value = true;
   pdfs.value = await (await fetch(url)).json()
+  loading.value = false;
 })
 
 </script>
 
 <template>
   <h3>تازه‌ترین کتاب‌های افزوده شده</h3>
-  <div>
-    <button @click="pageNumber++">بعدی</button>
-    <button @click="pageNumber--">قبلی</button>
+  
+  <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass
+        v-if="loading"
+        color="green"
+        size="4em"
+      />
+    <q-pagination
+      v-model="pageNumber"
+      v-if="!loading"
+      :max="100"
+      :max-pages="7"
+      direction-links
+      boundary-links
+      color="green"
+      icon-last="skip_previous"
+      icon-first="skip_next"
+      icon-next="fast_rewind"
+      icon-prev="fast_forward"
+    />
   </div>
 
   <div class="flex-container">

@@ -10,6 +10,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@quasar/extras": "^1.16.5",
+    "quasar": "^2.12.3",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"
   },
