@@ -15,6 +15,11 @@ const router = createRouter({
       name: 'view',
       component: ItemView
     },
+    {
+      path: '/page/:page',
+      name: 'page',
+      component: HomeView
+    },
   ]
 })
 
