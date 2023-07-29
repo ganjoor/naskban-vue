@@ -8,7 +8,7 @@ const route = useRoute()
 const loading = ref(false)
 const pageNumber = ref(null)
 const pdfs = ref(null)
-const pageCount = ref(100)
+const pageCount = ref(1)
 
 watchEffect(async () => {
   if (pageNumber.value == null) {
