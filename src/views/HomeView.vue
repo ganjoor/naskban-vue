@@ -8,24 +8,33 @@ const route = useRoute()
 const loading = ref(false)
 const pageNumber = ref(null)
 const pdfs = ref(null)
+const pageCount = ref(100)
 
 watchEffect(async () => {
   if (pageNumber.value == null) {
     if (route.params.page != null) {
       pageNumber.value = route.params.page
     } else {
-      pageNumber.value = 20;
+      pageNumber.value = 1;
     }
   }
   const url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
   loading.value = true;
-  pdfs.value = await (await fetch(url)).json()
+  const res = await fetch(url);
+  pdfs.value = await res.json();
+  for (var pair of res.headers.entries()) {
+   if(pair[0] == 'paging-headers'){
+    const paging_headers = JSON.parse(pair[1]);
+    pageCount.value = paging_headers.totalPages;
+
+   }
+}
   loading.value = false;
   if(pageNumber.value == 1){
     window.history.pushState({}, '', '/');
   }
   else{
-    window.history.pushState({}, '', '/page/' + pageNumber.value.toString());
+    window.history.pushState({}, '', '/p/' + pageNumber.value.toString());
   }
   
 })
@@ -39,7 +48,7 @@ watchEffect(async () => {
     <q-pagination
       v-model="pageNumber"
       v-if="!loading"
-      :max="29"
+      :max="pageCount"
       :max-pages="7"
       direction-links
       boundary-links

@@ -16,7 +16,7 @@ const router = createRouter({
       component: ItemView
     },
     {
-      path: '/page/:page',
+      path: '/p/:page',
       name: 'page',
       component: HomeView
     },
