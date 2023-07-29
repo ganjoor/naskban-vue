@@ -14,6 +14,7 @@ watchEffect(async () => {
   loading.value = true
   pdf.value = await (await fetch(url)).json()
   loading.value = false
+  document.title = 'نسک‌بان - ' + pdf.value.title;
 })
 </script>
 
