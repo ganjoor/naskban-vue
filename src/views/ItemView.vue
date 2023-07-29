@@ -22,6 +22,7 @@ watchEffect(async () => {
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-card v-if="pdf != null">
       <q-card-section>
+        <a :href="pdf.externalPDFFileUrl" target="_blank">
         <q-img
           :src="pdf.extenalCoverImageUrl"
           spinner-color="white"
@@ -29,9 +30,10 @@ watchEffect(async () => {
           style="width: 300px"
         >
         </q-img>
+        </a>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
-        {{ pdf.title }}
+        <a :href="pdf.externalPDFFileUrl" target="_blank">{{ pdf.title }}</a>
       </q-card-section>
       <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
         {{ pdf.subTitle }}
