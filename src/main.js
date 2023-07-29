@@ -1,4 +1,4 @@
-import './assets/fonts/Vazirmatn.css'
+import './assets/Vazirmatn-UI-FD-font-face.css'
 
 import { createApp } from 'vue'
 import { Quasar } from 'quasar'
