@@ -4,9 +4,9 @@ import {  RouterView } from 'vue-router'
 
 <template>
   <header>
-    <img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <a href="/"><img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125" /></a>
     <div class="wrapper">
-      <h1 class="green">نسک‌بان</h1>
+      <a href="/"><h1 class="green">نسک‌بان</h1></a>
     </div>
   </header>
 

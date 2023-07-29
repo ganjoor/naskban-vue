@@ -1,8 +1,3 @@
-<!--
-This example fetches latest Vue.js commits data from GitHub’s API and displays them as a list.
-You can switch between the two branches.
--->
-
 <script setup>
 import { ref, watchEffect } from 'vue'
 
@@ -44,7 +39,7 @@ watchEffect(async () => {
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="pdf.externalPDFFileUrl">
+      <a :href="pdf.id">
         <q-card class="fit">
           <q-img
             :src="pdf.extenalCoverImageUrl"
