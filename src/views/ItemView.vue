@@ -18,17 +18,40 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <div class="view">
-      <h1 v-if="pdf != null">{{pdf.title}}</h1>
-    </div>
-  </template>
-  
-  <style>
-  @media (min-width: 1024px) {
-    .about {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
+  <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    <q-card v-if="pdf != null">
+      <q-card-section>
+        <q-img
+          :src="pdf.extenalCoverImageUrl"
+          spinner-color="white"
+          class="rounded-borders"
+          style="width: 300px"
+        >
+        </q-img>
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center">
+        {{ pdf.title }}
+      </q-card-section>
+      <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
+        {{ pdf.subTitle }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center">
+        {{ pdf.authorsLine }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center">
+        <a :href="pdf.externalPDFFileUrl" target="_blank">دریافت</a>
+      </q-card-section>
+    </q-card>
+  </div>
+</template>
+
+<style>
+@media (min-width: 1024px) {
+  .about {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
   }
-  </style>
+}
+</style>
