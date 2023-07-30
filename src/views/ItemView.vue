@@ -27,8 +27,7 @@ watchEffect(async () => {
         <q-img
           :src="pdf.extenalCoverImageUrl"
           spinner-color="white"
-          class="rounded-borders"
-          style="width: 300px"
+          class="width-300px"
         >
         </q-img>
         </a>
@@ -50,11 +49,7 @@ watchEffect(async () => {
 </template>
 
 <style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
+.width-300px{
+  width: 300px;
 }
 </style>
