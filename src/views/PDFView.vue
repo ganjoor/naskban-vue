@@ -22,20 +22,13 @@ function en2fa(num) {
 watchEffect(async () => {
   const url = `${API_URL}/${route.params.id}`
   if (route.params.page != null) {
-    pageNumber.value = route.params.page
+    pageNumber.value = 3;//route.params.page
   }
 
   loading.value = true
   pdf.value = await (await fetch(url)).json()
   pdfFile.value = usePDF({
-    url: pdf.value.externalPDFFileUrl,
-    withCredentials: true,
-    httpHeaders: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'range',
-      'Access-Control-Expose-Headers': 'content-range, content-length, accept-ranges',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS'
-    }
+    url:  pdf.value.externalPDFFileUrl,
   })
   loading.value = false
   if (pageNumber.value == 1) {
@@ -48,5 +41,11 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <VuePDF :pdf="pdf" />
+  <button @click="pageNumber = pageNumber + 1">
+      + Page
+    </button>
+    <button @click="pageNumber = pageNumber - 1">
+      - Page
+    </button>
+  <VuePDF v-if="pdfFile != null" :pdf="pdfFile.pdf" :page="pageNumber.value" />
 </template>
