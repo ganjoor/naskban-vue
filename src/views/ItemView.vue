@@ -9,6 +9,8 @@ const loading = ref(false)
 
 const pdf = ref(null)
 
+
+
 watchEffect(async () => {
   const url = `${API_URL}/${route.params.id}`
   loading.value = true
@@ -40,6 +42,9 @@ watchEffect(async () => {
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         {{ pdf.authorsLine }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center">
+        <a :href="'/' + pdf.id + '/1'">مشاهده</a>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <a :href="pdf.externalPDFFileUrl" target="_blank">دریافت</a>
