@@ -10,6 +10,15 @@ const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
 
+function en2fa(num){
+    let arr = [];
+    const persian = {0:'۰',1:'۱',2:'۲',3:'۳',4:'۴',5:'۵',6:'۶',7:'۷',8:'۸',9:'۹'};
+    num.split('').map((number,index)=>{
+        arr[index] = (persian[number]);
+    });
+    return arr.join('');
+}
+
 watchEffect(async () => {
   if (pageNumber.value == null) {
     if (route.params.page != null) {
@@ -26,15 +35,16 @@ watchEffect(async () => {
    if(pair[0] == 'paging-headers'){
     const paging_headers = JSON.parse(pair[1]);
     pageCount.value = paging_headers.totalPages;
-
    }
 }
   loading.value = false;
   if(pageNumber.value == 1){
     window.history.pushState({}, '', '/');
+    document.title = 'نسک‌بان';
   }
   else{
     window.history.pushState({}, '', '/p/' + pageNumber.value.toString());
+    document.title = 'نسک‌بان - صفحهٔ ' + en2fa(pageNumber.value.toString());
   }
   
 })
