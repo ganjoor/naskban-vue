@@ -21,16 +21,16 @@ function en2fa(num) {
 
 watchEffect(async () => {
   const url = `${API_URL}/${route.params.id}`
-  if (route.params.page != null) {
-    pageNumber.value = 3;//route.params.page
-  }
 
   loading.value = true
   pdf.value = await (await fetch(url)).json()
   pdfFile.value = usePDF({
-    url:  pdf.value.externalPDFFileUrl,
+    url: pdf.value.externalPDFFileUrl
   })
-  loading.value = false
+  if (route.params.page != null) {
+    pageNumber.value =  parseInt(route.params.page)
+  }
+
   if (pageNumber.value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
   } else {
@@ -38,14 +38,32 @@ watchEffect(async () => {
       'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
   }
 })
+
+function onLoaded(){
+  loading.value = false
+}
+
+function setPage(newPageNumber) {
+  if (newPageNumber < 1) return
+  if (newPageNumber > pdfFile.value.pages) return
+  pageNumber.value = newPageNumber
+  if (pageNumber.value == 1) {
+    window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
+    document.title = 'نسک‌بان - ' + pdf.value.title
+  } else {
+    window.history.pushState(
+      {},
+      '',
+      '/' + pdf.value.id.toString() + '/' + pageNumber.value.toString()
+    )
+    'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+  }
+}
 </script>
 
 <template>
-  <button @click="pageNumber = pageNumber + 1">
-      + Page
-    </button>
-    <button @click="pageNumber = pageNumber - 1">
-      - Page
-    </button>
-  <VuePDF v-if="pdfFile != null" :pdf="pdfFile.pdf" :page="pageNumber.value" />
+  <button @click="setPage(parseInt(pageNumber) + 1)">+ Page</button>
+  <button @click="setPage(parseInt(pageNumber) - 1)">- Page</button>
+  <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+  <VuePDF v-if="pdfFile != null" :pdf="pdfFile.pdf" :page="pageNumber" @loaded="onLoaded" />
 </template>
