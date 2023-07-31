@@ -21,8 +21,8 @@ function en2fa(num){
 
 watchEffect(async () => {
   if (pageNumber.value == null) {
-    if (route.params.page != null) {
-      pageNumber.value = route.params.page
+    if (route.query.page != null) {
+      pageNumber.value = route.query.page
     } else {
       pageNumber.value = 1;
     }
@@ -43,7 +43,7 @@ watchEffect(async () => {
     document.title = 'نسک‌بان';
   }
   else{
-    window.history.pushState({}, '', '/p/' + pageNumber.value.toString());
+    window.history.pushState({}, '', '/?page=' + pageNumber.value.toString());
     document.title = 'نسک‌بان - صفحهٔ ' + en2fa(pageNumber.value.toString());
   }
   
