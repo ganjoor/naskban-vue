@@ -54,26 +54,23 @@ watchEffect(async () => {
 function onLoaded() {
   loading.value = false
 }
-function updatePageNumber(value){
+function updatePageNumber(value) {
   if (value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
-    document.title =
-      'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
-    window.history.pushState(
-      {},
-      '',
-      '/' + pdf.value.id.toString() + '/' + value.toString()
-    )
+    document.title = 'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
+    window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
 }
 </script>
 
 <template>
-  <div class="q-pa-lg flex flex-center">
-    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
-    <div class="q-pa-lg flex flex-center justify-center centers">
+  <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg flex flex-center">
+    <q-card-section>
+      <a :href="'/' + pdf.id">{{ pdf.title }}</a> 
+    </q-card-section>
+    <q-card-section class="full-width q-pa-lg flex flex-center justify-center centers">
       <q-pagination
         v-if="pdfFile != null"
         v-model="pageNumber"
@@ -86,9 +83,17 @@ function updatePageNumber(value){
         icon-prev="fast_forward"
         @update:model-value="updatePageNumber"
       />
-    </div>
-    <div class="full-width q-pa-lg flex flex-center justify-center centers">
+    </q-card-section>
+    
+  </q-card>
+  <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    
+    <div class="q-pa-lg flex flex-center justify-center centers">
       <VuePDF v-if="pdfFile != null" :pdf="pdfFile.pdf" :page="pageNumber" @loaded="onLoaded" />
     </div>
+    <q-card class="full-width q-pa-lg flex flex-center">
+      <a :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank">مشاهده در فایل</a>
+    </q-card>
   </div>
 </template>
