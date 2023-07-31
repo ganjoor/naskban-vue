@@ -51,8 +51,6 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <h3>تازه‌ترین کتاب‌های افزوده شده</h3>
-
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination

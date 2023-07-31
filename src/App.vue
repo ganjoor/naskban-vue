@@ -19,6 +19,9 @@ header {
   margin: auto;
   text-align: center;
 }
+h1{
+  font-size: 3em;
+}
  .wrapper{
   margin: auto;
 }
