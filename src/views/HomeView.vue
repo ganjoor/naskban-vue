@@ -82,7 +82,7 @@ watchEffect(async () => {
           <q-card-section class="text-h6">
             <a :href="'/' + pdf.id">{{ pdf.title }} </a>
           </q-card-section>
-          <q-card-section class="text-subtitle2" v-if="pdf.authorsLine.length > 1">
+          <q-card-section class="text-subtitle2" v-if="pdf.authorsLine != null && pdf.authorsLine.length > 1">
             {{ pdf.authorsLine }}
           </q-card-section>
         </q-card>
