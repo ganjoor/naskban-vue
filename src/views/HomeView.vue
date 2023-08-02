@@ -84,6 +84,7 @@ function doSearch(){
       id="s"
       name="s"
       type="text"
+      placeholder="جستجو"
       @keydown.enter.prevent="doSearch"
     />
     <q-icon name="search" class="cursor-pointer" @click="doSearch"></q-icon>
