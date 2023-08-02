@@ -68,21 +68,25 @@ watchEffect(async () => {
   document.title = docTitle
 })
 
+function doSearch(){
+  searchTerm.value = document.getElementById('s').value
+}
+
 </script>
 
 <template>
   <div class="q-pa-lg flex flex-center">
-    <q-input
+    <input
       outlined
-      v-model="searchTerm"
+      :value="searchTerm"
       input-class="text-right"
       class="q-ml-md"
-    >
-      <template v-slot:append>
-        <q-icon v-if="searchTerm === ''" name="search" />
-        <q-icon v-else name="clear" class="cursor-pointer" @click="searchTerm = ''" />
-      </template>
-    </q-input>
+      id="s"
+      name="s"
+      type="text"
+      @keydown.enter.prevent="doSearch"
+    />
+    <q-icon name="search" class="cursor-pointer" @click="doSearch"></q-icon>
   </div>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
@@ -144,4 +148,7 @@ h3 {
   text-align: center;
   max-width: 200px;
 }
+
+
+
 </style>
