@@ -9,48 +9,81 @@ const loading = ref(false)
 const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
+const searchTerm = ref('')
 
-function en2fa(num){
-    let arr = [];
-    const persian = {0:'۰',1:'۱',2:'۲',3:'۳',4:'۴',5:'۵',6:'۶',7:'۷',8:'۸',9:'۹'};
-    num.split('').map((number,index)=>{
-        arr[index] = (persian[number]);
-    });
-    return arr.join('');
+function en2fa(num) {
+  let arr = []
+  const persian = { 0: '۰', 1: '۱', 2: '۲', 3: '۳', 4: '۴', 5: '۵', 6: '۶', 7: '۷', 8: '۸', 9: '۹' }
+  num.split('').map((number, index) => {
+    arr[index] = persian[number]
+  })
+  return arr.join('')
 }
 
 watchEffect(async () => {
+  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
     } else {
-      pageNumber.value = 1;
+      pageNumber.value = 1
     }
   }
-  const url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
-  loading.value = true;
-  const res = await fetch(url);
-  pdfs.value = await res.json();
+
+  if (route.query.s != null) {
+    searchTerm.value = route.query.s
+  }
+  if (searchTerm.value != '') {
+    url = `${API_URL}/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`
+  }
+
+  loading.value = true
+  const res = await fetch(url)
+  pdfs.value = await res.json()
   for (var pair of res.headers.entries()) {
-   if(pair[0] == 'paging-headers'){
-    const paging_headers = JSON.parse(pair[1]);
-    pageCount.value = paging_headers.totalPages;
-   }
-}
-  loading.value = false;
-  if(pageNumber.value == 1){
-    window.history.pushState({}, '', '/');
-    document.title = 'نسک‌بان';
+    if (pair[0] == 'paging-headers') {
+      const paging_headers = JSON.parse(pair[1])
+      pageCount.value = paging_headers.totalPages
+    }
   }
-  else{
-    window.history.pushState({}, '', '/?page=' + pageNumber.value.toString());
-    document.title = 'نسک‌بان - صفحهٔ ' + en2fa(pageNumber.value.toString());
+  loading.value = false
+  let pageUrl = ''
+  let docTitle = 'نسک‌بان'
+  if (searchTerm.value != '') {
+    pageUrl = '/?s=' + encodeURI(searchTerm.value)
+    docTitle += ' - جستجوی ' + searchTerm.value
   }
-  
+  if (pageNumber.value > 1) {
+    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+  }
+  if (pageNumber.value != 1) {
+    if (pageUrl != '') {
+      pageUrl += '&'
+    } else {
+      pageUrl = '/?'
+    }
+    pageUrl += 'page=' + pageNumber.value.toString()
+  }
+  window.history.pushState({}, '', pageUrl)
+  document.title = docTitle
 })
+
 </script>
 
 <template>
+  <div class="q-pa-lg flex flex-center">
+    <q-input
+      outlined
+      v-model="searchTerm"
+      input-class="text-right"
+      class="q-ml-md"
+    >
+      <template v-slot:append>
+        <q-icon v-if="searchTerm === ''" name="search" />
+        <q-icon v-else name="clear" class="cursor-pointer" @click="searchTerm = ''" />
+      </template>
+    </q-input>
+  </div>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
@@ -82,7 +115,10 @@ watchEffect(async () => {
           <q-card-section class="text-h6">
             <a :href="'/' + pdf.id">{{ pdf.title }} </a>
           </q-card-section>
-          <q-card-section class="text-subtitle2" v-if="pdf.authorsLine != null && pdf.authorsLine.length > 1">
+          <q-card-section
+            class="text-subtitle2"
+            v-if="pdf.authorsLine != null && pdf.authorsLine.length > 1"
+          >
             {{ pdf.authorsLine }}
           </q-card-section>
         </q-card>
