@@ -70,6 +70,7 @@ watchEffect(async () => {
 
 function doSearch(){
   searchTerm.value = document.getElementById('s').value
+  pageNumber.value = 1
 }
 
 </script>
