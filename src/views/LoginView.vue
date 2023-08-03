@@ -1,11 +1,40 @@
 <script setup>
-function notImplementedAlert(){
-    alert('هنوز پیاده‌سازی نشده!')
+import { ref } from 'vue'
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
+
+async function signIn() {
+  loading.value = true
+  const API_LOGIN = `https://api.naskban.ir/api/users/login`
+  const response = await fetch(API_LOGIN, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: email.value,
+      password: password.value,
+      clientAppName: 'Naskban Vue Client',
+      language: 'fa-IR'
+    })
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  localStorage.setItem('userInfo', JSON.stringify(await response.json()))
+}
+function notImplementedAlert() {
+  alert('هنوز پیاده‌سازی نشده!')
 }
 </script>
 <template>
   <div class="flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-card class="q-pa-md shadow-2 login-card" bordered>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">ورود</div>
       <q-card-section>
         <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
         <q-input
@@ -25,6 +54,7 @@ function notImplementedAlert(){
           label="ورود"
           no-caps
           class="full-width"
+          @click="signIn"
         ></q-btn>
       </q-card-section>
       <q-card-section class="text-center q-pt-none">
