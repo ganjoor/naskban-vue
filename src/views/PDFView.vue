@@ -9,7 +9,6 @@ const loading = ref(false)
 const pdf = ref(null)
 const pdfFile = ref(null)
 const pageNumber = ref(null)
-const pageCount = ref(null)
 
 function en2fa(num) {
   let arr = []
@@ -35,7 +34,6 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
-  pageCount.value = pdfFile.value.pages
 
   if (pageNumber.value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
@@ -63,12 +61,22 @@ function updatePageNumber(value) {
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
 }
+function handleSwipe(swipeInfo) {
+  if (swipeInfo.direction == 'right' && pageNumber.value < pdfFile.value.pages) {
+    pageNumber.value += 1
+    updatePageNumber(pageNumber.value)
+  }
+  if (swipeInfo.direction == 'left' && pageNumber.value > 1) {
+    pageNumber.value -= 1
+    updatePageNumber(pageNumber.value)
+  }
+}
 </script>
 
 <template>
   <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg flex flex-center">
     <q-card-section>
-      <a :href="'/' + pdf.id">{{ pdf.title }}</a> 
+      <a :href="'/' + pdf.id">{{ pdf.title }}</a>
     </q-card-section>
     <q-card-section class="full-width q-pa-lg flex flex-center justify-center centers">
       <q-pagination
@@ -84,16 +92,21 @@ function updatePageNumber(value) {
         @update:model-value="updatePageNumber"
       />
     </q-card-section>
-    
   </q-card>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
-    
+
     <div class="q-pa-lg flex flex-center justify-center centers">
-      <VuePDF v-if="pdfFile != null" :pdf="pdfFile.pdf" :page="pageNumber" @loaded="onLoaded" />
+      <VuePDF
+        v-if="pdfFile != null"
+        :pdf="pdfFile.pdf"
+        :page="pageNumber"
+        @loaded="onLoaded"
+        v-touch-swipe.mouse="handleSwipe"
+      />
     </div>
     <q-card class="full-width q-pa-lg flex flex-center">
-      <a :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank">مشاهده در فایل</a>
+      <a v-if="pdf != null" :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank">مشاهده در فایل</a>
     </q-card>
   </div>
 </template>
