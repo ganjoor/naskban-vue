@@ -47,7 +47,7 @@ watchEffect(async () => {
         <a :href="'/' + pdf.id + '/1'">مشاهده</a>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
-        <a :href="pdf.externalPDFFileUrl" target="_blank">دریافت</a>
+        <a :href="pdf.externalPDFFileUrl" target="_blank">دریافت (اندازه {{ (pdf.pdfFile.fileSizeInBytes / 1024.0 / 1024.0).toFixed(2) }} مگابایت)</a>
       </q-card-section>
     </q-card>
   </div>
