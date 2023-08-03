@@ -4,7 +4,7 @@ import ItemView from '../views/ItemView.vue'
 import PDFView from '../views/PDFView.vue'
 import LoginView from '../views/LoginView.vue'
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   linkActiveClass: 'active',
   routes: [

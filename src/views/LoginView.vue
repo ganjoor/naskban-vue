@@ -1,5 +1,7 @@
 <script setup>
 import { ref } from 'vue'
+import { bus } from './../event-bus'
+import { router } from './../router'
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
@@ -24,7 +26,10 @@ async function signIn() {
     alert(await response.json())
     return
   }
-  localStorage.setItem('userInfo', JSON.stringify(await response.json()))
+  var userInfo = await response.json()
+  localStorage.setItem('userInfo', JSON.stringify(userInfo))
+  bus.emit('user-logged-in', userInfo)
+  router.push({ path: '/' })
 }
 function notImplementedAlert() {
   alert('هنوز پیاده‌سازی نشده!')

@@ -1,12 +1,29 @@
 <script setup>
-import {  RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import { ref } from 'vue'
+import { bus } from './event-bus'
+
+const userInfo = ref(null)
+
+bus.on('user-logged-in', (u) => {
+  userInfo.value = u
+})
+
+bus.on('user-logged-out', () => {
+  userInfo.value = null
+})
 </script>
 
 <template>
   <header>
-    <a href="/"><img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125" /></a>
+    <a href="/"
+      ><img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125"
+    /></a>
     <div class="wrapper">
       <a href="/"><h1 class="green">نسک‌بان</h1></a>
+    </div>
+    <div v-if="userInfo != null">
+      {{ userInfo.user.username }}
     </div>
   </header>
 
@@ -14,15 +31,14 @@ import {  RouterView } from 'vue-router'
 </template>
 
 <style scoped>
-
 header {
   margin: auto;
   text-align: center;
 }
-h1{
+h1 {
   font-size: 3em;
 }
- .wrapper{
+.wrapper {
   margin: auto;
 }
 
@@ -30,5 +46,4 @@ h1{
   display: block;
   margin: auto;
 }
-
 </style>
