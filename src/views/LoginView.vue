@@ -5,7 +5,7 @@ function notImplementedAlert(){
 </script>
 <template>
   <div class="flex flex-center">
-    <q-card class="q-pa-md shadow-2 my_card" bordered>
+    <q-card class="q-pa-md shadow-2 login-card" bordered>
       <q-card-section>
         <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
         <q-input
@@ -19,7 +19,6 @@ function notImplementedAlert(){
       </q-card-section>
       <q-card-section>
         <q-btn
-          style="border-radius: 8px"
           color="green"
           rounded
           size="md"
@@ -37,7 +36,7 @@ function notImplementedAlert(){
   </div>
 </template>
 <style>
-.my_card {
+.login-card {
   width: 25rem;
   border-radius: 8px;
   box-shadow:
