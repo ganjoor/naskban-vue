@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { bus } from './event-bus'
 
 const userInfo = ref(null)
@@ -12,6 +12,17 @@ bus.on('user-logged-in', (u) => {
 bus.on('user-logged-out', () => {
   userInfo.value = null
 })
+
+onMounted(() => {
+  if (localStorage.getItem("userInfo")) {
+      try {
+        userInfo.value = JSON.parse(localStorage.getItem("userInfo"));
+      } catch {
+        userInfo.value = null;
+      }
+    }
+    })
+
 </script>
 
 <template>
