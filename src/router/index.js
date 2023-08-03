@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import ItemView from '../views/ItemView.vue'
 import PDFView from '../views/PDFView.vue'
 import LoginView from '../views/LoginView.vue'
+import GanjoorFrame from '../views/GanjoorFrame.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,11 @@ export const router = createRouter({
       name: 'login',
       component: LoginView
     },
+    {
+      path: '/ganjoor',
+      name: 'ganjoor',
+      component: GanjoorFrame
+    }
   ]
 })
 
