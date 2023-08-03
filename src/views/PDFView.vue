@@ -73,7 +73,7 @@ function handleSwipe(swipeInfo) {
 }
 </script>
 
-<template>
+<template class="full-width">
   <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg flex flex-center">
     <q-card-section>
       <a :href="'/' + pdf.id">{{ pdf.title }}</a>
@@ -93,16 +93,17 @@ function handleSwipe(swipeInfo) {
       />
     </q-card-section>
   </q-card>
-  <div class="q-pa-lg flex flex-center">
+  <div class="q-pa-lg flex flex-center full-width">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
 
-    <div class="q-pa-lg flex flex-center justify-center centers">
+    <div class="q-pa-lg flex flex-center justify-center centers full-width">
       <VuePDF
         v-if="pdfFile != null"
         :pdf="pdfFile.pdf"
         :page="pageNumber"
         @loaded="onLoaded"
         v-touch-swipe.mouse="handleSwipe"
+        fit-parent
       />
     </div>
     <q-card class="full-width q-pa-lg flex flex-center">
