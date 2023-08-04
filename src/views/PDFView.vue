@@ -1,7 +1,8 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
+import { bus } from '../event-bus'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -9,6 +10,25 @@ const loading = ref(false)
 const pdf = ref(null)
 const pdfFile = ref(null)
 const pageNumber = ref(null)
+const userInfo = ref(null)
+const ganjoorLink = ref(false)
+bus.on('user-logged-in', (u) => {
+  userInfo.value = u
+})
+
+bus.on('user-logged-out', () => {
+  userInfo.value = null
+})
+
+onMounted(() => {
+  if (localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+})
 
 function en2fa(num) {
   let arr = []
@@ -107,7 +127,55 @@ function handleSwipe(swipeInfo) {
       />
     </div>
     <q-card class="full-width q-pa-lg flex flex-center">
-      <a v-if="pdf != null" :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank">مشاهده در فایل</a>
+      <a v-if="pdf != null" :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank"
+        >مشاهده در فایل</a
+      >
     </q-card>
+    <q-card class="full-width q-pa-lg flex flex-center">
+      <q-btn label="Maximized" color="primary" @click="ganjoorLink = true" />
+    </q-card>
+
+    <q-dialog
+      v-model="ganjoorLink"
+      persistent
+      maximized
+      transition-show="slide-up"
+      transition-hide="slide-down"
+    >
+      <q-card class="bg-primary text-white">
+        <q-bar>
+          <div class="text-h6">پیشنهاد شعر مرتبط در گنجور</div>
+          <q-space> </q-space>
+
+          <q-btn
+            dense
+            flat
+            icon="minimize"
+            @click="maximizedToggle = false"
+            :disable="!maximizedToggle"
+          >
+            <q-tooltip v-if="maximizedToggle" class="bg-white text-primary">Minimize</q-tooltip>
+          </q-btn>
+          <q-btn dense flat icon="close" v-close-popup>
+            <q-tooltip class="bg-white text-primary">Close</q-tooltip>
+          </q-btn>
+        </q-bar>
+
+        <q-card-section class="row">
+          <div class="col">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate
+            voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam
+            exercitationem aut, natus minima, porro labore.
+          </div>
+          <div class="col">
+            <iframe
+              src="/ganjoor?url=https://ganjoor.net"
+              ref="ganjoorFrame"
+              style="width: 50vw; height: 70vh"
+            ></iframe>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
