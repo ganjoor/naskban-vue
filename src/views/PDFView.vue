@@ -73,6 +73,8 @@ function onLoaded() {
   loading.value = false
 }
 function updatePageNumber(value) {
+  localStorage.setItem("id", pdf.value.id);
+  localStorage.setItem("page", value);
   if (value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
@@ -90,6 +92,53 @@ function handleSwipe(swipeInfo) {
     pageNumber.value -= 1
     updatePageNumber(pageNumber.value)
   }
+}
+function replaceAll(str, find, replace) {
+  return str.replace(new RegExp(find, 'g'), replace)
+}
+async function saveGanjoorLinkSuggestion() {
+  var ganjoorUrl = replaceAll(
+    replaceAll(
+      document
+        .getElementById('ganjoorFrame')
+        .contentWindow.location.href.substring(
+          document.getElementById('ganjoorFrame').contentWindow.location.href.indexOf('=') + 1
+        ),
+      '%3A',
+      ':'
+    ),
+    '%2F',
+    '/'
+  )
+
+  var ganjoorPostId = parseInt(localStorage.getItem('ganjoorPostId'))
+  var ganjoorTitle = localStorage.getItem('ganjoorPostTitle')
+  var sugArtifactFriendlyUrl = localStorage.getItem('id')
+  var sugItemId = localStorage.getItem('page')
+
+  alert(ganjoorUrl.toString())
+  alert(ganjoorPostId.toString())
+  alert(ganjoorTitle)
+  alert(sugArtifactFriendlyUrl)
+  alert(sugItemId)
+
+  /*
+      await fetch(
+        this.appConfig.$api_url + "/api/artifacts/ganjoor",  
+      {
+        method: "POST",
+        data: {
+          ganjoorPostId,
+          ganjoorUrl,
+          ganjoorTitle,
+          artifactFriendlyUrl: sugArtifactFriendlyUrl,
+          itemId: sugItemId,
+        },
+        headers: {
+          authorization: "bearer " + this.userInfo.token,
+          "content-type": "application/json",
+        },
+      });*/
 }
 </script>
 
@@ -132,7 +181,7 @@ function handleSwipe(swipeInfo) {
       >
     </q-card>
     <q-card class="full-width q-pa-lg flex flex-center">
-      <q-btn label="Maximized" color="primary" @click="ganjoorLink = true" />
+      <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />
     </q-card>
 
     <q-dialog
@@ -142,10 +191,12 @@ function handleSwipe(swipeInfo) {
       transition-show="slide-up"
       transition-hide="slide-down"
     >
-      <q-card class="bg-primary text-white">
+      <q-card>
         <q-bar>
           <div class="text-h6">پیشنهاد شعر مرتبط در گنجور</div>
           <q-space> </q-space>
+
+          <q-btn label="پیشنهاد" color="green" @click="saveGanjoorLinkSuggestion" />
 
           <q-btn
             dense
@@ -163,14 +214,15 @@ function handleSwipe(swipeInfo) {
 
         <q-card-section class="row">
           <div class="col">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum repellendus sit voluptate
-            voluptas eveniet porro. Rerum blanditiis perferendis totam, ea at omnis vel numquam
-            exercitationem aut, natus minima, porro labore.
+            <iframe
+              :src="`/${route.params.id}/${pageNumber}`"
+              style="width: 50vw; height: 70vh"
+            ></iframe>
           </div>
           <div class="col">
             <iframe
               src="/ganjoor?url=https://ganjoor.net"
-              ref="ganjoorFrame"
+              id="ganjoorFrame"
               style="width: 50vw; height: 70vh"
             ></iframe>
           </div>
