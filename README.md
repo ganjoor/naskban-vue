@@ -1,6 +1,6 @@
 # naskban
 
-This is the source code from the web site [https://naskban.ir/](https://naskban.ir)
+This is the source code for the web site [https://naskban.ir/](https://naskban.ir)
 
 Vue 3 + quasar
 
