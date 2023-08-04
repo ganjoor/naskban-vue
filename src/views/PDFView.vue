@@ -12,6 +12,7 @@ const pdfFile = ref(null)
 const pageNumber = ref(null)
 const userInfo = ref(null)
 const ganjoorLink = ref(false)
+const suggestionResult = ref('')
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
 })
@@ -111,8 +112,6 @@ async function saveGanjoorLinkSuggestion() {
     '/'
   )
 
-  
-
   var ganjoorPostId = parseInt(localStorage.getItem('ganjoorPostId'))
   var ganjoorTitle = localStorage.getItem('ganjoorPostTitle')
   ganjoorTitle = replaceAll(ganjoorTitle, '\r\n', '')
@@ -136,9 +135,12 @@ async function saveGanjoorLinkSuggestion() {
   })
   loading.value = false
   if (!response.ok) {
-    alert(await response.json())
+    suggestionResult.value = await response.json()
     return
   }
+  suggestionResult.value = `${pdf.value.title} » صفحهٔ ${en2fa(
+    pdfPageNumber.toString()
+  )} => ${ganjoorTitle}`
 }
 </script>
 
@@ -211,6 +213,10 @@ async function saveGanjoorLinkSuggestion() {
             <q-tooltip class="bg-white text-primary">Close</q-tooltip>
           </q-btn>
         </q-bar>
+
+        <q-card-section v-if="suggestionResult != ''" class="row">
+          {{ suggestionResult }}
+        </q-card-section>
 
         <q-card-section class="row">
           <div class="col">
