@@ -73,8 +73,8 @@ function onLoaded() {
   loading.value = false
 }
 function updatePageNumber(value) {
-  localStorage.setItem("id", pdf.value.id);
-  localStorage.setItem("page", value);
+  localStorage.setItem('id', pdf.value.id)
+  localStorage.setItem('page', value)
   if (value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
@@ -111,34 +111,34 @@ async function saveGanjoorLinkSuggestion() {
     '/'
   )
 
+  
+
   var ganjoorPostId = parseInt(localStorage.getItem('ganjoorPostId'))
   var ganjoorTitle = localStorage.getItem('ganjoorPostTitle')
-  var sugArtifactFriendlyUrl = localStorage.getItem('id')
-  var sugItemId = localStorage.getItem('page')
-
-  alert(ganjoorUrl.toString())
-  alert(ganjoorPostId.toString())
-  alert(ganjoorTitle)
-  alert(sugArtifactFriendlyUrl)
-  alert(sugItemId)
-
-  /*
-      await fetch(
-        this.appConfig.$api_url + "/api/artifacts/ganjoor",  
-      {
-        method: "POST",
-        data: {
-          ganjoorPostId,
-          ganjoorUrl,
-          ganjoorTitle,
-          artifactFriendlyUrl: sugArtifactFriendlyUrl,
-          itemId: sugItemId,
-        },
-        headers: {
-          authorization: "bearer " + this.userInfo.token,
-          "content-type": "application/json",
-        },
-      });*/
+  ganjoorTitle = replaceAll(ganjoorTitle, '\r\n', '')
+  var pdfId = parseInt(localStorage.getItem('id'))
+  var pdfPageNumber = parseInt(localStorage.getItem('page'))
+  loading.value = true
+  const response = await fetch('https://api.naskban.ir/api/pdf/ganjoor', {
+    method: 'POST',
+    body: JSON.stringify({
+      ganjoorPostId,
+      ganjoorUrl,
+      ganjoorTitle,
+      pdfBookId: pdfId,
+      pageNumber: pdfPageNumber,
+      isTextOriginalSource: true
+    }),
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
 }
 </script>
 
