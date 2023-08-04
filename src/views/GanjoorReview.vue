@@ -29,16 +29,38 @@ watchEffect(async () => {
   }
   ganjoorLink.value = await response.json();
 })
+
+async function reviewLink(result){
+    if(userInfo.value == null) return;
+  let apiRes = result == true ? 1 : 2;
+  const url = `https://api.naskban.ir/api/pdf/ganjoor/review/${ganjoorLink.value.id}/${apiRes}`
+
+  loading.value = true
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  });
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  window.location.reload()
+}
+
 </script>
 <template class="full-width">
-    <div>hello</div>
+    <div v-if="ganjoorLink == null">موردی پیشنهاد نشده</div>
     <q-card v-if="ganjoorLink != null">
         <q-bar>
           <div class="text-h6">بازبینی پیشنهادها</div>
           <q-space> </q-space>
 
-          <q-btn label="تأیید" color="green" @click="saveGanjoorLinkSuggestion" />
-          <q-btn label="رد" color="red" @click="saveGanjoorLinkSuggestion" />
+          <q-btn label="تأیید" color="green" @click="reviewLink(true)" />
+          <q-btn label="رد" color="red" @click="reviewLink(false)" />
         </q-bar>
 
         <q-card-section class="row">
