@@ -184,7 +184,7 @@ async function saveGanjoorLinkSuggestion() {
     </q-card>
     <q-card v-if="pdf!=null && pdf.pages[pageNumber-1].pageText != null && pdf.pages[pageNumber-1].pageText  != ''" class="full-width q-pa-lg flex flex-center">
       <q-card-section>
-        متن بازخوانی خودکار
+        متن بازشناسی شده
       </q-card-section>
       <q-card-section>
         <div v-html="pdf.pages[pageNumber-1].pageText.replace('\n', '<br />')" ></div>
