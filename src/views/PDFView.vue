@@ -182,6 +182,14 @@ async function saveGanjoorLinkSuggestion() {
         >مشاهده در فایل</a
       >
     </q-card>
+    <q-card v-if="pdf!=null && pdf.pages[pageNumber-1].pageText != null && pdf.pages[pageNumber-1].pageText  != ''" class="full-width q-pa-lg flex flex-center">
+      <q-card-section>
+        متن بازخوانی خودکار
+      </q-card-section>
+      <q-card-section>
+        <div v-html="pdf.pages[pageNumber-1].pageText.replace('\n', '<br />')" ></div>
+      </q-card-section>
+    </q-card>
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
       <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />
     </q-card>
