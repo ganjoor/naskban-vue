@@ -21,7 +21,6 @@ function en2fa(num) {
 }
 
 watchEffect(async () => {
-  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
@@ -33,50 +32,45 @@ watchEffect(async () => {
   if (route.query.s != null) {
     searchTerm.value = route.query.s
   }
+  let pageUrl = '/text'
+  let docTitle = 'نسک‌بان - جستجو در متن'
   if (searchTerm.value != '') {
-    url = `${API_URL}/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`
-  }
+    let url = `${API_URL}/search/pages/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`
+    loading.value = true
+    const res = await fetch(url)
+    pdfs.value = await res.json()
+    for (var pair of res.headers.entries()) {
+      if (pair[0] == 'paging-headers') {
+        const paging_headers = JSON.parse(pair[1])
+        pageCount.value = paging_headers.totalPages
+      }
+    }
+    loading.value = false
 
-  loading.value = true
-  const res = await fetch(url)
-  pdfs.value = await res.json()
-  for (var pair of res.headers.entries()) {
-    if (pair[0] == 'paging-headers') {
-      const paging_headers = JSON.parse(pair[1])
-      pageCount.value = paging_headers.totalPages
+    if (searchTerm.value != '') {
+      pageUrl = '/text?s=' + encodeURI(searchTerm.value)
+      docTitle += ' - جستجوی ' + searchTerm.value
     }
-  }
-  loading.value = false
-  let pageUrl = ''
-  let docTitle = 'نسک‌بان'
-  if (searchTerm.value != '') {
-    pageUrl = '/?s=' + encodeURI(searchTerm.value)
-    docTitle += ' - جستجوی ' + searchTerm.value
-  }
-  if (pageNumber.value > 1) {
-    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
-  }
-  if (pageNumber.value != 1) {
-    if (pageUrl != '') {
-      pageUrl += '&'
-    } else {
-      pageUrl = '/?'
+    if (pageNumber.value > 1) {
+      docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
     }
-    pageUrl += 'page=' + pageNumber.value.toString()
+    if (pageNumber.value != 1) {
+      if (pageUrl != '') {
+        pageUrl += '&'
+      } else {
+        pageUrl = '/text?'
+      }
+      pageUrl += 'page=' + pageNumber.value.toString()
+    }
   }
   window.history.pushState({}, '', pageUrl)
   document.title = docTitle
 })
 
-function doSearch(){
+function doSearch() {
   searchTerm.value = document.getElementById('s').value
   pageNumber.value = 1
 }
-
-function fullTextSearch(){
-  window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
-}
-
 </script>
 
 <template>
@@ -93,7 +87,6 @@ function fullTextSearch(){
       @keydown.enter.prevent="doSearch"
     />
     <q-icon name="search" class="cursor-pointer" @click="doSearch"></q-icon>
-    <q-icon name="manage_search" class="cursor-pointer" @click="fullTextSearch"></q-icon>
   </div>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
@@ -155,7 +148,4 @@ h3 {
   text-align: center;
   max-width: 200px;
 }
-
-
-
 </style>

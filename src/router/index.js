@@ -5,6 +5,7 @@ import PDFView from '../views/PDFView.vue'
 import LoginView from '../views/LoginView.vue'
 import GanjoorFrame from '../views/GanjoorFrame.vue'
 import GanjoorReview from '../views/GanjoorReview.vue'
+import SearchText from '../views/SearchText.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -44,6 +45,11 @@ export const router = createRouter({
       path: '/review',
       name: 'review',
       component: GanjoorReview
+    },
+    {
+      path: '/text',
+      name: 'text',
+      component: SearchText
     }
   ]
 })
