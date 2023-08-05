@@ -107,7 +107,7 @@ function doSearch() {
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="'/' + pdf.id">
+      <a :href="'/' + pdf.id+ '?s=' + encodeURI(searchTerm)">
         <q-card class="fit">
           <q-img
             :src="pdf.extenalCoverImageUrl"
@@ -117,7 +117,7 @@ function doSearch() {
           >
           </q-img>
           <q-card-section class="text-h6">
-            <a :href="'/' + pdf.id">{{ pdf.title }} </a>
+            <a :href="'/' + pdf.id + '?s=' + encodeURI(searchTerm)">{{ pdf.title }} </a>
           </q-card-section>
           <q-card-section
             class="text-subtitle2"
