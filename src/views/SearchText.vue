@@ -92,7 +92,7 @@ function doSearch() {
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
       v-model="pageNumber"
-      v-if="!loading"
+      v-if="!loading && pageCount != null && pageCount > 0"
       :max="pageCount"
       :max-pages="7"
       direction-links
@@ -103,6 +103,9 @@ function doSearch() {
       icon-next="fast_rewind"
       icon-prev="fast_forward"
     />
+    <q-card v-if="!loading && pageCount == 0">
+      نتیجه‌ای یافت نشد.
+    </q-card>
   </div>
 
   <div class="row justify-center">

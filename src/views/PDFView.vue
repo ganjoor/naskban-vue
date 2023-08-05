@@ -182,7 +182,7 @@ async function saveGanjoorLinkSuggestion() {
         >مشاهده در فایل</a
       >
     </q-card>
-    <q-card v-if="pdf!=null && pdf.pages[pageNumber-1].pageText != null && pdf.pages[pageNumber-1].pageText  != ''" class="full-width q-pa-lg flex flex-center">
+    <q-card v-if="pdf!=null && pageNumber != null && pageNumber <= pdf.pages.length && pdf.pages[pageNumber-1].pageText != null && pdf.pages[pageNumber-1].pageText  != ''" class="full-width q-pa-lg flex flex-center">
       <q-card-section>
         متن بازشناسی شده
       </q-card-section>
