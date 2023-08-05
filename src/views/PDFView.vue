@@ -182,7 +182,7 @@ async function saveGanjoorLinkSuggestion() {
         >مشاهده در فایل</a
       >
     </q-card>
-    <q-card class="full-width q-pa-lg flex flex-center">
+    <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
       <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />
     </q-card>
 
