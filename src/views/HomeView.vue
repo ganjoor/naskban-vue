@@ -22,7 +22,6 @@ function en2fa(num) {
 }
 
 watchEffect(async () => {
-  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
@@ -30,6 +29,7 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
+  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
 
   if (route.query.s != null) {
     searchTerm.value = route.query.s
