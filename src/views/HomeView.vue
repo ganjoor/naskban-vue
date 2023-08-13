@@ -139,7 +139,6 @@ function fullTextSearch(){
   </div>
 
   <div class="q-pa-lg flex flex-center">
-    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
       v-model="pageNumber"
       v-if="!loading"

@@ -118,6 +118,18 @@ async function performSearch() {
       <q-card-section v-if="pdf.originalFileUrl != null" class="q-pa-lg flex flex-center">
         <a :href="pdf.originalFileUrl" target="_blank">دریافت فایل از منبع</a>
       </q-card-section>
+      <q-card-section v-if="pdf.tags.length > 0" class="q-pa-lg flex flex-center">
+        <table>
+          <tr>
+            <th>برچسب</th>
+            <th>مقدار</th>
+          </tr>
+          <tr v-for="tag in pdf.tags" :key="tag.id">
+            <td>{{ tag.rTag.name }}</td>
+            <td>{{ tag.value }}</td>
+          </tr>
+        </table>
+      </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <a :href="'/' + pdf.id + '/1'">مشاهده</a>
       </q-card-section>
