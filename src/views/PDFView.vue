@@ -13,6 +13,7 @@ const pageNumber = ref(null)
 const userInfo = ref(null)
 const ganjoorLink = ref(false)
 const suggestionResult = ref('')
+const ocrText = ref(null)
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
 })
@@ -68,12 +69,13 @@ watchEffect(async () => {
       '/' + pdf.value.id.toString() + '/' + pageNumber.value.toString()
     )
   }
+  await loadOCRText(pageNumber.value);
 })
 
 function onLoaded() {
   loading.value = false
 }
-function updatePageNumber(value) {
+async function updatePageNumber(value) {
   localStorage.setItem('id', pdf.value.id)
   localStorage.setItem('page', value)
   if (value == 1) {
@@ -83,15 +85,28 @@ function updatePageNumber(value) {
     document.title = 'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
+  await loadOCRText(value);
 }
-function handleSwipe(swipeInfo) {
+async function loadOCRText(pageNumber){
+  if(pdf.value.ocRed){
+    const url = `${API_URL}/${route.params.id}/page/${pageNumber}`
+    let pageInfo = await (await fetch(url)).json();
+    if(pageInfo == null || pageInfo.pageText == null){
+      ocrText.value = null;
+    }else{
+      ocrText.value = pageInfo.pageText.replace('\n', '<br />');
+    }
+    
+  }
+}
+async function handleSwipe(swipeInfo) {
   if (swipeInfo.direction == 'right' && pageNumber.value < pdfFile.value.pages) {
     pageNumber.value += 1
-    updatePageNumber(pageNumber.value)
+    await updatePageNumber(pageNumber.value)
   }
   if (swipeInfo.direction == 'left' && pageNumber.value > 1) {
     pageNumber.value -= 1
-    updatePageNumber(pageNumber.value)
+    await updatePageNumber(pageNumber.value)
   }
 }
 function replaceAll(str, find, replace) {
@@ -182,12 +197,12 @@ async function saveGanjoorLinkSuggestion() {
         >مشاهده در فایل</a
       >
     </q-card>
-    <q-card v-if="pdf!=null && pageNumber != null && pageNumber <= pdf.pages.length && pdf.pages[pageNumber-1].pageText != null && pdf.pages[pageNumber-1].pageText  != ''" class="full-width q-pa-lg flex flex-center">
+    <q-card v-if="ocrText != null" class="full-width q-pa-lg flex flex-center">
       <q-card-section>
         متن بازشناسی شده
       </q-card-section>
       <q-card-section>
-        <div v-html="pdf.pages[pageNumber-1].pageText.replace('\n', '<br />')" ></div>
+        <div v-html="ocrText" ></div>
       </q-card-section>
     </q-card>
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
