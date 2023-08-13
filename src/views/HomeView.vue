@@ -10,6 +10,7 @@ const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
 const searchTerm = ref('')
+const pageSize = 20
 
 function en2fa(num) {
   let arr = []
@@ -21,7 +22,7 @@ function en2fa(num) {
 }
 
 watchEffect(async () => {
-  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=20`
+  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
@@ -34,7 +35,7 @@ watchEffect(async () => {
     searchTerm.value = route.query.s
   }
   if (searchTerm.value != '') {
-    url = `${API_URL}/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`
+    url = `${API_URL}/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=${pageSize}`
   }
 
   loading.value = true
@@ -119,7 +120,7 @@ function fullTextSearch(){
           <q-img
             :src="pdf.extenalCoverImageUrl"
             spinner-color="white"
-            style="width: 200px"
+            style="max-width: 200px; max-height: 300px;"
             class="rounded-borders"
           >
           </q-img>
@@ -135,6 +136,23 @@ function fullTextSearch(){
         </q-card>
       </a>
     </div>
+  </div>
+
+  <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    <q-pagination
+      v-model="pageNumber"
+      v-if="!loading"
+      :max="pageCount"
+      :max-pages="7"
+      direction-links
+      boundary-links
+      color="green"
+      icon-last="skip_previous"
+      icon-first="skip_next"
+      icon-next="fast_rewind"
+      icon-prev="fast_forward"
+    />
   </div>
 </template>
 
