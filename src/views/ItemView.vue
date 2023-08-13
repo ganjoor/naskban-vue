@@ -73,8 +73,50 @@ async function performSearch() {
       <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
         {{ pdf.subTitle }}
       </q-card-section>
-      <q-card-section class="q-pa-lg flex flex-center">
+      <q-card-section v-if="pdf.titleInOriginalLanguage != null" class="q-pa-lg flex flex-center">
+        {{ pdf.titleInOriginalLanguage }}
+      </q-card-section>
+      <q-card-section v-if="pdf.authorsLine != null" class="q-pa-lg flex flex-center">
         {{ pdf.authorsLine }}
+      </q-card-section>
+      <q-card-section v-if="pdf.translatorsLine != null" class="q-pa-lg flex flex-center">
+        ترجمه: {{ pdf.translatorsLine }}
+      </q-card-section>
+      <q-card-section v-if="pdf.publisherLine != null" class="q-pa-lg flex flex-center">
+        ناشر: {{ pdf.publisherLine }}
+      </q-card-section>
+      <q-card-section v-if="pdf.publishingDate != null" class="q-pa-lg flex flex-center">
+        تاریخ چاپ: {{ pdf.publishingDate }}
+      </q-card-section>
+      <q-card-section v-if="pdf.publishingLocation != null" class="q-pa-lg flex flex-center">
+        محل چاپ: {{ pdf.publishingLocation }}
+      </q-card-section>
+      <q-card-section v-if="pdf.publishingNumber != null" class="q-pa-lg flex flex-center">
+        نوبت چاپ: {{ pdf.publishingNumber }}
+      </q-card-section>
+      <q-card-section v-if="pdf.claimedPageCount != null" class="q-pa-lg flex flex-center">
+        تعداد صفحات (کاغذی): {{ pdf.claimedPageCount }}
+      </q-card-section>
+      <q-card-section v-if="pdf.description != null" class="q-pa-lg flex flex-center">
+        {{ pdf.description }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center">
+        تعداد صفحات (تصویربرداری شده): {{ pdf.pageCount }}
+      </q-card-section>
+      <q-card-section v-if="pdf.isbn != null" class="q-pa-lg flex flex-center">
+        شابک: {{ pdf.isbn }}
+      </q-card-section>
+      <q-card-section v-if="pdf.multiVolumePDFCollectionId != null" class="q-pa-lg flex flex-center">
+        شماره جلد: {{ pdf.volumeOrder }}
+      </q-card-section>
+      <q-card-section v-if="pdf.pdfSource != null" class="q-pa-lg flex flex-center">
+        منبع:&nbsp;<a :href="pdf.pdfSource.url">{{ pdf.pdfSource.description }}</a>
+      </q-card-section>
+      <q-card-section v-if="pdf.originalSourceUrl != null" class="q-pa-lg flex flex-center">
+        <a :href="pdf.originalSourceUrl" target="_blank">صفحه در وبگاه منبع</a>
+      </q-card-section>
+      <q-card-section v-if="pdf.originalFileUrl != null" class="q-pa-lg flex flex-center">
+        <a :href="pdf.originalFileUrl" target="_blank">دریافت فایل از منبع</a>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <a :href="'/' + pdf.id + '/1'">مشاهده</a>
