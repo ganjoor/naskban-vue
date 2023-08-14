@@ -150,7 +150,7 @@ async function performSearch() {
           class="q-ml-md"
           id="s"
           name="s"
-          type="text"
+          type="search"
           placeholder="جستجو در متن"
           @keydown.enter.prevent="initSearch"
         />

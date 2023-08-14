@@ -69,6 +69,7 @@ watchEffect(async () => {
 
 function doSearch() {
   searchTerm.value = document.getElementById('s').value
+  route.query.s = searchTerm.value
   pageNumber.value = 1
 }
 </script>
@@ -82,7 +83,7 @@ function doSearch() {
       class="q-ml-md"
       id="s"
       name="s"
-      type="text"
+      type="search"
       placeholder="جستجو"
       @keydown.enter.prevent="doSearch"
     />

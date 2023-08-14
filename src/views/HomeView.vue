@@ -88,7 +88,7 @@ function fullTextSearch() {
       class="q-ml-md"
       id="s"
       name="s"
-      type="text"
+      type="search"
       placeholder="جستجو"
       @keydown.enter.prevent="doSearch"
     />
