@@ -38,6 +38,7 @@ watchEffect(async () => {
 
 async function initSearch() {
   searchTerm.value = document.getElementById('s').value
+  route.query.s = searchTerm.value
   pageNumber.value = 1
   await performSearch()
 }
