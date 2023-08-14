@@ -93,7 +93,7 @@ async function performSearch() {
  
   let httpPages = await res.json()
   for(var i = 0; i<httpPages.length; i++){
-    searchTerm.value.split(' ').forEach((key) => {
+    searchTerm.value.replace('"', '').replace('"', '').split(' ').forEach((key) => {
       httpPages[i].pageText = highlight(httpPages[i].pageText, key)
     })
     
