@@ -11,7 +11,7 @@ const pdf = ref(null)
 
 const searchTerm = ref('')
 const pageNumber = ref(null)
-const pageCount = ref(1)
+const pageCount = ref(0)
 const pages = ref(null)
 
 function en2fa(num) {
@@ -21,6 +21,28 @@ function en2fa(num) {
     arr[index] = persian[number]
   })
   return arr.join('')
+}
+
+async function setUrlAndTitle(){
+  let pageUrl = '/' + route.params.id.toString();
+  let docTitle = 'نسک‌بان - ' + pdf.value.title
+  if (searchTerm.value != '') {
+    pageUrl = '/'+route.params.id.toString()+'?s=' + encodeURI(searchTerm.value)
+    docTitle += ' - جستجوی ' + searchTerm.value
+  }
+  if (pageNumber.value > 1) {
+    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+  }
+  if (pageNumber.value != 1) {
+    if (pageUrl != '') {
+      pageUrl += '&'
+    } else {
+      pageUrl = '/'+ route.params.id.toString()+'?'
+    }
+    pageUrl += 'page=' + pageNumber.value.toString()
+  }
+  window.history.pushState({}, '', pageUrl)
+  document.title = docTitle
 }
 
 watchEffect(async () => {
@@ -42,26 +64,11 @@ watchEffect(async () => {
   if (searchTerm.value != '') {
     await performSearch()
   }
+  else{
+    await setUrlAndTitle();
+  }
 
-  let pageUrl = '/' + route.params.id.toString();
-  let docTitle = 'نسک‌بان - ' + pdf.value.title
-  if (searchTerm.value != '') {
-    pageUrl = '/'+route.params.id.toString()+'?s=' + encodeURI(searchTerm.value)
-    docTitle += ' - جستجوی ' + searchTerm.value
-  }
-  if (pageNumber.value > 1) {
-    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
-  }
-  if (pageNumber.value != 1) {
-    if (pageUrl != '') {
-      pageUrl += '&'
-    } else {
-      pageUrl = '/'+ route.params.id.toString()+'?'
-    }
-    pageUrl += 'page=' + pageNumber.value.toString()
-  }
-  window.history.pushState({}, '', pageUrl)
-  document.title = docTitle
+  
 })
 
 async function initSearch() {
@@ -83,12 +90,16 @@ async function performSearch() {
     }
   }
   pages.value = await res.json()
+  await setUrlAndTitle();
 }
 </script>
 
 <template>
   <div class="q-pa-lg flex flex-center justify-center centers">
-    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    <div class="q-pa-lg flex flex-center">
+      <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    </div>
+    
     <q-card v-if="pdf != null">
       <q-card-section class="q-pa-lg flex flex-center justify-center centers">
         <a :href="'/' + pdf.id + '/1'">
@@ -244,7 +255,7 @@ async function performSearch() {
         />
         <q-pagination
           v-model="pageNumber"
-          v-if="!loading"
+          v-if="!loading && pageCount > 0"
           :max="pageCount"
           :max-pages="7"
           direction-links
