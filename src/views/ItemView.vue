@@ -89,9 +89,27 @@ async function performSearch() {
       pageCount.value = paging_headers.totalPages
     }
   }
-  pages.value = await res.json()
+  
+ 
+  let httpPages = await res.json()
+  for(var i = 0; i<httpPages.length; i++){
+    searchTerm.value.split(' ').forEach((key) => {
+      httpPages[i].pageText = highlight(httpPages[i].pageText, key)
+    })
+    
+  }
+  pages.value = httpPages
   await setUrlAndTitle();
 }
+
+function highlight(text, keyword) {
+  var index = text.indexOf(keyword);
+  if (index >= 0) { 
+   text = text.substring(0,index) + "<span class='highlight'>" + text.substring(index,index+keyword.length) + "</span>" + text.substring(index + keyword.length);
+  }
+  return text;
+}
+
 </script>
 
 <template>
@@ -278,5 +296,8 @@ async function performSearch() {
 <style>
 .width-300px {
   width: 300px;
+}
+.highlight {
+  background-color: yellow;
 }
 </style>
