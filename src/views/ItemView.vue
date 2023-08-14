@@ -95,11 +95,10 @@ async function performSearch() {
 </script>
 
 <template>
-  <div class="q-pa-lg flex flex-center justify-center centers">
-    <div class="q-pa-lg flex flex-center">
+   <div class="q-pa-lg flex flex-center">
       <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     </div>
-    
+  <div class="q-pa-lg flex flex-center justify-center centers">
     <q-card v-if="pdf != null">
       <q-card-section class="q-pa-lg flex flex-center justify-center centers">
         <a :href="'/' + pdf.id + '/1'">
@@ -198,9 +197,14 @@ async function performSearch() {
           @keydown.enter.prevent="initSearch"
         />
         <q-icon name="search" class="cursor-pointer" @click="initSearch"></q-icon>
+        <q-spinner-hourglass
+          v-if="loading"
+          color="green"
+          size="4em"
+        />
       </q-card-section>
       <q-card-section
-        v-if="searchTerm != null && pageCount == 0"
+        v-if="!loading && searchTerm != '' && pageCount == 0"
         class="q-pa-lg flex flex-center justify-center centers"
       >
         نتیجه‌ای یافت نشد.
@@ -249,7 +253,7 @@ async function performSearch() {
 
       <div class="q-pa-lg flex flex-center">
         <q-spinner-hourglass
-          v-if="loading && pages != null && pages.length > 0"
+          v-if="loading"
           color="green"
           size="4em"
         />
