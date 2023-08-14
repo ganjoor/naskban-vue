@@ -14,6 +14,15 @@ const pageNumber = ref(null)
 const pageCount = ref(1)
 const pages = ref(null)
 
+function en2fa(num) {
+  let arr = []
+  const persian = { 0: '۰', 1: '۱', 2: '۲', 3: '۳', 4: '۴', 5: '۵', 6: '۶', 7: '۷', 8: '۸', 9: '۹' }
+  num.split('').map((number, index) => {
+    arr[index] = persian[number]
+  })
+  return arr.join('')
+}
+
 watchEffect(async () => {
   if (route.query.s != null) {
     searchTerm.value = route.query.s
@@ -29,11 +38,31 @@ watchEffect(async () => {
   loading.value = true
   pdf.value = await (await fetch(url)).json()
   loading.value = false
-  document.title = 'نسک‌بان - ' + pdf.value.title
+
 
   if (searchTerm.value != '') {
     await performSearch()
   }
+
+  let pageUrl = ''
+  let docTitle =  'نسک‌بان - ' + pdf.value.title
+  if (searchTerm.value != '') {
+    pageUrl = '/?s=' + encodeURI(searchTerm.value)
+    docTitle += ' - جستجوی ' + searchTerm.value
+  }
+  if (pageNumber.value > 1) {
+    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+  }
+  if (pageNumber.value != 1) {
+    if (pageUrl != '') {
+      pageUrl += '&'
+    } else {
+      pageUrl = '/?'
+    }
+    pageUrl += 'page=' + pageNumber.value.toString()
+  }
+  window.history.pushState({}, '', pageUrl)
+  document.title = docTitle
 })
 
 async function initSearch() {
