@@ -39,15 +39,14 @@ watchEffect(async () => {
   pdf.value = await (await fetch(url)).json()
   loading.value = false
 
-
   if (searchTerm.value != '') {
     await performSearch()
   }
 
-  let pageUrl = ''
-  let docTitle =  'نسک‌بان - ' + pdf.value.title
+  let pageUrl = '/' + route.params.id.toString();
+  let docTitle = 'نسک‌بان - ' + pdf.value.title
   if (searchTerm.value != '') {
-    pageUrl = '/?s=' + encodeURI(searchTerm.value)
+    pageUrl = '/'+route.params.id.toString()+'?s=' + encodeURI(searchTerm.value)
     docTitle += ' - جستجوی ' + searchTerm.value
   }
   if (pageNumber.value > 1) {
@@ -57,7 +56,7 @@ watchEffect(async () => {
     if (pageUrl != '') {
       pageUrl += '&'
     } else {
-      pageUrl = '/?'
+      pageUrl = '/'+ route.params.id.toString()+'?'
     }
     pageUrl += 'page=' + pageNumber.value.toString()
   }
@@ -136,7 +135,10 @@ async function performSearch() {
       <q-card-section v-if="pdf.isbn != null" class="q-pa-lg flex flex-center">
         شابک: {{ pdf.isbn }}
       </q-card-section>
-      <q-card-section v-if="pdf.multiVolumePDFCollectionId != null" class="q-pa-lg flex flex-center">
+      <q-card-section
+        v-if="pdf.multiVolumePDFCollectionId != null"
+        class="q-pa-lg flex flex-center"
+      >
         شماره جلد: {{ pdf.volumeOrder }}
       </q-card-section>
       <q-card-section v-if="pdf.pdfSource != null" class="q-pa-lg flex flex-center">
@@ -186,10 +188,16 @@ async function performSearch() {
         />
         <q-icon name="search" class="cursor-pointer" @click="initSearch"></q-icon>
       </q-card-section>
-      <q-card-section v-if="searchTerm != null && pageCount == 0" class="q-pa-lg flex flex-center justify-center centers">
-       نتیجه‌ای یافت نشد.
+      <q-card-section
+        v-if="searchTerm != null && pageCount == 0"
+        class="q-pa-lg flex flex-center justify-center centers"
+      >
+        نتیجه‌ای یافت نشد.
       </q-card-section>
-      <q-card-section v-if="pages != null && pageCount > 0" class="q-pa-lg flex flex-center justify-center centers">
+      <q-card-section
+        v-if="pages != null && pageCount > 0"
+        class="q-pa-lg flex flex-center justify-center centers"
+      >
         <q-pagination
           v-model="pageNumber"
           v-if="!loading"
@@ -227,6 +235,27 @@ async function performSearch() {
           </div>
         </div>
       </q-card-section>
+
+      <div class="q-pa-lg flex flex-center">
+        <q-spinner-hourglass
+          v-if="loading && pages != null && pages.length > 0"
+          color="green"
+          size="4em"
+        />
+        <q-pagination
+          v-model="pageNumber"
+          v-if="!loading"
+          :max="pageCount"
+          :max-pages="7"
+          direction-links
+          boundary-links
+          color="green"
+          icon-last="skip_previous"
+          icon-first="skip_next"
+          icon-next="fast_rewind"
+          icon-prev="fast_forward"
+        />
+      </div>
     </q-card>
   </div>
 </template>
