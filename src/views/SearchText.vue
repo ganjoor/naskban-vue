@@ -132,6 +132,23 @@ function doSearch() {
       </a>
     </div>
   </div>
+
+  <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass v-if="loading && pdfs != null && pdfs.length > 0" color="green" size="4em" />
+    <q-pagination
+      v-model="pageNumber"
+      v-if="!loading && pageCount != null && pageCount > 0"
+      :max="pageCount"
+      :max-pages="7"
+      direction-links
+      boundary-links
+      color="green"
+      icon-last="skip_previous"
+      icon-first="skip_next"
+      icon-next="fast_rewind"
+      icon-prev="fast_forward"
+    />
+  </div>
 </template>
 
 <style>
