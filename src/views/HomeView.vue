@@ -69,15 +69,14 @@ watchEffect(async () => {
   document.title = docTitle
 })
 
-function doSearch(){
+function doSearch() {
   searchTerm.value = document.getElementById('s').value
   pageNumber.value = 1
 }
 
-function fullTextSearch(){
+function fullTextSearch() {
   window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
 }
-
 </script>
 
 <template>
@@ -120,7 +119,7 @@ function fullTextSearch(){
           <q-img
             :src="pdf.extenalCoverImageUrl"
             spinner-color="white"
-            style="max-width: 200px; max-height: 300px;"
+            style="max-width: 200px; max-height: 300px"
             class="rounded-borders"
           >
           </q-img>
@@ -139,6 +138,11 @@ function fullTextSearch(){
   </div>
 
   <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass
+      v-if="loading && pdfs != null && pdfs.length > 0"
+      color="green"
+      size="4em"
+    />
     <q-pagination
       v-model="pageNumber"
       v-if="!loading"
@@ -172,7 +176,4 @@ h3 {
   text-align: center;
   max-width: 200px;
 }
-
-
-
 </style>
