@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { ref, watchEffect } from 'vue'
+import { en2fa } from '../en2fa';
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -14,14 +15,6 @@ const pageNumber = ref(null)
 const pageCount = ref(0)
 const pages = ref(null)
 
-function en2fa(num) {
-  let arr = []
-  const persian = { 0: '۰', 1: '۱', 2: '۲', 3: '۳', 4: '۴', 5: '۵', 6: '۶', 7: '۷', 8: '۸', 9: '۹' }
-  num.split('').map((number, index) => {
-    arr[index] = persian[number]
-  })
-  return arr.join('')
-}
 
 async function setUrlAndTitle(){
   let pageUrl = '/' + route.params.id.toString();
