@@ -7,11 +7,11 @@ import 'quasar/dist/quasar.css'
 import './assets/main.css'
 
 import App from './App.vue'
-import router from './router'
+import {routes} from './routes'
 
 const app = createApp(App)
 
-app.use(router)
+app.use(routes)
 app.use(Quasar, {
     plugins: {}, // import Quasar plugins and add here
   })
