@@ -11,7 +11,7 @@ const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
 const searchTerm = ref('')
-const pageSize = 20
+const pageSize = 500
 
 
 
