@@ -1,7 +1,8 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { en2fa } from '../en2fa';
+import { bus } from '../event-bus'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -14,6 +15,25 @@ const searchTerm = ref('')
 const pageNumber = ref(null)
 const pageCount = ref(0)
 const pages = ref(null)
+const userInfo = ref(null)
+
+bus.on('user-logged-in', (u) => {
+  userInfo.value = u
+})
+
+bus.on('user-logged-out', () => {
+  userInfo.value = null
+})
+
+onMounted(() => {
+  if (localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+})
 
 
 async function setUrlAndTitle(){
@@ -101,6 +121,26 @@ function highlight(text, keyword) {
    text = text.substring(0,index) + "<span class='highlight'>" + text.substring(index,index+keyword.length) + "</span>" + text.substring(index + keyword.length);
   }
   return text;
+}
+
+async function deletePDFBook(){
+  if(!confirm('آیا از حذف این کتاب اطمینان دارید؟')){
+      return;
+  }
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/${pdf.value.id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json());
+    return;
+  }
+  alert('کتاب حذف شد!');
 }
 
 </script>
@@ -282,6 +322,9 @@ function highlight(text, keyword) {
           icon-prev="fast_forward"
         />
       </div>
+    </q-card>
+    <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+      <q-btn label="حذف کتاب" @click="deletePDFBook" />
     </q-card>
   </div>
 </template>
