@@ -86,8 +86,8 @@ function fullTextSearch() {
   window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
 }
 
-async function deletePDFBook(id) {
-  if (!confirm('آیا از حذف این کتاب اطمینان دارید؟')) {
+async function deletePDFBook(id, title) {
+  if (!confirm(`آیا از حذف ${title} اطمینان دارید؟`)) {
     return
   }
   loading.value = true
@@ -100,10 +100,10 @@ async function deletePDFBook(id) {
   })
   loading.value = false
   if (!response.ok) {
-    alert(await response.json())
+    alert(`${title} - ${await response.json()}`)
     return
   }
-  alert('کتاب حذف شد!')
+  alert(`${title} حذف شد!`)
 }
 </script>
 
@@ -163,7 +163,7 @@ async function deletePDFBook(id) {
         </q-card>
       </a>
       <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
-        <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id)" />
+        <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
       </q-card>
     </div>
   </div>
