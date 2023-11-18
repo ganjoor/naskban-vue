@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { en2fa } from '../en2fa';
+import { en2fa } from '../en2fa'
+import { bus } from '../event-bus'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -12,8 +13,21 @@ const pdfs = ref(null)
 const pageCount = ref(1)
 const searchTerm = ref('')
 const pageSize = 500
+const userInfo = ref(null)
 
+bus.on('user-logged-out', () => {
+  userInfo.value = null
+})
 
+onMounted(() => {
+  if (localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+})
 
 watchEffect(async () => {
   if (pageNumber.value == null) {
@@ -70,6 +84,26 @@ function doSearch() {
 
 function fullTextSearch() {
   window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
+}
+
+async function deletePDFBook(id) {
+  if (!confirm('آیا از حذف این کتاب اطمینان دارید؟')) {
+    return
+  }
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/${id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  alert('کتاب حذف شد!')
 }
 </script>
 
@@ -128,6 +162,9 @@ function fullTextSearch() {
           </q-card-section>
         </q-card>
       </a>
+      <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+        <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id)" />
+      </q-card>
     </div>
   </div>
 
