@@ -107,6 +107,7 @@ function replaceAll(str, find, replace) {
   return str.replace(new RegExp(find, 'g'), replace)
 }
 async function saveGanjoorLinkSuggestion() {
+  loading.value = true
   var ganjoorUrl = replaceAll(
     replaceAll(
       document
@@ -126,7 +127,7 @@ async function saveGanjoorLinkSuggestion() {
   ganjoorTitle = replaceAll(ganjoorTitle, '\r\n', '')
   var pdfId = parseInt(localStorage.getItem('id'))
   var pdfPageNumber = parseInt(localStorage.getItem('page'))
-  loading.value = true
+
   const response = await fetch('https://api.naskban.ir/api/pdf/ganjoor', {
     method: 'POST',
     body: JSON.stringify({
@@ -215,7 +216,7 @@ async function saveGanjoorLinkSuggestion() {
           <div class="text-h6">پیشنهاد شعر مرتبط در گنجور</div>
           <q-space> </q-space>
 
-          <q-btn label="پیشنهاد" color="green" @click="saveGanjoorLinkSuggestion" />
+          <q-btn v-if="!loading" label="پیشنهاد" color="green" @click="saveGanjoorLinkSuggestion" />
 
           <q-btn
             dense
