@@ -239,7 +239,7 @@ async function saveGanjoorLinkSuggestion() {
         <q-card-section class="row">
           <div class="col">
             <iframe
-              :src="`/${route.params.id}/${pageNumber}`"
+              :src="`/frame/${route.params.id}/${pageNumber}`"
               style="width: 50vw; height: 70vh"
             ></iframe>
           </div>

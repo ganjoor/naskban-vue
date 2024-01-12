@@ -27,6 +27,11 @@ export const routes = createRouter({
       component: PDFView
     },
     {
+      path: '/frame/:id/:page',
+      name: 'pdfframe',
+      component: PDFView
+    },
+    {
       path: '/p/:page',
       name: 'page',
       component: HomeView

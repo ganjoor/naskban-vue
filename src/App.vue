@@ -26,7 +26,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <header>
+  <header v-if="$route.name != 'ganjoor' && $route.name != 'pdfframe'">
     <a href="/"
       ><img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125"
     /></a>
