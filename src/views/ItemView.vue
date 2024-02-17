@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { ref, watchEffect, onMounted } from 'vue'
-import { en2fa } from '../en2fa';
+import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
@@ -16,6 +16,7 @@ const pageNumber = ref(null)
 const pageCount = ref(0)
 const pages = ref(null)
 const userInfo = ref(null)
+const editMode = ref(false)
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -35,12 +36,11 @@ onMounted(() => {
   }
 })
 
-
-async function setUrlAndTitle(){
-  let pageUrl = '/' + route.params.id.toString();
+async function setUrlAndTitle() {
+  let pageUrl = '/' + route.params.id.toString()
   let docTitle = 'نسک‌بان - ' + pdf.value.title
   if (searchTerm.value != '') {
-    pageUrl = '/'+route.params.id.toString()+'?s=' + encodeURI(searchTerm.value)
+    pageUrl = '/' + route.params.id.toString() + '?s=' + encodeURI(searchTerm.value)
     docTitle += ' - جستجوی ' + searchTerm.value
   }
   if (pageNumber.value > 1) {
@@ -50,7 +50,7 @@ async function setUrlAndTitle(){
     if (pageUrl != '') {
       pageUrl += '&'
     } else {
-      pageUrl = '/'+ route.params.id.toString()+'?'
+      pageUrl = '/' + route.params.id.toString() + '?'
     }
     pageUrl += 'page=' + pageNumber.value.toString()
   }
@@ -76,12 +76,9 @@ watchEffect(async () => {
 
   if (searchTerm.value != '') {
     await performSearch()
+  } else {
+    await setUrlAndTitle()
   }
-  else{
-    await setUrlAndTitle();
-  }
-
-  
 })
 
 async function initSearch() {
@@ -102,30 +99,37 @@ async function performSearch() {
       pageCount.value = paging_headers.totalPages
     }
   }
-  
- 
+
   let httpPages = await res.json()
-  for(var i = 0; i<httpPages.length; i++){
-    searchTerm.value.replace('"', '').replace('"', '').split(' ').forEach((key) => {
-      httpPages[i].pageText = highlight(httpPages[i].pageText, key)
-    })
-    
+  for (var i = 0; i < httpPages.length; i++) {
+    searchTerm.value
+      .replace('"', '')
+      .replace('"', '')
+      .split(' ')
+      .forEach((key) => {
+        httpPages[i].pageText = highlight(httpPages[i].pageText, key)
+      })
   }
   pages.value = httpPages
-  await setUrlAndTitle();
+  await setUrlAndTitle()
 }
 
 function highlight(text, keyword) {
-  var index = text.indexOf(keyword);
-  if (index >= 0) { 
-   text = text.substring(0,index) + "<span class='highlight'>" + text.substring(index,index+keyword.length) + "</span>" + text.substring(index + keyword.length);
+  var index = text.indexOf(keyword)
+  if (index >= 0) {
+    text =
+      text.substring(0, index) +
+      "<span class='highlight'>" +
+      text.substring(index, index + keyword.length) +
+      '</span>' +
+      text.substring(index + keyword.length)
   }
-  return text;
+  return text
 }
 
-async function deletePDFBook(){
-  if(!confirm('آیا از حذف این کتاب اطمینان دارید؟')){
-      return;
+async function deletePDFBook() {
+  if (!confirm('آیا از حذف این کتاب اطمینان دارید؟')) {
+    return
   }
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/pdf/${pdf.value.id}`, {
@@ -137,18 +141,17 @@ async function deletePDFBook(){
   })
   loading.value = false
   if (!response.ok) {
-    alert(await response.json());
-    return;
+    alert(await response.json())
+    return
   }
-  alert('کتاب حذف شد!');
+  alert('کتاب حذف شد!')
 }
-
 </script>
 
 <template>
-   <div class="q-pa-lg flex flex-center">
-      <q-spinner-hourglass v-if="loading" color="green" size="4em" />
-    </div>
+  <div class="q-pa-lg flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+  </div>
   <div class="q-pa-lg flex flex-center justify-center centers">
     <q-card v-if="pdf != null">
       <q-card-section class="q-pa-lg flex flex-center justify-center centers">
@@ -156,45 +159,83 @@ async function deletePDFBook(){
           <q-img :src="pdf.extenalCoverImageUrl" spinner-color="white" class="width-300px"> </q-img>
         </a>
       </q-card-section>
-
+      <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+        <q-btn label="ویرایش" @click="editMode = !editMode" />
+      </q-card>
       <q-card-section class="q-pa-lg flex flex-center">
         <a :href="'/' + pdf.id + '/1'">{{ pdf.title }}</a>
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.title" label="عنوان" />
       </q-card-section>
       <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
         {{ pdf.subTitle }}
       </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.subTitle" label="زیرعنوان" />
+      </q-card-section>
       <q-card-section v-if="pdf.titleInOriginalLanguage != null" class="q-pa-lg flex flex-center">
         {{ pdf.titleInOriginalLanguage }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.titleInOriginalLanguage" label="عنوان به زبان اصلی" />
       </q-card-section>
       <q-card-section v-if="pdf.authorsLine != null" class="q-pa-lg flex flex-center">
         {{ pdf.authorsLine }}
       </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.authorsLine" label="پدیدآورندگان" />
+      </q-card-section>
       <q-card-section v-if="pdf.translatorsLine != null" class="q-pa-lg flex flex-center">
         ترجمه: {{ pdf.translatorsLine }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.translatorsLine" label="مترجمان" />
       </q-card-section>
       <q-card-section v-if="pdf.publisherLine != null" class="q-pa-lg flex flex-center">
         ناشر: {{ pdf.publisherLine }}
       </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.publisherLine" label="ناشر" />
+      </q-card-section>
       <q-card-section v-if="pdf.publishingDate != null" class="q-pa-lg flex flex-center">
         تاریخ چاپ: {{ pdf.publishingDate }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.publishingDate" label="تاریخ چاپ" />
       </q-card-section>
       <q-card-section v-if="pdf.publishingLocation != null" class="q-pa-lg flex flex-center">
         محل چاپ: {{ pdf.publishingLocation }}
       </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.publishingLocation" label="محل چاپ" />
+      </q-card-section>
       <q-card-section v-if="pdf.publishingNumber != null" class="q-pa-lg flex flex-center">
         نوبت چاپ: {{ pdf.publishingNumber }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.publishingNumber" label="نوبت چاپ" />
       </q-card-section>
       <q-card-section v-if="pdf.claimedPageCount != null" class="q-pa-lg flex flex-center">
         تعداد صفحات (کاغذی): {{ pdf.claimedPageCount }}
       </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.claimedPageCount" label="تعداد صفحات (کاغذی)" />
+      </q-card-section>
       <q-card-section v-if="pdf.description != null" class="q-pa-lg flex flex-center">
         {{ pdf.description }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.description" label="توضیحات" />
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         تعداد صفحات (تصویربرداری شده): {{ pdf.pageCount }}
       </q-card-section>
       <q-card-section v-if="pdf.isbn != null" class="q-pa-lg flex flex-center">
         شابک: {{ pdf.isbn }}
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-input v-model="pdf.isbn" label="شابک" />
       </q-card-section>
       <q-card-section
         v-if="pdf.multiVolumePDFCollectionId != null"
@@ -248,11 +289,7 @@ async function deletePDFBook(){
           @keydown.enter.prevent="initSearch"
         />
         <q-icon name="search" class="cursor-pointer" @click="initSearch"></q-icon>
-        <q-spinner-hourglass
-          v-if="loading"
-          color="green"
-          size="4em"
-        />
+        <q-spinner-hourglass v-if="loading" color="green" size="4em" />
       </q-card-section>
       <q-card-section
         v-if="!loading && searchTerm != '' && pageCount == 0"
@@ -303,11 +340,7 @@ async function deletePDFBook(){
       </q-card-section>
 
       <div class="q-pa-lg flex flex-center">
-        <q-spinner-hourglass
-          v-if="loading"
-          color="green"
-          size="4em"
-        />
+        <q-spinner-hourglass v-if="loading" color="green" size="4em" />
         <q-pagination
           v-model="pageNumber"
           v-if="!loading && pageCount > 0"
