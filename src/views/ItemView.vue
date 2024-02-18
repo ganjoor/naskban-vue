@@ -73,7 +73,6 @@ watchEffect(async () => {
   loading.value = true
   pdf.value = await (await fetch(url)).json()
   loading.value = false
-
   if (searchTerm.value != '') {
     await performSearch()
   } else {
@@ -145,6 +144,47 @@ async function deletePDFBook() {
     return
   }
   alert('کتاب حذف شد!')
+}
+
+async function saveEdits() {
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf`, {
+    method: 'PUT',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      id: pdf.value.id,
+      bookId: pdf.value.bookId,
+      multiVolumePDFCollectionId: pdf.value.multiVolumePDFCollectionId,
+      pdfSourceId: pdf.value.pdfSourceId,
+      status: pdf.value.status,
+      title: pdf.value.title,
+      subTitle: pdf.value.subTitle,
+      titleInOriginalLanguage: pdf.value.titleInOriginalLanguage,
+      authorsLine: pdf.value.authorsLine,
+      publisherLine: pdf.value.publisherLine,
+      isbn: pdf.value.isbn,
+      description: pdf.value.Description,
+      isTranslation: pdf.value.isTranslation,
+      translatorsLine: pdf.value.translatorsLine,
+      publishingDate:pdf.value.publishingDate,
+      publishingLocation: pdf.value.publishingLocation,
+      publishingNumber: pdf.value.publishingNumber,
+      claimedPageCount: pdf.value.claimedPageCount,
+      originalSourceName: pdf.value.originalSourceName,
+      originalFileUrl: pdf.value.originalFileUrl,
+      volumeOrder: pdf.value.volumeOrder,  
+      bookScriptType: pdf.value.bookScriptType
+    })
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  alert('تغییرات ذخیره شد!')
 }
 </script>
 
@@ -236,6 +276,9 @@ async function deletePDFBook() {
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
         <q-input v-model="pdf.isbn" label="شابک" />
+      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
+        <q-btn label="ذخیرهٔ تغییرات" @click="saveEdits" />
       </q-card-section>
       <q-card-section
         v-if="pdf.multiVolumePDFCollectionId != null"
