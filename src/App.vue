@@ -32,9 +32,6 @@ onMounted(() => {
     <div class="wrapper">
       <a href="/"><h1 class="green">نسک‌بان</h1></a>
     </div>
-    <div v-if="userInfo != null">
-      {{ userInfo.user.username }}
-    </div>
   </header>
 
   <RouterView />

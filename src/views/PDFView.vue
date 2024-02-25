@@ -14,6 +14,7 @@ const pageNumber = ref(null)
 const userInfo = ref(null)
 const ganjoorLink = ref(false)
 const suggestionResult = ref('')
+const pageInfo = ref(null)
 const ocrText = ref(null)
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -32,8 +33,6 @@ onMounted(() => {
     }
   }
 })
-
-
 
 watchEffect(async () => {
   const url = `${API_URL}/${route.params.id}`
@@ -63,7 +62,7 @@ watchEffect(async () => {
       '/' + pdf.value.id.toString() + '/' + pageNumber.value.toString()
     )
   }
-  await loadOCRText(pageNumber.value);
+  await loadOCRText(pageNumber.value)
 })
 
 function onLoaded() {
@@ -79,18 +78,17 @@ async function updatePageNumber(value) {
     document.title = 'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
-  await loadOCRText(value);
+  await loadOCRText(value)
 }
-async function loadOCRText(pageNumber){
-  if(pdf.value.ocRed){
+async function loadOCRText(pageNumber) {
+  if (pdf.value.ocRed) {
     const url = `${API_URL}/${route.params.id}/page/${pageNumber}`
-    let pageInfo = await (await fetch(url)).json();
-    if(pageInfo == null || pageInfo.pageText == null){
-      ocrText.value = null;
-    }else{
-      ocrText.value = pageInfo.pageText.replace('\n', '<br />');
+    pageInfo.value = await (await fetch(url)).json()
+    if (pageInfo.value == null || pageInfo.value.pageText == null) {
+      ocrText.value = null
+    } else {
+      ocrText.value = pageInfo.value.pageText.replace('\n', '<br />')
     }
-    
   }
 }
 async function handleSwipe(swipeInfo) {
@@ -177,9 +175,8 @@ async function logout() {
 </script>
 
 <template class="full-width">
-   <q-bar class="bg-white text-white flex-center">
+  <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
-      
       <q-separator v-if="userInfo != null" vertical inset spaced />
       <q-btn
         v-if="userInfo == null"
@@ -235,17 +232,31 @@ async function logout() {
         fit-parent
       />
     </div>
+    <q-card-section
+      v-if="pageInfo != null && pageInfo.tags.length > 0"
+      class="q-pa-lg flex flex-center"
+    >
+      <table>
+        <tr>
+          <th>برچسب</th>
+          <th>مقدار</th>
+        </tr>
+        <tr v-for="tag in pageInfo.tags" :key="tag.id">
+          <td>{{ tag.rTag.name }}</td>
+          <td v-if="tag.valueSupplement == null">{{ tag.value }}</td>
+          <td v-if="tag.valueSupplement != null"><a :href="tag.valueSupplement" target="_blank"> {{ tag.value }}</a></td>
+        </tr>
+      </table>
+    </q-card-section>
     <q-card class="full-width q-pa-lg flex flex-center">
       <a v-if="pdf != null" :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank"
         >مشاهده در فایل</a
       >
     </q-card>
     <q-card v-if="ocrText != null" class="full-width q-pa-lg flex flex-center">
+      <q-card-section> متن بازشناسی شده </q-card-section>
       <q-card-section>
-        متن بازشناسی شده
-      </q-card-section>
-      <q-card-section>
-        <div v-html="ocrText" ></div>
+        <div v-html="ocrText"></div>
       </q-card-section>
     </q-card>
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
