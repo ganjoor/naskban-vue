@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { bus } from './../event-bus'
 import { routes } from './../routes'
 const email = ref('')
 const captchaImageId = ref('')
@@ -8,29 +7,30 @@ const captchaValue = ref('')
 const loading = ref(false)
 
 onMounted(async () => {
-  document.title = 'نسک‌بان - نام‌نویسی';
-  loading.value = true;
-  const response = await fetch(`https://api.naskban.ir/api/users/captchaimage`);
-  loading.value = false;
+  document.title = 'نسک‌بان - نام‌نویسی'
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/users/captchaimage`)
+  loading.value = false
   if (!response.ok) {
     alert(await response.json())
     return
   }
-  captchaImageId.value = await response.json();
+  captchaImageId.value = await response.json()
 })
 
-
-async function signIn() {
+async function signUp() {
   loading.value = true
-  const API_LOGIN = `https://api.naskban.ir/api/users/login`
-  const response = await fetch(API_LOGIN, {
+  const API_SIGNUP = `https://api.naskban.ir/api/users/signup`
+  const response = await fetch(API_SIGNUP, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: email.value,
-      password: '',
+      email: email.value,
+      captchaImageId: captchaImageId.value,
+      captchaValue: captchaValue.value,
+      callbackUrl: '/',
       clientAppName: 'Naskban Vue Client',
       language: 'fa-IR'
     })
@@ -38,22 +38,26 @@ async function signIn() {
   loading.value = false
   if (!response.ok) {
     alert(await response.json())
+    loading.value = true
+    const response2 = await fetch(`https://api.naskban.ir/api/users/captchaimage`)
+    loading.value = false
+    if (!response2.ok) {
+      alert(await response2.json())
+      return
+    }
+    captchaImageId.value = await response2.json()
     return
   }
-  var userInfo = await response.json()
-  localStorage.setItem('userInfo', JSON.stringify(userInfo))
-  bus.emit('user-logged-in', userInfo)
+
   routes.push({ path: '/' })
 }
-
 </script>
 <template>
-    <div class="q-pa-lg flex flex-center"  v-if="loading" >
-        <q-spinner-hourglass color="green" size="4em" />
-    </div>
-     
+  <div class="q-pa-lg flex flex-center" v-if="loading">
+    <q-spinner-hourglass color="green" size="4em" />
+  </div>
+
   <div class="flex flex-center">
-   
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">ورود</div>
       <q-card-section>
@@ -73,7 +77,7 @@ async function signIn() {
           label="نام‌نویسی"
           no-caps
           class="full-width"
-          @click="signIn"
+          @click="signUp"
         ></q-btn>
       </q-card-section>
     </q-card>
