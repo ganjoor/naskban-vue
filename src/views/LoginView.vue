@@ -1,10 +1,14 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
+
+onMounted(() => {
+  document.title = 'نسک‌بان - ورود';
+})
 
 async function signIn() {
   loading.value = true
