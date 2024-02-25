@@ -263,20 +263,73 @@ async function logout() {
   </div>
   <div class="q-pa-lg flex flex-center justify-center centers">
     <q-card v-if="pdf != null">
-      <q-card-section class="q-pa-lg flex flex-center justify-center centers">
-        <a :href="'/' + pdf.id + '/1'">
-          <q-img :src="pdf.extenalCoverImageUrl" spinner-color="white" class="width-300px"> </q-img>
-        </a>
-      </q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center justify-center centers"> </q-card-section>
       <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
         <q-btn label="ویرایش" @click="editMode = !editMode" />
       </q-card>
       <q-card-section class="q-pa-lg flex flex-center">
-        <a :href="'/' + pdf.id + '/1'">{{ pdf.title }}</a>
+        <a :href="'/' + pdf.id">{{ pdf.title }}</a>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
         <q-input v-model="pdf.title" label="عنوان" />
       </q-card-section>
+    </q-card>
+  </div>
+  <q-card-section
+    v-if="!loading && searchTerm != '' && pageCount == 0"
+    class="q-pa-lg flex flex-center justify-center centers"
+  >
+    نتیجه‌ای یافت نشد.
+  </q-card-section>
+  <q-card-section
+    v-if="pages != null && pageCount > 0"
+    class="q-pa-lg flex flex-center justify-center centers"
+  >
+    <q-pagination
+      v-model="pageNumber"
+      v-if="!loading"
+      :max="pageCount"
+      :max-pages="7"
+      direction-links
+      boundary-links
+      color="green"
+      icon-last="skip_previous"
+      icon-first="skip_next"
+      icon-next="fast_rewind"
+      icon-prev="fast_forward"
+    />
+  </q-card-section>
+  <q-card-section v-if="pages != null">
+    <div class="row justify-center">
+      <div class="pdf flex q-ma-sm" v-for="page in pages" :key="page.id">
+        <a :href="'/' + page.pdfBookId + '/' + page.pageNumber">
+          <q-card class="fit">
+            <q-img
+              :src="page.extenalThumbnailImageUrl"
+              spinner-color="white"
+              style="width: 200px"
+              class="rounded-borders"
+            >
+            </q-img>
+            <q-card-section class="text-h6">
+              <a :href="'/' + page.pdfBookId + '/' + page.pageNumber">{{ page.pageNumber }} </a>
+            </q-card-section>
+            <q-card-section style="color: black">
+              <div v-html="page.pageText.replace('\n', '<br />')"></div>
+            </q-card-section>
+          </q-card>
+        </a>
+      </div>
+    </div>
+  </q-card-section>
+  <div class="q-pa-lg flex flex-center justify-center centers">
+    <q-card v-if="pdf != null">
+      <q-card-section class="q-pa-lg flex flex-center">
+        <a :href="'/' + pdf.id + '/1'">
+        <q-img :src="pdf.extenalCoverImageUrl" spinner-color="white" class="width-300px"> </q-img>
+      </a>
+      </q-card-section>
+     
       <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
         {{ pdf.subTitle }}
       </q-card-section>
@@ -384,71 +437,6 @@ async function logout() {
           >دریافت (اندازه
           {{ (pdf.pdfFile.fileSizeInBytes / 1024.0 / 1024.0).toFixed(2) }} مگابایت)</a
         >
-      </q-card-section>
-      <q-card-section
-        v-if="pdf != null && pdf.ocRed == true"
-        class="q-pa-lg flex flex-center justify-center centers"
-      >
-        <input
-          outlined
-          :value="searchTerm"
-          input-class="text-right"
-          class="q-ml-md"
-          id="s"
-          name="s"
-          type="search"
-          placeholder="جستجو در متن"
-          @keydown.enter.prevent="initSearch"
-        />
-        <q-icon name="search" class="cursor-pointer" @click="initSearch"></q-icon>
-        <q-spinner-hourglass v-if="loading" color="green" size="4em" />
-      </q-card-section>
-      <q-card-section
-        v-if="!loading && searchTerm != '' && pageCount == 0"
-        class="q-pa-lg flex flex-center justify-center centers"
-      >
-        نتیجه‌ای یافت نشد.
-      </q-card-section>
-      <q-card-section
-        v-if="pages != null && pageCount > 0"
-        class="q-pa-lg flex flex-center justify-center centers"
-      >
-        <q-pagination
-          v-model="pageNumber"
-          v-if="!loading"
-          :max="pageCount"
-          :max-pages="7"
-          direction-links
-          boundary-links
-          color="green"
-          icon-last="skip_previous"
-          icon-first="skip_next"
-          icon-next="fast_rewind"
-          icon-prev="fast_forward"
-        />
-      </q-card-section>
-      <q-card-section v-if="pages != null">
-        <div class="row justify-center">
-          <div class="pdf flex q-ma-sm" v-for="page in pages" :key="page.id">
-            <a :href="'/' + page.pdfBookId + '/' + page.pageNumber">
-              <q-card class="fit">
-                <q-img
-                  :src="page.extenalThumbnailImageUrl"
-                  spinner-color="white"
-                  style="width: 200px"
-                  class="rounded-borders"
-                >
-                </q-img>
-                <q-card-section class="text-h6">
-                  <a :href="'/' + page.pdfBookId + '/' + page.pageNumber">{{ page.pageNumber }} </a>
-                </q-card-section>
-                <q-card-section style="color: black">
-                  <div v-html="page.pageText.replace('\n', '<br />')"></div>
-                </q-card-section>
-              </q-card>
-            </a>
-          </div>
-        </div>
       </q-card-section>
 
       <div class="q-pa-lg flex flex-center">
