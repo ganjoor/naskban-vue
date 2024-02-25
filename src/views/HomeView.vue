@@ -105,8 +105,11 @@ async function deletePDFBook(id, title) {
   }
   alert(`${title} حذف شد!`)
 }
-function goToLogin(){
-  window.location.href = '/login';
+function goToLogin() {
+  window.location.href = '/login'
+}
+function logout(){
+
 }
 </script>
 
@@ -131,10 +134,12 @@ function goToLogin(){
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
-      <q-btn dense flat icon="login" class="gt-xs green" @click="goToLogin">
-          <q-tooltip class="bg-green text-white">ورود</q-tooltip>
-        </q-btn>
-      >
+      <q-btn v-if="userInfo == null" dense flat icon="login" class="gt-xs green" @click="goToLogin">
+        <q-tooltip class="bg-green text-white">ورود</q-tooltip>
+      </q-btn>
+      <q-btn v-if="userInfo != null" dense flat icon="directions_run" class="gt-xs green flip-horizontal" @click="logout">
+        <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
     </div>
   </q-bar>
 
