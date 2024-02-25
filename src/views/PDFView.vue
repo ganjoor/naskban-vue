@@ -152,9 +152,57 @@ async function saveGanjoorLinkSuggestion() {
     pdfPageNumber.toString()
   )} => ${ganjoorTitle}`
 }
+function goToLogin() {
+  window.location.href = '/login'
+}
+async function logout() {
+  if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
+    return
+  }
+  loading.value = true
+  await fetch(
+    `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  localStorage.setItem('userInfo', null)
+  bus.emit('user-logged-out')
+}
 </script>
 
 <template class="full-width">
+   <q-bar class="bg-white text-white flex-center">
+    <div class="q-pa-lg flex flex-center">
+      
+      <q-separator v-if="userInfo != null" vertical inset spaced />
+      <q-btn
+        v-if="userInfo == null"
+        dense
+        flat
+        icon="account_circle"
+        class="gt-xs green"
+        @click="goToLogin"
+      >
+        <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="directions_run"
+        class="gt-xs green flip-horizontal"
+        @click="logout"
+      >
+        <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+    </div>
+  </q-bar>
   <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg flex flex-center">
     <q-card-section>
       <a :href="'/' + pdf.id">{{ pdf.title }}</a>
