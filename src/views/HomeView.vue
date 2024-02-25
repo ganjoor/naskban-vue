@@ -3,6 +3,7 @@ import { ref, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
+import PermissionChecker from './../utilities/PermissionChecker'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -14,6 +15,7 @@ const pageCount = ref(1)
 const searchTerm = ref('')
 const pageSize = 20
 const userInfo = ref(null)
+const canDelete = ref(false)
 
 bus.on('user-logged-out', () => {
   userInfo.value = null
@@ -45,6 +47,8 @@ watchEffect(async () => {
   if (searchTerm.value != '') {
     url = `${API_URL}/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=${pageSize}`
   }
+
+  canDelete.value = checkPermission('pdf', 'delete')
 
   loading.value = true
   const res = await fetch(url)
@@ -85,7 +89,9 @@ function doSearch() {
 function fullTextSearch() {
   window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
 }
-
+function checkPermission(secShortName, opShortName) {
+  return PermissionChecker.check(userInfo.value, secShortName, opShortName)
+}
 async function deletePDFBook(id, title) {
   if (!confirm(`آیا از حذف ${title} اطمینان دارید؟`)) {
     return
@@ -111,20 +117,23 @@ function goToLogin() {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
-async function logout(){
+async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
   }
   loading.value = true
-  await fetch(`https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
+  await fetch(
+    `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
     }
-  })
+  )
   loading.value = false
-  localStorage.setItem('userInfo',null)
+  localStorage.setItem('userInfo', null)
   bus.emit('user-logged-out')
 }
 </script>
@@ -150,14 +159,35 @@ async function logout(){
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
-      <q-btn v-if="userInfo != null" dense flat icon="bookmarks" class="gt-xs green" @click="goToBookmarks">
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="bookmarks"
+        class="gt-xs green"
+        @click="goToBookmarks"
+      >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
-      <q-btn v-if="userInfo == null" dense flat icon="account_circle" class="gt-xs green" @click="goToLogin">
+      <q-btn
+        v-if="userInfo == null"
+        dense
+        flat
+        icon="account_circle"
+        class="gt-xs green"
+        @click="goToLogin"
+      >
         <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
       </q-btn>
-      <q-btn v-if="userInfo != null" dense flat icon="directions_run" class="gt-xs green flip-horizontal" @click="logout">
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="directions_run"
+        class="gt-xs green flip-horizontal"
+        @click="logout"
+      >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
     </div>
@@ -202,7 +232,7 @@ async function logout(){
           </q-card-section>
         </q-card>
       </a>
-      <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+      <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
         <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
       </q-card>
     </div>
