@@ -17,6 +17,7 @@ const pageCount = ref(0)
 const pages = ref(null)
 const userInfo = ref(null)
 const editMode = ref(false)
+const bookmarked = ref(false)
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -72,6 +73,18 @@ watchEffect(async () => {
   const url = `${API_URL}/${route.params.id}`
   loading.value = true
   pdf.value = await (await fetch(url)).json()
+  bookmarked.value = false;
+  if(userInfo.value != null){
+    let bookmarkedRes =  await (await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`,
+    {headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }}
+    )).json()
+    if(bookmarkedRes.length > 0){
+      bookmarked.value = true;
+    }
+  }
   loading.value = false
   if (searchTerm.value != '') {
     await performSearch()
@@ -241,6 +254,12 @@ function copyUrl(){
       <q-separator vertical inset spaced v-if="pdf != null && pdf.ocRed == true"/>
       <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
+      </q-btn>
+      <q-btn dense flat v-if="bookmarked" icon="bookmark" class="gt-xs green" @click="copyUrl">
+        <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
+      </q-btn>
+      <q-btn dense flat v-if="!bookmarked" icon="bookmark_border" class="gt-xs green" @click="copyUrl">
+        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
       <q-btn
