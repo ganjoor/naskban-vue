@@ -82,6 +82,9 @@ async function updatePageNumber(value) {
   }
   await loadOCRText(value)
 }
+function goToBookmarks() {
+  window.location.href = '/bookmarks'
+}
 async function switchBookmark(){
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber.value}`, {
@@ -214,6 +217,9 @@ function copyUrl(){
       </q-btn>
       <q-btn dense flat v-if="userInfo != null && bookmarked" icon="bookmark" class="gt-xs green" @click="switchBookmark">
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
+      </q-btn>
+      <q-btn v-if="userInfo != null" dense flat icon="bookmarks" class="gt-xs green" @click="goToBookmarks">
+        <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
       <q-btn dense flat v-if="userInfo != null && !bookmarked" icon="bookmark_border" class="gt-xs green" @click="switchBookmark">
         <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>

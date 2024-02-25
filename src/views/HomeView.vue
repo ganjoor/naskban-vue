@@ -108,6 +108,9 @@ async function deletePDFBook(id, title) {
 function goToLogin() {
   window.location.href = '/login'
 }
+function goToBookmarks() {
+  window.location.href = '/bookmarks'
+}
 async function logout(){
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
@@ -145,6 +148,10 @@ async function logout(){
       </q-btn>
       <q-btn dense flat icon="manage_search" class="gt-xs green" @click="fullTextSearch">
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced v-if="userInfo != null" />
+      <q-btn v-if="userInfo != null" dense flat icon="bookmarks" class="gt-xs green" @click="goToBookmarks">
+        <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
       <q-btn v-if="userInfo == null" dense flat icon="account_circle" class="gt-xs green" @click="goToLogin">
