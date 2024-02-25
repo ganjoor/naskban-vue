@@ -93,6 +93,21 @@ watchEffect(async () => {
   }
 })
 
+async function switchBookmark(){
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
+    method: 'POST',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (response.ok) {
+    bookmarked.value = !bookmarked.value;
+  }
+}
+
 async function initSearch() {
   searchTerm.value = document.getElementById('s').value
   route.query.s = searchTerm.value
@@ -255,10 +270,10 @@ function copyUrl(){
       <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
       </q-btn>
-      <q-btn dense flat v-if="bookmarked" icon="bookmark" class="gt-xs green" @click="copyUrl">
+      <q-btn dense flat v-if="bookmarked" icon="bookmark" class="gt-xs green" @click="switchBookmark">
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
       </q-btn>
-      <q-btn dense flat v-if="!bookmarked" icon="bookmark_border" class="gt-xs green" @click="copyUrl">
+      <q-btn dense flat v-if="!bookmarked" icon="bookmark_border" class="gt-xs green" @click="switchBookmark">
         <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
