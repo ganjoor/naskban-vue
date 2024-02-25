@@ -147,8 +147,8 @@ async function logout(){
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
-      <q-btn v-if="userInfo == null" dense flat icon="login" class="gt-xs green" @click="goToLogin">
-        <q-tooltip class="bg-green text-white">ورود</q-tooltip>
+      <q-btn v-if="userInfo == null" dense flat icon="account_circle" class="gt-xs green" @click="goToLogin">
+        <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="directions_run" class="gt-xs green flip-horizontal" @click="logout">
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
