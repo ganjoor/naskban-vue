@@ -1,7 +1,8 @@
 <script setup>
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { en2fa } from '../en2fa';
+import { bus } from '../event-bus'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -11,8 +12,21 @@ const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
 const searchTerm = ref('')
+const userInfo = ref(null)
 
+bus.on('user-logged-out', () => {
+  userInfo.value = null
+})
 
+onMounted(() => {
+  if (localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+})
 
 watchEffect(async () => {
   if (pageNumber.value == null) {
@@ -66,23 +80,84 @@ function doSearch() {
   route.query.s = searchTerm.value
   pageNumber.value = 1
 }
+function goToLogin() {
+  window.location.href = '/login'
+}
+function goToBookmarks() {
+  window.location.href = '/bookmarks'
+}
+async function logout() {
+  if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
+    return
+  }
+  loading.value = true
+  await fetch(
+    `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  localStorage.setItem('userInfo', null)
+  bus.emit('user-logged-out')
+}
 </script>
 
 <template>
-  <div class="q-pa-lg flex flex-center">
-    <input
-      outlined
-      :value="searchTerm"
-      input-class="text-right"
-      class="q-ml-md"
-      id="s"
-      name="s"
-      type="search"
-      placeholder="جستجو"
-      @keydown.enter.prevent="doSearch"
-    />
-    <q-icon name="search" class="cursor-pointer" @click="doSearch"></q-icon>
-  </div>
+  <q-bar class="bg-white text-white flex-center">
+    <div class="q-pa-lg flex flex-center">
+      <input
+        outlined
+        :value="searchTerm"
+        input-class="text-right"
+        class="q-ml-md"
+        id="s"
+        name="s"
+        type="search"
+        placeholder="جستجو"
+        @keydown.enter.prevent="doSearch"
+      />
+      <q-btn dense flat icon="manage_search" class="gt-xs green" @click="doSearch">
+        <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced v-if="userInfo != null" />
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="bookmarks"
+        class="gt-xs green"
+        @click="goToBookmarks"
+      >
+        <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn
+        v-if="userInfo == null"
+        dense
+        flat
+        icon="account_circle"
+        class="gt-xs green"
+        @click="goToLogin"
+      >
+        <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="directions_run"
+        class="gt-xs green flip-horizontal"
+        @click="logout"
+      >
+        <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+    </div>
+  </q-bar>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
