@@ -126,7 +126,7 @@ async function logout(){
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="bookmark in bookmarks" :key="bookmark.id">
-      <a :href="'/' + bookmark.id" v-if="bookmark.pageNumber == null">
+      <a :href="'/' + bookmark.bookId" v-if="bookmark.pageNumber == 0">
         <q-card class="fit">
           <q-img
             :src="bookmark.extenalImageUrl"
@@ -136,12 +136,12 @@ async function logout(){
           >
           </q-img>
           <q-card-section class="text-h6">
-            <a :href="'/' + bookmark.id">{{ bookmark.bookTitle }} </a>
+            <a :href="'/' + bookmark.bookId">{{ bookmark.bookTitle }} </a>
           </q-card-section>
          
         </q-card>
       </a>
-      <a :href="'/' + bookmark.id + '/' + bookmark.pageNumber" v-if="bookmark.pageNumber != null">
+      <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber" v-if="bookmark.pageNumber != 0">
         <q-card class="fit">
           <q-img
             :src="bookmark.extenalImageUrl"
@@ -151,7 +151,7 @@ async function logout(){
           >
           </q-img>
           <q-card-section class="text-h6">
-            <a :href="'/' + bookmark.id + '/' + bookmark.pageNumber">{{ bookmark.bookTitle }} </a>
+            <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber">{{ bookmark.bookTitle }} - صفحهٔ {{ en2fa(bookmark.pageNumber.toString()) }} </a>
           </q-card-section>
          
         </q-card>
