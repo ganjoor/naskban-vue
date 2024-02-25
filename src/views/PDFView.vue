@@ -16,6 +16,7 @@ const ganjoorLink = ref(false)
 const suggestionResult = ref('')
 const pageInfo = ref(null)
 const ocrText = ref(null)
+const bookmarked = ref(false)
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
 })
@@ -49,6 +50,7 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
+  
 
   if (pageNumber.value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
@@ -80,7 +82,33 @@ async function updatePageNumber(value) {
   }
   await loadOCRText(value)
 }
+async function switchBookmark(){
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber.value}`, {
+    method: 'POST',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (response.ok) {
+    bookmarked.value = !bookmarked.value;
+  }
+}
 async function loadOCRText(pageNumber) {
+  bookmarked.value = false;
+  if(userInfo.value != null){
+    let bookmarkedRes =  await (await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber}`,
+    {headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }}
+    )).json()
+    if(bookmarkedRes.length > 0){
+      bookmarked.value = true;
+    }
+  }
   if (pdf.value.ocRed) {
     const url = `${API_URL}/${route.params.id}/page/${pageNumber}`
     pageInfo.value = await (await fetch(url)).json()
@@ -183,6 +211,12 @@ function copyUrl(){
     <div class="q-pa-lg flex flex-center">
       <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
+      </q-btn>
+      <q-btn dense flat v-if="userInfo != null && bookmarked" icon="bookmark" class="gt-xs green" @click="switchBookmark">
+        <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
+      </q-btn>
+      <q-btn dense flat v-if="userInfo != null && !bookmarked" icon="bookmark_border" class="gt-xs green" @click="switchBookmark">
+        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
       <q-btn
