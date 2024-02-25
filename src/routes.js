@@ -3,6 +3,7 @@ import HomeView from './views/HomeView.vue'
 import ItemView from './views/ItemView.vue'
 import PDFView from './views/PDFView.vue'
 import LoginView from './views/LoginView.vue'
+import SignupView from './views/SignupView.vue'
 import GanjoorFrame from './views/GanjoorFrame.vue'
 import GanjoorReview from './views/GanjoorReview.vue'
 import SearchText from './views/SearchText.vue'
@@ -41,6 +42,11 @@ export const routes = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: SignupView
     },
     {
       path: '/ganjoor',

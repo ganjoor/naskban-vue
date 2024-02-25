@@ -3,12 +3,22 @@ import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
 const email = ref('')
-const password = ref('')
+const captchaImageId = ref('')
+const captchaValue = ref('')
 const loading = ref(false)
 
-onMounted(() => {
-  document.title = 'نسک‌بان - ورود';
+onMounted(async () => {
+  document.title = 'نسک‌بان - نام‌نویسی';
+  loading.value = true;
+  const response = await fetch(`https://api.naskban.ir/api/users/captchaimage`);
+  loading.value = false;
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  captchaImageId.value = await response.json();
 })
+
 
 async function signIn() {
   loading.value = true
@@ -20,7 +30,7 @@ async function signIn() {
     },
     body: JSON.stringify({
       username: email.value,
-      password: password.value,
+      password: '',
       clientAppName: 'Naskban Vue Client',
       language: 'fa-IR'
     })
@@ -35,9 +45,7 @@ async function signIn() {
   bus.emit('user-logged-in', userInfo)
   routes.push({ path: '/' })
 }
-function goToSignup() {
-  window.location.href = '/signup'
-}
+
 </script>
 <template>
   <div class="flex flex-center">
@@ -46,30 +54,23 @@ function goToSignup() {
       <div class="text-grey-9 text-h5 text-weight-bold text-center">ورود</div>
       <q-card-section>
         <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
-        <q-input
-          dense
-          outlined
-          class="q-mt-md"
-          v-model="password"
-          type="password"
-          label="گذرواژه"
-        ></q-input>
+      </q-card-section>
+      <q-card-section>
+        <img :src="`https://api.naskban.ir/api/rimages/${captchaImageId}.jpg`" />
+      </q-card-section>
+      <q-card-section>
+        <q-input dense outlined v-model="captchaValue" label="عدد تصویر امنیتی"></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
           color="green"
           rounded
           size="md"
-          label="ورود"
+          label="نام‌نویسی"
           no-caps
           class="full-width"
           @click="signIn"
         ></q-btn>
-      </q-card-section>
-      <q-card-section class="text-center q-pt-none">
-        <div class="text-grey-8">
-          <a @click="goToSignup" class="text-dark text-weight-bold">نام‌نویسی</a>
-        </div>
       </q-card-section>
     </q-card>
   </div>
