@@ -172,12 +172,19 @@ async function logout() {
   localStorage.setItem('userInfo', null)
   bus.emit('user-logged-out')
 }
+
+function copyUrl(){
+  navigator.clipboard.writeText(window.location.href);
+}
 </script>
 
 <template class="full-width">
   <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
-      <q-separator v-if="userInfo != null" vertical inset spaced />
+      <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
+        <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
       <q-btn
         v-if="userInfo == null"
         dense
@@ -244,7 +251,9 @@ async function logout() {
         <tr v-for="tag in pageInfo.tags" :key="tag.id">
           <td>{{ tag.rTag.name }}</td>
           <td v-if="tag.valueSupplement == null">{{ tag.value }}</td>
-          <td v-if="tag.valueSupplement != null"><a :href="tag.valueSupplement" target="_blank"> {{ tag.value }}</a></td>
+          <td v-if="tag.valueSupplement != null">
+            <a :href="tag.valueSupplement" target="_blank"> {{ tag.value }}</a>
+          </td>
         </tr>
       </table>
     </q-card-section>
