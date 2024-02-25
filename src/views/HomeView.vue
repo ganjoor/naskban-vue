@@ -12,7 +12,7 @@ const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
 const searchTerm = ref('')
-const pageSize = 100
+const pageSize = 20
 const userInfo = ref(null)
 
 bus.on('user-logged-out', () => {

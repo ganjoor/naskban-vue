@@ -169,13 +169,13 @@ async function saveEdits() {
       description: pdf.value.Description,
       isTranslation: pdf.value.isTranslation,
       translatorsLine: pdf.value.translatorsLine,
-      publishingDate:pdf.value.publishingDate,
+      publishingDate: pdf.value.publishingDate,
       publishingLocation: pdf.value.publishingLocation,
       publishingNumber: pdf.value.publishingNumber,
       claimedPageCount: pdf.value.claimedPageCount,
       originalSourceName: pdf.value.originalSourceName,
       originalFileUrl: pdf.value.originalFileUrl,
-      volumeOrder: pdf.value.volumeOrder,  
+      volumeOrder: pdf.value.volumeOrder,
       bookScriptType: pdf.value.bookScriptType
     })
   })
@@ -186,9 +186,78 @@ async function saveEdits() {
   }
   alert('تغییرات ذخیره شد!')
 }
+function goToLogin() {
+  window.location.href = '/login'
+}
+async function logout() {
+  if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
+    return
+  }
+  loading.value = true
+  await fetch(
+    `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  localStorage.setItem('userInfo', null)
+  bus.emit('user-logged-out')
+}
 </script>
 
 <template>
+  <q-bar class="bg-white text-white flex-center">
+    <div class="q-pa-lg flex flex-center">
+      <input
+        v-if="pdf != null && pdf.ocRed == true"
+        outlined
+        :value="searchTerm"
+        input-class="text-right"
+        class="q-ml-md"
+        id="s"
+        name="s"
+        type="search"
+        placeholder="جستجو در متن"
+        @keydown.enter.prevent="initSearch"
+      />
+      <q-btn
+        v-if="pdf != null && pdf.ocRed == true"
+        dense
+        flat
+        icon="manage_search"
+        class="gt-xs green"
+        @click="initSearch"
+      >
+        <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn
+        v-if="userInfo == null"
+        dense
+        flat
+        icon="account_circle"
+        class="gt-xs green"
+        @click="goToLogin"
+      >
+        <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="directions_run"
+        class="gt-xs green flip-horizontal"
+        @click="logout"
+      >
+        <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+    </div>
+  </q-bar>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
   </div>
