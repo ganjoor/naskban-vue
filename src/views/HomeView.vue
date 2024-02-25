@@ -105,6 +105,9 @@ async function deletePDFBook(id, title) {
   }
   alert(`${title} حذف شد!`)
 }
+function goToLogin(){
+  window.location.href = '/login';
+}
 </script>
 
 <template>
@@ -128,10 +131,9 @@ async function deletePDFBook(id, title) {
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
-      <a href="/login" class="text-white"
-        ><q-btn dense flat icon="login" class="gt-xs green">
+      <q-btn dense flat icon="login" class="gt-xs green" @click="goToLogin">
           <q-tooltip class="bg-green text-white">ورود</q-tooltip>
-        </q-btn></a
+        </q-btn>
       >
     </div>
   </q-bar>
