@@ -208,6 +208,9 @@ async function logout() {
   localStorage.setItem('userInfo', null)
   bus.emit('user-logged-out')
 }
+function copyUrl(){
+  navigator.clipboard.writeText(window.location.href);
+}
 </script>
 
 <template>
@@ -234,6 +237,10 @@ async function logout() {
         @click="initSearch"
       >
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced v-if="pdf != null && pdf.ocRed == true"/>
+      <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
+        <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
       <q-btn
