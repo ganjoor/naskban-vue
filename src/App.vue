@@ -35,18 +35,6 @@ onMounted(() => {
     <div v-if="userInfo != null">
       {{ userInfo.user.username }}
     </div>
-    <q-bar class="bg-primary text-white">
-      <a href="/login" class="text-white"><q-btn dense flat icon="login" class="gt-xs">
-        <q-tooltip class="bg-white green">ورود</q-tooltip>
-      </q-btn></a>
-      <q-space />
-
-      <q-btn dense flat icon="battery_charging_full" />
-      <q-btn dense flat icon="wifi" />
-      <div>9:41</div>
-      <q-btn dense flat icon="search" />
-      <q-btn dense flat icon="list" />
-    </q-bar>
   </header>
 
   <RouterView />

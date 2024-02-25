@@ -108,21 +108,34 @@ async function deletePDFBook(id, title) {
 </script>
 
 <template>
-  <div class="q-pa-lg flex flex-center">
-    <input
-      outlined
-      :value="searchTerm"
-      input-class="text-right"
-      class="q-ml-md"
-      id="s"
-      name="s"
-      type="search"
-      placeholder="جستجو"
-      @keydown.enter.prevent="doSearch"
-    />
-    <q-icon name="search" class="cursor-pointer" @click="doSearch"></q-icon>
-    <q-icon name="manage_search" class="cursor-pointer" @click="fullTextSearch"></q-icon>
-  </div>
+  <q-bar class="bg-white text-white flex-center">
+    <div class="q-pa-lg flex flex-center">
+      <input
+        outlined
+        :value="searchTerm"
+        input-class="text-right"
+        class="q-ml-md"
+        id="s"
+        name="s"
+        type="search"
+        placeholder="جستجو"
+        @keydown.enter.prevent="doSearch"
+      />
+      <q-btn dense flat icon="search" class="gt-xs green" @click="doSearch">
+        <q-tooltip class="bg-green text-white">جستجو در ابرداده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn dense flat icon="manage_search" class="gt-xs green" @click="fullTextSearch">
+        <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <a href="/login" class="text-white"
+        ><q-btn dense flat icon="login" class="gt-xs green">
+          <q-tooltip class="bg-green text-white">ورود</q-tooltip>
+        </q-btn></a
+      >
+    </div>
+  </q-bar>
+
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
