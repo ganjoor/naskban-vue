@@ -59,7 +59,7 @@ async function signUp() {
 
   <div class="flex flex-center">
     <q-card class="q-pa-md shadow-2 login-card" bordered>
-      <div class="text-grey-9 text-h5 text-weight-bold text-center">ورود</div>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">نام‌نویسی</div>
       <q-card-section>
         <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
       </q-card-section>
