@@ -48,14 +48,18 @@ async function signIn() {
 
 </script>
 <template>
+    <div class="q-pa-lg flex flex-center"  v-if="loading" >
+        <q-spinner-hourglass color="green" size="4em" />
+    </div>
+     
   <div class="flex flex-center">
-    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+   
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">ورود</div>
       <q-card-section>
         <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
       </q-card-section>
-      <q-card-section>
+      <q-card-section class="q-pa-lg flex flex-center">
         <img :src="`https://api.naskban.ir/api/rimages/${captchaImageId}.jpg`" />
       </q-card-section>
       <q-card-section>
