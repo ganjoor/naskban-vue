@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router'
 import { ref, watchEffect, onMounted } from 'vue'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
+import PermissionChecker from './../utilities/PermissionChecker'
 
 const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
@@ -18,6 +19,7 @@ const pages = ref(null)
 const userInfo = ref(null)
 const editMode = ref(false)
 const bookmarked = ref(false)
+const canDelete = ref(false)
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -59,6 +61,10 @@ async function setUrlAndTitle() {
   document.title = docTitle
 }
 
+function checkPermission(secShortName, opShortName) {
+  return PermissionChecker.check(userInfo.value, secShortName, opShortName)
+}
+
 watchEffect(async () => {
   if (route.query.s != null) {
     searchTerm.value = route.query.s
@@ -72,17 +78,20 @@ watchEffect(async () => {
   }
   const url = `${API_URL}/${route.params.id}`
   loading.value = true
+  canDelete.value = checkPermission('pdf', 'delete')
   pdf.value = await (await fetch(url)).json()
-  bookmarked.value = false;
-  if(userInfo.value != null){
-    let bookmarkedRes =  await (await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`,
-    {headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
-    }}
-    )).json()
-    if(bookmarkedRes.length > 0){
-      bookmarked.value = true;
+  bookmarked.value = false
+  if (userInfo.value != null) {
+    let bookmarkedRes = await (
+      await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
+        headers: {
+          authorization: 'bearer ' + userInfo.value.token,
+          'content-type': 'application/json'
+        }
+      })
+    ).json()
+    if (bookmarkedRes.length > 0) {
+      bookmarked.value = true
     }
   }
   loading.value = false
@@ -95,7 +104,7 @@ watchEffect(async () => {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
-async function switchBookmark(){
+async function switchBookmark() {
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
     method: 'POST',
@@ -106,7 +115,7 @@ async function switchBookmark(){
   })
   loading.value = false
   if (response.ok) {
-    bookmarked.value = !bookmarked.value;
+    bookmarked.value = !bookmarked.value
   }
 }
 
@@ -238,8 +247,8 @@ async function logout() {
   localStorage.setItem('userInfo', null)
   bus.emit('user-logged-out')
 }
-function copyUrl(){
-  navigator.clipboard.writeText(window.location.href);
+function copyUrl() {
+  navigator.clipboard.writeText(window.location.href)
 }
 </script>
 
@@ -268,17 +277,38 @@ function copyUrl(){
       >
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
-      <q-separator vertical inset spaced v-if="pdf != null && pdf.ocRed == true"/>
+      <q-separator vertical inset spaced v-if="pdf != null && pdf.ocRed == true" />
       <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
       </q-btn>
-      <q-btn dense flat v-if="userInfo != null && bookmarked" icon="bookmark" class="gt-xs green" @click="switchBookmark">
+      <q-btn
+        dense
+        flat
+        v-if="userInfo != null && bookmarked"
+        icon="bookmark"
+        class="gt-xs green"
+        @click="switchBookmark"
+      >
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
       </q-btn>
-      <q-btn v-if="userInfo != null" dense flat icon="bookmarks" class="gt-xs green" @click="goToBookmarks">
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="bookmarks"
+        class="gt-xs green"
+        @click="goToBookmarks"
+      >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn dense flat v-if="userInfo != null && !bookmarked" icon="bookmark_border" class="gt-xs green" @click="switchBookmark">
+      <q-btn
+        dense
+        flat
+        v-if="userInfo != null && !bookmarked"
+        icon="bookmark_border"
+        class="gt-xs green"
+        @click="switchBookmark"
+      >
         <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
@@ -307,18 +337,16 @@ function copyUrl(){
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
   </div>
-  <div class="q-pa-lg flex flex-center justify-center centers">
-    <q-card v-if="pdf != null">
-      <q-card-section class="q-pa-lg flex flex-center justify-center centers"> </q-card-section>
-      <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
-        <q-btn label="ویرایش" @click="editMode = !editMode" />
-      </q-card>
-      <q-card-section class="q-pa-lg flex flex-center">
-        <a :href="'/' + pdf.id">{{ pdf.title }}</a>
-      </q-card-section>
-      <q-card-section class="q-pa-lg flex flex-center" v-if="editMode">
-        <q-input v-model="pdf.title" label="عنوان" />
-      </q-card-section>
+  <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
+  
+    <a :href="'/' + pdf.id">{{ pdf.title }}</a>
+  </div>
+  <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
+      <q-btn label="ویرایش" @click="editMode = !editMode" />
+    </q-card>
+  <div class="q-pa-lg flex flex-center justify-center centers" v-if="editMode">
+    <q-card class="q-pa-lg flex flex-center">
+      <q-input v-model="pdf.title" label="عنوان" />
     </q-card>
   </div>
   <q-card-section
@@ -372,10 +400,10 @@ function copyUrl(){
     <q-card v-if="pdf != null">
       <q-card-section class="q-pa-lg flex flex-center">
         <a :href="'/' + pdf.id + '/1'">
-        <q-img :src="pdf.extenalCoverImageUrl" spinner-color="white" class="width-300px"> </q-img>
-      </a>
+          <q-img :src="pdf.extenalCoverImageUrl" spinner-color="white" class="width-300px"> </q-img>
+        </a>
       </q-card-section>
-     
+
       <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
         {{ pdf.subTitle }}
       </q-card-section>
@@ -502,7 +530,7 @@ function copyUrl(){
         />
       </div>
     </q-card>
-    <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+    <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
       <q-btn label="حذف کتاب" @click="deletePDFBook" />
     </q-card>
   </div>
