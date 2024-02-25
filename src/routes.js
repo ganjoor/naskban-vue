@@ -6,6 +6,7 @@ import LoginView from './views/LoginView.vue'
 import GanjoorFrame from './views/GanjoorFrame.vue'
 import GanjoorReview from './views/GanjoorReview.vue'
 import SearchText from './views/SearchText.vue'
+import BookmarksView from './views/BookmarksView.vue'
 
 export const routes = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -55,6 +56,11 @@ export const routes = createRouter({
       path: '/text',
       name: 'text',
       component: SearchText
+    },
+    {
+      path: '/bookmarks',
+      name: 'bookmarks',
+      component: BookmarksView
     }
   ]
 })
