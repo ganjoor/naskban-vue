@@ -108,8 +108,21 @@ async function deletePDFBook(id, title) {
 function goToLogin() {
   window.location.href = '/login'
 }
-function logout(){
-
+async function logout(){
+  if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
+    return
+  }
+  loading.value = true
+  await fetch(`https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  localStorage.setItem('userInfo',null)
+  bus.emit('user-logged-out')
 }
 </script>
 
