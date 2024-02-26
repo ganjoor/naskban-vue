@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { bus } from './../event-bus'
+import { routes } from './../routes'
 const email = ref('')
 const captchaImageId = ref('')
 const captchaValue = ref('')
@@ -9,7 +11,7 @@ const confirmPassword = ref('')
 const firstName = ref('')
 const surName = ref('')
 const loading = ref(false)
-const phase = ref('final')
+const phase = ref('signup')
 
 onMounted(async () => {
   document.title = 'نسک‌بان - نام‌نویسی'
@@ -72,6 +74,58 @@ async function verify() {
   email.value = await response.json();
   phase.value = 'final';
 }
+async function signIn() {
+  loading.value = true
+  const API_LOGIN = `https://api.naskban.ir/api/users/login`
+  const response = await fetch(API_LOGIN, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: email.value,
+      password: password.value,
+      clientAppName: 'Naskban Vue Client',
+      language: 'fa-IR'
+    })
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  var userInfo = await response.json()
+  localStorage.setItem('userInfo', JSON.stringify(userInfo))
+  bus.emit('user-logged-in', userInfo)
+  routes.push({ path: '/' })
+}
+async function finalizeSetup(){
+  if(password.value != confirmPassword.value){
+    alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژه وارد کنید.');
+    return;
+  }
+  const response = await fetch(`https://api.naskban.ir/api/users/finalizesignup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email: email.value,
+      secret: verificationCode.value,
+      password: password.value,
+      firstName: firstName.value,
+      sureName: surName.value,
+    })
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+
+  await signIn();
+
+}
 </script>
 <template>
   <div class="q-pa-lg flex flex-center" v-if="loading">
@@ -82,13 +136,13 @@ async function verify() {
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">نام‌نویسی</div>
       <q-card-section>
-        <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی"></q-input>
+        <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی" autocomplete="off"></q-input>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <img :src="`https://api.naskban.ir/api/rimages/${captchaImageId}.jpg`" />
       </q-card-section>
       <q-card-section>
-        <q-input dense outlined v-model="captchaValue" label="عدد تصویر امنیتی"></q-input>
+        <q-input dense outlined v-model="captchaValue" label="عدد تصویر امنیتی" autocomplete="off"></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
@@ -110,7 +164,7 @@ async function verify() {
         <p>لطفاً ایمیل خود را بررسی بفرمایید. می‌بایست ایمیلی از نشانی noreply@naskban.ir حاوی یک کد عددی دریافت کرده باشید. ‌آن کد را در کادر زیر وارد کنید:</p>
       </q-card-section>
       <q-card-section>
-        <q-input dense outlined v-model="verificationCode" label="کد ۶ رقمی تأیید"></q-input>
+        <q-input dense outlined v-model="verificationCode" label="کد ۶ رقمی تأیید" autocomplete="off"></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
@@ -135,8 +189,8 @@ async function verify() {
       <div class="text-grey-9 text-h5 text-weight-bold text-center">مرحلهٔ پایانی</div>
       <q-card-section>
         <p>لطفاً نام و نام خانوادگی (واقعی یا مستعار) و گذرواژهٔ مد نظر خود برای ورود را وارد کنید. </p>
-        <q-input dense outlined v-model="firstName" label="نام"></q-input>
-        <q-input dense outlined v-model="surName" label="نام خانوادگی"></q-input>
+        <q-input dense outlined v-model="firstName" label="نام" autocomplete="off"></q-input>
+        <q-input dense outlined v-model="surName" label="نام خانوادگی" autocomplete="off"></q-input>
         <p>گذرواژه باید دست کم شامل ۶ حرف باشد و از ترکیبی از اعداد و حروف انگلیسی تشکیل شده باشد. </p>
         <p>حروف و اعداد نباید تکراری باشند و وجود حداقل یک عدد و یک حرف کوچک انگلیسی در گذرواژه الزامی است.</p>
         <q-input
@@ -146,6 +200,7 @@ async function verify() {
           v-model="password"
           type="password"
           label="گذرواژه"
+          autocomplete="off"
         ></q-input>
         <q-input
           dense
@@ -154,6 +209,7 @@ async function verify() {
           v-model="confirmPassword"
           type="password"
           label="تکرار گذرواژه"
+          autocomplete="off"
         ></q-input>
       </q-card-section>
       <q-card-section>
