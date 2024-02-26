@@ -4,8 +4,12 @@ const email = ref('')
 const captchaImageId = ref('')
 const captchaValue = ref('')
 const verificationCode = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const firstName = ref('')
+const surName = ref('')
 const loading = ref(false)
-const phase = ref('verify')
+const phase = ref('final')
 
 onMounted(async () => {
   document.title = 'نسک‌بان - نام‌نویسی'
@@ -123,6 +127,45 @@ async function verify() {
           <a @click="goToSignup" class="text-dark text-weight-bold">مرحلهٔ قبل</a>
         </div>
       </q-card-section>
+      </q-card-section>
+    </q-card>
+  </div>
+  <div class="flex flex-center" v-if="phase == 'final'">
+    <q-card class="q-pa-md shadow-2 login-card" bordered>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">مرحلهٔ پایانی</div>
+      <q-card-section>
+        <p>لطفاً نام و نام خانوادگی (واقعی یا مستعار) و گذرواژهٔ مد نظر خود برای ورود را وارد کنید. </p>
+        <q-input dense outlined v-model="firstName" label="نام"></q-input>
+        <q-input dense outlined v-model="surName" label="نام خانوادگی"></q-input>
+        <p>گذرواژه باید دست کم شامل ۶ حرف باشد و از ترکیبی از اعداد و حروف انگلیسی تشکیل شده باشد. </p>
+        <p>حروف و اعداد نباید تکراری باشند و وجود حداقل یک عدد و یک حرف کوچک انگلیسی در گذرواژه الزامی است.</p>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="password"
+          type="password"
+          label="گذرواژه"
+        ></q-input>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="confirmPassword"
+          type="password"
+          label="تکرار گذرواژه"
+        ></q-input>
+      </q-card-section>
+      <q-card-section>
+        <q-btn
+          color="green"
+          rounded
+          size="md"
+          label="پایان"
+          no-caps
+          class="full-width"
+          @click="finalizeSetup"
+        ></q-btn>
       </q-card-section>
     </q-card>
   </div>
