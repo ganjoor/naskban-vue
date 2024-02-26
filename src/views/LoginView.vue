@@ -2,9 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
+import { useRoute } from 'vue-router'
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
+const route = useRoute()
 
 onMounted(() => {
   document.title = 'نسک‌بان - ورود';
@@ -33,7 +35,13 @@ async function signIn() {
   var userInfo = await response.json()
   localStorage.setItem('userInfo', JSON.stringify(userInfo))
   bus.emit('user-logged-in', userInfo)
-  routes.push({ path: '/' })
+  if(route.query.redirect != null){
+    routes.push({ path: route.query.redirect })
+  }
+  else{
+    routes.push({ path: '/' })
+  }
+
 }
 function goToSignup() {
   window.location.href = '/signup'
