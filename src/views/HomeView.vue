@@ -29,6 +29,9 @@ onMounted(() => {
       userInfo.value = null
     }
   }
+  if(userInfo.value == null){
+    goToLogin();
+  }
 })
 
 watchEffect(async () => {

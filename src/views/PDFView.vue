@@ -33,6 +33,10 @@ onMounted(() => {
       userInfo.value = null
     }
   }
+
+  if(userInfo.value == null){
+    window.location.href = `/login?redirect=${window.location.href.replace('https://naskban.ir', '').replace('http://localhost:5173', '')}`
+  }
 })
 
 watchEffect(async () => {
