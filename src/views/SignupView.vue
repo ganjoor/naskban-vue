@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { routes } from './../routes'
 const email = ref('')
 const captchaImageId = ref('')
 const captchaValue = ref('')
+const verificationCode = ref('')
 const loading = ref(false)
+const phase = ref('verify')
 
 onMounted(async () => {
   document.title = 'نسک‌بان - نام‌نویسی'
@@ -20,8 +21,7 @@ onMounted(async () => {
 
 async function signUp() {
   loading.value = true
-  const API_SIGNUP = `https://api.naskban.ir/api/users/signup`
-  const response = await fetch(API_SIGNUP, {
+  const response = await fetch(`https://api.naskban.ir/api/users/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -30,7 +30,7 @@ async function signUp() {
       email: email.value,
       captchaImageId: captchaImageId.value,
       captchaValue: captchaValue.value,
-      callbackUrl: '/',
+      callbackUrl: 'http://localhost:5173/signup',
       clientAppName: 'Naskban Vue Client',
       language: 'fa-IR'
     })
@@ -39,17 +39,34 @@ async function signUp() {
   if (!response.ok) {
     alert(await response.json())
     loading.value = true
-    const response2 = await fetch(`https://api.naskban.ir/api/users/captchaimage`)
+    const responseNewCaptcha = await fetch(`https://api.naskban.ir/api/users/captchaimage`)
     loading.value = false
-    if (!response2.ok) {
-      alert(await response2.json())
+    if (!responseNewCaptcha.ok) {
+      alert(await responseNewCaptcha.json())
       return
     }
-    captchaImageId.value = await response2.json()
+    captchaImageId.value = await responseNewCaptcha.json()
     return
   }
 
-  routes.push({ path: '/' })
+  phase.value = 'verify';
+}
+function goToSignup() {
+  phase.value = 'signup';
+}
+async function verify() {
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/users/verify?type=0&secret=${verificationCode.value}`, {
+    method: 'GET',
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+
+  email.value = await response.json();
+  phase.value = 'final';
 }
 </script>
 <template>
@@ -57,11 +74,11 @@ async function signUp() {
     <q-spinner-hourglass color="green" size="4em" />
   </div>
 
-  <div class="flex flex-center">
+  <div class="flex flex-center" v-if="phase == 'signup'">
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">نام‌نویسی</div>
       <q-card-section>
-        <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
+        <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی"></q-input>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <img :src="`https://api.naskban.ir/api/rimages/${captchaImageId}.jpg`" />
@@ -79,6 +96,33 @@ async function signUp() {
           class="full-width"
           @click="signUp"
         ></q-btn>
+      </q-card-section>
+    </q-card>
+  </div>
+  <div class="flex flex-center" v-if="phase == 'verify'">
+    <q-card class="q-pa-md shadow-2 login-card" bordered>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">تأیید نام‌نویسی</div>
+      <q-card-section>
+        <p>لطفاً ایمیل خود را بررسی بفرمایید. می‌بایست ایمیلی از نشانی noreply@naskban.ir حاوی یک کد عددی دریافت کرده باشید. ‌آن کد را در کادر زیر وارد کنید:</p>
+      </q-card-section>
+      <q-card-section>
+        <q-input dense outlined v-model="verificationCode" label="کد ۶ رقمی تأیید"></q-input>
+      </q-card-section>
+      <q-card-section>
+        <q-btn
+          color="green"
+          rounded
+          size="md"
+          label="بررسی"
+          no-caps
+          class="full-width"
+          @click="verify"
+        ></q-btn>
+        <q-card-section class="text-center q-pa-md">
+        <div class="text-grey-8">
+          <a @click="goToSignup" class="text-dark text-weight-bold">مرحلهٔ قبل</a>
+        </div>
+      </q-card-section>
       </q-card-section>
     </q-card>
   </div>
