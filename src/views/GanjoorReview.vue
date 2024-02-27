@@ -13,10 +13,8 @@ watchEffect(async () => {
     }
   }
   if(userInfo.value == null) return;
-  const url = `https://api.naskban.ir/api/pdf/ganjoor/nextunreviewed?skip=0`
-
   loading.value = true
-  const response = await fetch(url, {
+  const response = await fetch(`https://api.naskban.ir/api/pdf/ganjoor/nextunreviewed?skip=0`, {
     headers: {
       authorization: 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
@@ -33,10 +31,8 @@ watchEffect(async () => {
 async function reviewLink(result){
     if(userInfo.value == null) return;
   let apiRes = result == true ? 1 : 2;
-  const url = `https://api.naskban.ir/api/pdf/ganjoor/review/${ganjoorLink.value.id}/${apiRes}`
-
   loading.value = true
-  const response = await fetch(url, {
+  const response = await fetch(`https://api.naskban.ir/api/pdf/ganjoor/review/${ganjoorLink.value.id}/${apiRes}`, {
     method: 'PUT',
     headers: {
       authorization: 'bearer ' + userInfo.value.token,

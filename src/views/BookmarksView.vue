@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 
-const API_URL = `https://api.naskban.ir/api/pdf/bookmark/null/null`
 const route = useRoute()
 
 const loading = ref(false)
@@ -36,11 +35,8 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
-  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
-
-  
   loading.value = true
-  const res = await fetch(url, {
+  const res = await fetch(`https://api.naskban.ir/api/pdf/bookmark/null/null?PageNumber=${pageNumber.value}&PageSize=${pageSize}`, {
     headers: {
       authorization: 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
