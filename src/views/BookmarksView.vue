@@ -91,6 +91,7 @@ async function logout(){
   loading.value = false
   localStorage.setItem('userInfo',null)
   bus.emit('user-logged-out')
+  window.location.href = '/login'
 }
 </script>
 
