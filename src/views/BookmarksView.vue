@@ -36,12 +36,15 @@ watchEffect(async () => {
     }
   }
   loading.value = true
-  const res = await fetch(`https://api.naskban.ir/api/pdf/bookmark/null/null?PageNumber=${pageNumber.value}&PageSize=${pageSize}`, {
-    headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
+  const res = await fetch(
+    `https://api.naskban.ir/api/pdf/bookmark/null/null?PageNumber=${pageNumber.value}&PageSize=${pageSize}`,
+    {
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
     }
-  })
+  )
   bookmarks.value = await res.json()
   for (var pair of res.headers.entries()) {
     if (pair[0] == 'paging-headers') {
@@ -52,7 +55,7 @@ watchEffect(async () => {
   loading.value = false
   let pageUrl = ''
   let docTitle = 'نسک‌بان - نشان‌شده‌ها'
-  
+
   if (pageNumber.value > 1) {
     docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
   }
@@ -68,24 +71,26 @@ watchEffect(async () => {
   document.title = docTitle
 })
 
-
 function goToLogin() {
   window.location.href = '/login'
 }
-async function logout(){
+async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
   }
   loading.value = true
-  await fetch(`https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
+  await fetch(
+    `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
     }
-  })
+  )
   loading.value = false
-  localStorage.setItem('userInfo',null)
+  localStorage.setItem('userInfo', null)
   bus.emit('user-logged-out')
   window.location.href = '/login'
 }
@@ -95,10 +100,24 @@ async function logout(){
   <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
       <q-separator vertical inset spaced />
-      <q-btn v-if="userInfo == null" dense flat icon="account_circle" class="gt-xs green" @click="goToLogin">
+      <q-btn
+        v-if="userInfo == null"
+        dense
+        flat
+        icon="account_circle"
+        class="gt-xs green"
+        @click="goToLogin"
+      >
         <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
       </q-btn>
-      <q-btn v-if="userInfo != null" dense flat icon="directions_run" class="gt-xs green flip-horizontal" @click="logout">
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="directions_run"
+        class="gt-xs green flip-horizontal"
+        @click="logout"
+      >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
     </div>
@@ -135,7 +154,6 @@ async function logout(){
           <q-card-section class="text-h6">
             <a :href="'/' + bookmark.bookId">{{ bookmark.bookTitle }} </a>
           </q-card-section>
-         
         </q-card>
       </a>
       <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber" v-if="bookmark.pageNumber != 0">
@@ -148,9 +166,10 @@ async function logout(){
           >
           </q-img>
           <q-card-section class="text-h6">
-            <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber">{{ bookmark.bookTitle }} - صفحهٔ {{ en2fa(bookmark.pageNumber.toString()) }} </a>
+            <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber"
+              >{{ bookmark.bookTitle }} - صفحهٔ {{ en2fa(bookmark.pageNumber.toString()) }}
+            </a>
           </q-card-section>
-         
         </q-card>
       </a>
     </div>

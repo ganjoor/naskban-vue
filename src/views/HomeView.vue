@@ -5,7 +5,6 @@ import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
 
-const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
 
 const loading = ref(false)
@@ -29,8 +28,8 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  if(userInfo.value == null){
-    goToLogin();
+  if (userInfo.value == null) {
+    goToLogin()
   }
 })
 
@@ -42,19 +41,24 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
-  let url = `${API_URL}?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
+  let url = `https://api.naskban.ir/api/pdf?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
 
   if (route.query.s != null) {
     searchTerm.value = route.query.s
   }
   if (searchTerm.value != '') {
-    url = `${API_URL}/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=${pageSize}`
+    url = `https://api.naskban.ir/api/pdf/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=${pageSize}`
   }
 
   canDelete.value = checkPermission('pdf', 'delete')
 
   loading.value = true
-  const res = await fetch(url)
+  const res = await fetch(url, {
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
   pdfs.value = await res.json()
   for (var pair of res.headers.entries()) {
     if (pair[0] == 'paging-headers') {

@@ -1,10 +1,9 @@
 <script setup>
 import { ref, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { en2fa } from '../en2fa';
+import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 
-const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
 
 const loading = ref(false)
@@ -26,8 +25,10 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  if(userInfo.value == null){
-    window.location.href = `/login?redirect=${window.location.href.replace('https://naskban.ir', '').replace('http://localhost:5173', '')}`
+  if (userInfo.value == null) {
+    window.location.href = `/login?redirect=${window.location.href
+      .replace('https://naskban.ir', '')
+      .replace('http://localhost:5173', '')}`
   }
 })
 
@@ -46,9 +47,16 @@ watchEffect(async () => {
   let pageUrl = '/text'
   let docTitle = 'نسک‌بان - جستجو در متن'
   if (searchTerm.value != '') {
-    let url = `${API_URL}/search/pages/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`
     loading.value = true
-    const res = await fetch(url)
+    const res = await fetch(
+      `https://api.naskban.ir/api/pdf/search/pages/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`,
+      {
+        headers: {
+          authorization: 'bearer ' + userInfo.value.token,
+          'content-type': 'application/json'
+        }
+      }
+    )
     pdfs.value = await res.json()
     for (var pair of res.headers.entries()) {
       if (pair[0] == 'paging-headers') {
@@ -177,14 +185,12 @@ async function logout() {
       icon-next="fast_rewind"
       icon-prev="fast_forward"
     />
-    <q-card v-if="!loading && pageCount == 0">
-      نتیجه‌ای یافت نشد.
-    </q-card>
+    <q-card v-if="!loading && pageCount == 0"> نتیجه‌ای یافت نشد. </q-card>
   </div>
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="'/' + pdf.id+ '?s=' + encodeURI(searchTerm)">
+      <a :href="'/' + pdf.id + '?s=' + encodeURI(searchTerm)">
         <q-card class="fit">
           <q-img
             :src="pdf.extenalCoverImageUrl"
@@ -208,7 +214,11 @@ async function logout() {
   </div>
 
   <div class="q-pa-lg flex flex-center">
-    <q-spinner-hourglass v-if="loading && pdfs != null && pdfs.length > 0" color="green" size="4em" />
+    <q-spinner-hourglass
+      v-if="loading && pdfs != null && pdfs.length > 0"
+      color="green"
+      size="4em"
+    />
     <q-pagination
       v-model="pageNumber"
       v-if="!loading && pageCount != null && pageCount > 0"

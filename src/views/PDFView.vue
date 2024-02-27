@@ -5,7 +5,6 @@ import { VuePDF, usePDF } from '@tato30/vue-pdf'
 import { bus } from '../event-bus'
 import { en2fa } from '../en2fa'
 
-const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
 const loading = ref(false)
 const pdf = ref(null)
@@ -34,16 +33,23 @@ onMounted(() => {
     }
   }
 
-  if(userInfo.value == null){
-    window.location.href = `/login?redirect=${window.location.href.replace('https://naskban.ir', '').replace('http://localhost:5173', '')}`
+  if (userInfo.value == null) {
+    window.location.href = `/login?redirect=${window.location.href
+      .replace('https://naskban.ir', '')
+      .replace('http://localhost:5173', '')}`
   }
 })
 
 watchEffect(async () => {
-  const url = `${API_URL}/${route.params.id}`
-
   loading.value = true
-  pdf.value = await (await fetch(url)).json()
+  pdf.value = await (
+    await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    })
+  ).json()
   pdfFile.value = usePDF({
     url: pdf.value.externalPDFFileUrl
   })
@@ -54,7 +60,6 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
-  
 
   if (pageNumber.value == 1) {
     document.title = 'نسک‌بان - ' + pdf.value.title
@@ -89,36 +94,47 @@ async function updatePageNumber(value) {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
-async function switchBookmark(){
+async function switchBookmark() {
   loading.value = true
-  const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber.value}`, {
-    method: 'POST',
-    headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
+  const response = await fetch(
+    `https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber.value}`,
+    {
+      method: 'POST',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
     }
-  })
+  )
   loading.value = false
   if (response.ok) {
-    bookmarked.value = !bookmarked.value;
+    bookmarked.value = !bookmarked.value
   }
 }
 async function loadOCRText(pageNumber) {
-  bookmarked.value = false;
-  if(userInfo.value != null){
-    let bookmarkedRes =  await (await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber}`,
-    {headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
-    }}
-    )).json()
-    if(bookmarkedRes.length > 0){
-      bookmarked.value = true;
+  bookmarked.value = false
+  if (userInfo.value != null) {
+    let bookmarkedRes = await (
+      await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber}`, {
+        headers: {
+          authorization: 'bearer ' + userInfo.value.token,
+          'content-type': 'application/json'
+        }
+      })
+    ).json()
+    if (bookmarkedRes.length > 0) {
+      bookmarked.value = true
     }
   }
   if (pdf.value.ocRed) {
-    const url = `${API_URL}/${route.params.id}/page/${pageNumber}`
-    pageInfo.value = await (await fetch(url)).json()
+    pageInfo.value = await (
+      await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}/page/${pageNumber}`, {
+        headers: {
+          authorization: 'bearer ' + userInfo.value.token,
+          'content-type': 'application/json'
+        }
+      })
+    ).json()
     if (pageInfo.value == null || pageInfo.value.pageText == null) {
       ocrText.value = null
     } else {
@@ -209,8 +225,8 @@ async function logout() {
   window.location.href = '/login'
 }
 
-function copyUrl(){
-  navigator.clipboard.writeText(window.location.href);
+function copyUrl() {
+  navigator.clipboard.writeText(window.location.href)
 }
 </script>
 
@@ -220,13 +236,34 @@ function copyUrl(){
       <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
       </q-btn>
-      <q-btn dense flat v-if="userInfo != null && bookmarked" icon="bookmark" class="gt-xs green" @click="switchBookmark">
+      <q-btn
+        dense
+        flat
+        v-if="userInfo != null && bookmarked"
+        icon="bookmark"
+        class="gt-xs green"
+        @click="switchBookmark"
+      >
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
       </q-btn>
-      <q-btn v-if="userInfo != null" dense flat icon="bookmarks" class="gt-xs green" @click="goToBookmarks">
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="bookmarks"
+        class="gt-xs green"
+        @click="goToBookmarks"
+      >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn dense flat v-if="userInfo != null && !bookmarked" icon="bookmark_border" class="gt-xs green" @click="switchBookmark">
+      <q-btn
+        dense
+        flat
+        v-if="userInfo != null && !bookmarked"
+        icon="bookmark_border"
+        class="gt-xs green"
+        @click="switchBookmark"
+      >
         <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />

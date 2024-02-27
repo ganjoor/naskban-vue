@@ -5,7 +5,6 @@ import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
 
-const API_URL = `https://api.naskban.ir/api/pdf`
 const route = useRoute()
 
 const loading = ref(false)
@@ -37,8 +36,10 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  if(userInfo.value == null){
-    window.location.href = `/login?redirect=${window.location.href.replace('https://naskban.ir', '').replace('http://localhost:5173', '')}`
+  if (userInfo.value == null) {
+    window.location.href = `/login?redirect=${window.location.href
+      .replace('https://naskban.ir', '')
+      .replace('http://localhost:5173', '')}`
   }
 })
 
@@ -79,10 +80,16 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
-  const url = `${API_URL}/${route.params.id}`
   loading.value = true
   canDelete.value = checkPermission('pdf', 'delete')
-  pdf.value = await (await fetch(url)).json()
+  pdf.value = await (
+    await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    })
+  ).json()
   bookmarked.value = false
   if (userInfo.value != null) {
     let bookmarkedRes = await (
@@ -130,9 +137,16 @@ async function initSearch() {
 }
 
 async function performSearch() {
-  const url = `${API_URL}/search/pdfbook/${pdf.value.id}/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`
   loading.value = true
-  const res = await await fetch(url)
+  const res = await await fetch(
+    `https://api.naskban.ir/api/pdf/search/pdfbook/${pdf.value.id}/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`,
+    {
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
   loading.value = false
   for (var pair of res.headers.entries()) {
     if (pair[0] == 'paging-headers') {
@@ -342,12 +356,11 @@ function copyUrl() {
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
   </div>
   <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
-  
     <a :href="'/' + pdf.id">{{ pdf.title }}</a>
   </div>
   <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
-      <q-btn label="ویرایش" @click="editMode = !editMode" />
-    </q-card>
+    <q-btn label="ویرایش" @click="editMode = !editMode" />
+  </q-card>
   <div class="q-pa-lg flex flex-center justify-center centers" v-if="editMode">
     <q-card class="q-pa-lg flex flex-center">
       <q-input v-model="pdf.title" label="عنوان" />
