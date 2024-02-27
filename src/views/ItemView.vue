@@ -290,13 +290,13 @@ function copyUrl() {
         dense
         flat
         icon="manage_search"
-        class="gt-xs green"
+        class="green"
         @click="initSearch"
       >
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="pdf != null && pdf.ocRed == true" />
-      <q-btn dense flat icon="link" class="gt-xs green" @click="copyUrl">
+      <q-btn dense flat icon="link" class="green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
       </q-btn>
       <q-btn
@@ -304,7 +304,7 @@ function copyUrl() {
         flat
         v-if="userInfo != null && bookmarked"
         icon="bookmark"
-        class="gt-xs green"
+        class="green"
         @click="switchBookmark"
       >
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
@@ -314,7 +314,7 @@ function copyUrl() {
         dense
         flat
         icon="bookmarks"
-        class="gt-xs green"
+        class="green"
         @click="goToBookmarks"
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
@@ -324,7 +324,7 @@ function copyUrl() {
         flat
         v-if="userInfo != null && !bookmarked"
         icon="bookmark_border"
-        class="gt-xs green"
+        class="green"
         @click="switchBookmark"
       >
         <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
@@ -335,7 +335,7 @@ function copyUrl() {
         dense
         flat
         icon="account_circle"
-        class="gt-xs green"
+        class="green"
         @click="goToLogin"
       >
         <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
@@ -345,7 +345,7 @@ function copyUrl() {
         dense
         flat
         icon="directions_run"
-        class="gt-xs green flip-horizontal"
+        class="green flip-horizontal"
         @click="logout"
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>

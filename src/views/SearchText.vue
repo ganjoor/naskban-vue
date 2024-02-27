@@ -133,7 +133,7 @@ async function logout() {
         placeholder="جستجو"
         @keydown.enter.prevent="doSearch"
       />
-      <q-btn dense flat icon="manage_search" class="gt-xs green" @click="doSearch">
+      <q-btn dense flat icon="manage_search" class="green" @click="doSearch">
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
@@ -142,7 +142,7 @@ async function logout() {
         dense
         flat
         icon="bookmarks"
-        class="gt-xs green"
+        class="green"
         @click="goToBookmarks"
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
@@ -153,7 +153,7 @@ async function logout() {
         dense
         flat
         icon="account_circle"
-        class="gt-xs green"
+        class="green"
         @click="goToLogin"
       >
         <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
@@ -163,7 +163,7 @@ async function logout() {
         dense
         flat
         icon="directions_run"
-        class="gt-xs green flip-horizontal"
+        class="green flip-horizontal"
         @click="logout"
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>

@@ -105,7 +105,7 @@ async function logout() {
         dense
         flat
         icon="account_circle"
-        class="gt-xs green"
+        class="green"
         @click="goToLogin"
       >
         <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
@@ -115,7 +115,7 @@ async function logout() {
         dense
         flat
         icon="directions_run"
-        class="gt-xs green flip-horizontal"
+        class="green flip-horizontal"
         @click="logout"
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
