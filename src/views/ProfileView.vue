@@ -3,13 +3,20 @@ import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
 import { useRoute } from 'vue-router'
+const route = useRoute()
 const userInfo = ref(null)
-const email = ref('aaa')
+
+const email = ref('')
 const password = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
+
+const firstName = ref('')
+const sureName = ref('')
+const nickName = ref('')
+
 const loading = ref(false)
-const route = useRoute()
+
 
 onMounted(() => {
   document.title = 'نسک‌بان - نمایهٔ کاربر';
@@ -21,6 +28,9 @@ onMounted(() => {
     }
   }
   email.value = userInfo.value.user.email;
+  firstName.value = userInfo.value.user.firstName;
+  sureName.value = userInfo.value.user.sureName;
+  nickName.value = userInfo.value.user.nickName;
 })
 
 async function changePassword() {
@@ -46,6 +56,29 @@ async function changePassword() {
     return
   }
   alert('گذرواژهٔ شما به درستی تغییر کرد.')
+}
+
+async function saveProfile(){
+  loading.value = true
+  userInfo.value.user.nickName = nickName.value;
+  userInfo.value.user.firstName = firstName.value;
+  userInfo.value.user.sureName = sureName.value;
+  const response = await fetch(`https://api.naskban.ir/api/users/${userInfo.value.user.id}`, {
+    method: 'PUT',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(
+      userInfo.value.user
+    )
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  alert('نمایهٔ کاربری شما ذخیره شد.')
 }
 </script>
 <template>
@@ -109,25 +142,22 @@ async function changePassword() {
           dense
           outlined
           class="q-mt-md"
-          v-model="password"
-          type="password"
-          label="گذرواژهٔ کنونی"
+          v-model="nickName"
+          label="نام مستعار"
         ></q-input>
         <q-input
           dense
           outlined
           class="q-mt-md"
-          v-model="password"
-          type="password"
-          label="گذرواژهٔ جدید"
+          v-model="firstName"
+          label="نام"
         ></q-input>
         <q-input
           dense
           outlined
           class="q-mt-md"
-          v-model="password"
-          type="password"
-          label="تکرار گذرواژهٔ کنونی"
+          v-model="sureName"
+          label="نام خانوادگی"
         ></q-input>
       </q-card-section>
       <q-card-section>
@@ -135,10 +165,10 @@ async function changePassword() {
           color="green"
           rounded
           size="md"
-          label="تغییر گذرواژه"
+          label="ذخیره"
           no-caps
           class="full-width"
-          @click="signIn"
+          @click="saveProfile"
         ></q-btn>
       </q-card-section>
     </q-card>
