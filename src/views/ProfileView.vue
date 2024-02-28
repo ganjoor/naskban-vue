@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
 import { useRoute } from 'vue-router'
-const email = ref('')
+const email = ref('aaa')
 const password = ref('')
 const loading = ref(false)
 const route = useRoute()
@@ -43,9 +43,6 @@ async function signIn() {
   }
 
 }
-function goToSignup() {
-  window.location.href = '/signup'
-}
 </script>
 <template>
   <div class="flex flex-center">
@@ -53,6 +50,57 @@ function goToSignup() {
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">تغییر گذرواژه</div>
       <q-card-section>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="password"
+          type="password"
+          label="گذرواژهٔ کنونی"
+        ></q-input>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="password"
+          type="password"
+          label="گذرواژهٔ جدید"
+        ></q-input>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="password"
+          type="password"
+          label="تکرار گذرواژهٔ کنونی"
+        ></q-input>
+      </q-card-section>
+      <q-card-section>
+        <q-btn
+          color="green"
+          rounded
+          size="md"
+          label="تغییر گذرواژه"
+          no-caps
+          class="full-width"
+          @click="signIn"
+        ></q-btn>
+      </q-card-section>
+    </q-card>
+  </div>
+  <div class="flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    <q-card class="q-pa-md shadow-2 login-card" bordered>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">نمایهٔ کاربر</div>
+      <q-card-section>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="email"
+          readonly
+          label="پست الکترونیکی"
+        ></q-input>
         <q-input
           dense
           outlined
