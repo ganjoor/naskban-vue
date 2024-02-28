@@ -36,7 +36,7 @@ async function signUp() {
       email: email.value,
       captchaImageId: captchaImageId.value,
       captchaValue: captchaValue.value,
-      callbackUrl: 'http://localhost:5173/signup',
+      callbackUrl: 'https://naskban.ir/signup',
       clientAppName: 'Naskban Vue Client',
       language: 'fa-IR'
     })

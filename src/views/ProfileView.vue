@@ -15,6 +15,8 @@ const firstName = ref('')
 const sureName = ref('')
 const nickName = ref('')
 
+const phase = ref('start')
+
 const loading = ref(false)
 
 onMounted(() => {
@@ -75,7 +77,31 @@ async function saveProfile() {
     alert(await response.json())
     return
   }
-  alert('نمایهٔ کاربری شما ذخیره شد.')
+  phase.value = 'verify'
+}
+
+async function startDeleteUser() {
+  loading.value = true
+  userInfo.value.user.nickName = nickName.value
+  userInfo.value.user.firstName = firstName.value
+  userInfo.value.user.sureName = sureName.value
+  const response = await fetch(`https://api.naskban.ir/api/users/selfdelete/start`, {
+    method: 'POST',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      password: password.value,
+      callbackUrl: 'https://naskban.ir/profile'
+    })
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  phase.value = 'verify'
 }
 </script>
 <template>
@@ -165,6 +191,7 @@ async function saveProfile() {
       </p>
       <q-card-section>
         <q-input
+          v-if="phase != 'verify'"
           dense
           outlined
           class="q-mt-md"
@@ -175,13 +202,14 @@ async function saveProfile() {
       </q-card-section>
       <q-card-section>
         <q-btn
+          v-if="phase != 'verify'"
           color="red"
           rounded
           size="md"
           label="حذف حساب کاربری"
           no-caps
           class="full-width"
-          @click="saveProfile"
+          @click="startDeleteUser"
         ></q-btn>
       </q-card-section>
     </q-card>
