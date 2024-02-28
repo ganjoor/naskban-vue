@@ -228,11 +228,40 @@ async function logout() {
 function copyUrl() {
   navigator.clipboard.writeText(window.location.href)
 }
+function initSearch(){
+  window.location.href = '/' + pdf.value.id.toString() + '?s=' + encodeURI(document.getElementById('s').value)
+}
 </script>
 
 <template class="full-width">
+    <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
+    <a :href="'/' + pdf.id">{{ pdf.title }}</a>
+  </div>
   <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
+      <input
+        v-if="pdf != null && pdf.ocRed == true"
+        outlined
+        :value="searchTerm"
+        input-class="text-right"
+        class="q-ml-md"
+        id="s"
+        name="s"
+        type="search"
+        placeholder="جستجو در متن"
+        @keydown.enter.prevent="initSearch"
+      />
+      <q-btn
+        v-if="pdf != null && pdf.ocRed == true"
+        dense
+        flat
+        icon="manage_search"
+        class="green"
+        @click="initSearch"
+      >
+        <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced v-if="pdf != null && pdf.ocRed == true" />
       <q-btn dense flat icon="link" class="green" @click="copyUrl">
         <q-tooltip class="bg-green text-white">کپی نشانی به حافظه</q-tooltip>
       </q-btn>
@@ -290,9 +319,6 @@ function copyUrl() {
     </div>
   </q-bar>
   <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg flex flex-center">
-    <q-card-section>
-      <a :href="'/' + pdf.id">{{ pdf.title }}</a>
-    </q-card-section>
     <q-card-section class="full-width q-pa-lg flex flex-center justify-center centers">
       <q-pagination
         v-if="pdfFile != null"

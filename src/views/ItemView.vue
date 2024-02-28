@@ -271,6 +271,9 @@ function copyUrl() {
 </script>
 
 <template>
+  <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
+    <a :href="'/' + pdf.id">{{ pdf.title }}</a>
+  </div>
   <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
       <input
@@ -354,9 +357,6 @@ function copyUrl() {
   </q-bar>
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
-  </div>
-  <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
-    <a :href="'/' + pdf.id">{{ pdf.title }}</a>
   </div>
   <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
     <q-btn label="ویرایش" @click="editMode = !editMode" />
