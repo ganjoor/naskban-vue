@@ -17,6 +17,8 @@ const nickName = ref('')
 
 const phase = ref('start')
 
+const verificationCode = ref('')
+
 const loading = ref(false)
 
 onMounted(() => {
@@ -82,9 +84,6 @@ async function saveProfile() {
 
 async function startDeleteUser() {
   loading.value = true
-  userInfo.value.user.nickName = nickName.value
-  userInfo.value.user.firstName = firstName.value
-  userInfo.value.user.sureName = sureName.value
   const response = await fetch(`https://api.naskban.ir/api/users/selfdelete/start`, {
     method: 'POST',
     headers: {
@@ -102,6 +101,30 @@ async function startDeleteUser() {
     return
   }
   phase.value = 'verify'
+}
+async function finalizeDelete() {
+  if (!confirm('آیا از حذف حساب کاربری خود اطمینان دارید؟')) {
+    return
+  }
+  loading.value = true
+  const response = await fetch(
+    `https://api.naskban.ir/api/users/selfdelete/finalize/${verificationCode.value}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  localStorage.setItem('userInfo', null)
+  bus.emit('user-logged-out')
+  window.location.href = '/login'
 }
 </script>
 <template>
@@ -186,12 +209,9 @@ async function startDeleteUser() {
         حذف حساب کاربری موجب حذف تمام سوابق کاربر در نسک‌بان به صورت غیر قابل برگشت می‌شود. در صورت
         نام‌نویسی دوباره موارد نشان‌شده و سایر اطلاعات برنخواهد گشت.
       </p>
-      <p>
-        برای شروع عملیات حذف حساب کاربری گذرواژهٔ خود را وارد کنید.
-      </p>
-      <q-card-section>
+      <p v-if="phase != 'verify'">برای شروع عملیات حذف حساب کاربری گذرواژهٔ خود را وارد کنید.</p>
+      <q-card-section v-if="phase != 'verify'">
         <q-input
-          v-if="phase != 'verify'"
           dense
           outlined
           class="q-mt-md"
@@ -200,9 +220,8 @@ async function startDeleteUser() {
           label="گذرواژه"
         ></q-input>
       </q-card-section>
-      <q-card-section>
+      <q-card-section v-if="phase != 'verify'">
         <q-btn
-          v-if="phase != 'verify'"
           color="red"
           rounded
           size="md"
@@ -210,6 +229,32 @@ async function startDeleteUser() {
           no-caps
           class="full-width"
           @click="startDeleteUser"
+        ></q-btn>
+      </q-card-section>
+      <q-card-section v-if="phase == 'verify'">
+        <p>
+          لطفاً ایمیل خود را بررسی بفرمایید. می‌بایست ایمیلی از نشانی noreply@naskban.ir حاوی یک کد
+          عددی دریافت کرده باشید. ‌آن کد را در کادر زیر وارد کنید:
+        </p>
+      </q-card-section>
+      <q-card-section v-if="phase == 'verify'">
+        <q-input
+          dense
+          outlined
+          v-model="verificationCode"
+          label="کد ۶ رقمی تأیید"
+          autocomplete="off"
+        ></q-input>
+      </q-card-section>
+      <q-card-section v-if="phase == 'verify'">
+        <q-btn
+          color="red"
+          rounded
+          size="md"
+          label="حذف نهایی حساب کاربری"
+          no-caps
+          class="full-width"
+          @click="finalizeDelete"
         ></q-btn>
       </q-card-section>
     </q-card>
