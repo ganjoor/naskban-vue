@@ -17,9 +17,8 @@ const nickName = ref('')
 
 const loading = ref(false)
 
-
 onMounted(() => {
-  document.title = 'نسک‌بان - نمایهٔ کاربر';
+  document.title = 'نسک‌بان - نمایهٔ کاربر'
   if (localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
@@ -27,16 +26,16 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  email.value = userInfo.value.user.email;
-  firstName.value = userInfo.value.user.firstName;
-  sureName.value = userInfo.value.user.sureName;
-  nickName.value = userInfo.value.user.nickName;
+  email.value = userInfo.value.user.email
+  firstName.value = userInfo.value.user.firstName
+  sureName.value = userInfo.value.user.sureName
+  nickName.value = userInfo.value.user.nickName
 })
 
 async function changePassword() {
-  if(newPassword.value != confirmPassword.value){
-    alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژهٔ جدید وارد کنید.');
-    return;
+  if (newPassword.value != confirmPassword.value) {
+    alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژهٔ جدید وارد کنید.')
+    return
   }
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/users/setmypassword`, {
@@ -58,20 +57,18 @@ async function changePassword() {
   alert('گذرواژهٔ شما به درستی تغییر کرد.')
 }
 
-async function saveProfile(){
+async function saveProfile() {
   loading.value = true
-  userInfo.value.user.nickName = nickName.value;
-  userInfo.value.user.firstName = firstName.value;
-  userInfo.value.user.sureName = sureName.value;
+  userInfo.value.user.nickName = nickName.value
+  userInfo.value.user.firstName = firstName.value
+  userInfo.value.user.sureName = sureName.value
   const response = await fetch(`https://api.naskban.ir/api/users/${userInfo.value.user.id}`, {
     method: 'PUT',
     headers: {
       authorization: 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
     },
-    body: JSON.stringify(
-      userInfo.value.user
-    )
+    body: JSON.stringify(userInfo.value.user)
   })
   loading.value = false
   if (!response.ok) {
@@ -138,27 +135,9 @@ async function saveProfile(){
           readonly
           label="پست الکترونیکی"
         ></q-input>
-        <q-input
-          dense
-          outlined
-          class="q-mt-md"
-          v-model="nickName"
-          label="نام مستعار"
-        ></q-input>
-        <q-input
-          dense
-          outlined
-          class="q-mt-md"
-          v-model="firstName"
-          label="نام"
-        ></q-input>
-        <q-input
-          dense
-          outlined
-          class="q-mt-md"
-          v-model="sureName"
-          label="نام خانوادگی"
-        ></q-input>
+        <q-input dense outlined class="q-mt-md" v-model="nickName" label="نام مستعار"></q-input>
+        <q-input dense outlined class="q-mt-md" v-model="firstName" label="نام"></q-input>
+        <q-input dense outlined class="q-mt-md" v-model="sureName" label="نام خانوادگی"></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
@@ -166,6 +145,40 @@ async function saveProfile(){
           rounded
           size="md"
           label="ذخیره"
+          no-caps
+          class="full-width"
+          @click="saveProfile"
+        ></q-btn>
+      </q-card-section>
+    </q-card>
+  </div>
+  <div class="flex flex-center">
+    <q-spinner-hourglass v-if="loading" color="green" size="4em" />
+    <q-card class="q-pa-md shadow-2 login-card" bordered>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">حذف حساب کاربری</div>
+      <p>
+        حذف حساب کاربری موجب حذف تمام سوابق کاربر در نسک‌بان به صورت غیر قابل برگشت می‌شود. در صورت
+        نام‌نویسی دوباره موارد نشان‌شده و سایر اطلاعات برنخواهد گشت.
+      </p>
+      <p>
+        برای شروع عملیات حذف حساب کاربری گذرواژهٔ خود را وارد کنید.
+      </p>
+      <q-card-section>
+        <q-input
+          dense
+          outlined
+          class="q-mt-md"
+          v-model="password"
+          type="password"
+          label="گذرواژه"
+        ></q-input>
+      </q-card-section>
+      <q-card-section>
+        <q-btn
+          color="red"
+          rounded
+          size="md"
+          label="حذف حساب کاربری"
           no-caps
           class="full-width"
           @click="saveProfile"
