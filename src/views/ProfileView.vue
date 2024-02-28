@@ -3,28 +3,41 @@ import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
 import { useRoute } from 'vue-router'
+const userInfo = ref(null)
 const email = ref('aaa')
 const password = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
 const loading = ref(false)
 const route = useRoute()
 
 onMounted(() => {
   document.title = 'نسک‌بان - نمایهٔ کاربر';
+  if (localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+  email.value = userInfo.value.user.email;
 })
 
-async function signIn() {
+async function changePassword() {
+  if(newPassword.value != confirmPassword.value){
+    alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژهٔ جدید وارد کنید.');
+    return;
+  }
   loading.value = true
-  const API_LOGIN = `https://api.naskban.ir/api/users/login`
-  const response = await fetch(API_LOGIN, {
+  const response = await fetch(`https://api.naskban.ir/api/users/setmypassword`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
     },
     body: JSON.stringify({
-      username: email.value,
-      password: password.value,
-      clientAppName: 'Naskban Vue Client',
-      language: 'fa-IR'
+      oldPassword: password.value,
+      newPassword: newPassword.value
     })
   })
   loading.value = false
@@ -32,16 +45,7 @@ async function signIn() {
     alert(await response.json())
     return
   }
-  var userInfo = await response.json()
-  localStorage.setItem('userInfo', JSON.stringify(userInfo))
-  bus.emit('user-logged-in', userInfo)
-  if(route.query.redirect != null){
-    routes.push({ path: route.query.redirect })
-  }
-  else{
-    routes.push({ path: '/' })
-  }
-
+  alert('گذرواژهٔ شما به درستی تغییر کرد.')
 }
 </script>
 <template>
@@ -62,7 +66,7 @@ async function signIn() {
           dense
           outlined
           class="q-mt-md"
-          v-model="password"
+          v-model="newPassword"
           type="password"
           label="گذرواژهٔ جدید"
         ></q-input>
@@ -70,7 +74,7 @@ async function signIn() {
           dense
           outlined
           class="q-mt-md"
-          v-model="password"
+          v-model="confirmPassword"
           type="password"
           label="تکرار گذرواژهٔ کنونی"
         ></q-input>
@@ -83,7 +87,7 @@ async function signIn() {
           label="تغییر گذرواژه"
           no-caps
           class="full-width"
-          @click="signIn"
+          @click="changePassword"
         ></q-btn>
       </q-card-section>
     </q-card>
