@@ -79,6 +79,9 @@ function goToSignup() {
           <a @click="goToSignup" class="text-dark text-weight-bold">نام‌نویسی</a>
         </div>
       </q-card-section>
+      <q-card-section>
+        <p>برای استفاده از امکانات نسک‌بان باید وارد آن شوید. اگر حساب کاربری ندارید <a href="/signup">نام‌نویسی</a> کنید.</p>
+      </q-card-section>
     </q-card>
   </div>
 </template>
