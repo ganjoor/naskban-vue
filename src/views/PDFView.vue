@@ -41,7 +41,7 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
-  if( userInfo.value == null) return;
+  if (userInfo.value == null) return
   loading.value = true
   pdf.value = await (
     await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
@@ -202,9 +202,7 @@ async function saveGanjoorLinkSuggestion() {
     pdfPageNumber.toString()
   )} => ${ganjoorTitle}`
 }
-function goToLogin() {
-  window.location.href = '/login'
-}
+
 function goToProfile() {
   window.location.href = '/profile'
 }
@@ -232,13 +230,45 @@ async function logout() {
 function copyUrl() {
   navigator.clipboard.writeText(window.location.href)
 }
-function initSearch(){
-  window.location.href = '/' + pdf.value.id.toString() + '?s=' + encodeURI(document.getElementById('s').value)
+function initSearch() {
+  window.location.href =
+    '/' + pdf.value.id.toString() + '?s=' + encodeURI(document.getElementById('s').value)
+}
+async function makeCover() {
+  loading.value = true
+  pageInfo.value = await (
+    await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}/page/${pageNumber.value}`, {
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    })
+  ).json()
+  loading.value = false
+  if (pageInfo.value == null) {
+    alert('pageInfo.value == null')
+    return
+  }
+  var response = await fetch(
+    `https://api.naskban.ir/api/pdf/${route.params.id}/cover/${pageInfo.value.id}`,
+    {
+      method: 'PUT',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  if (response.ok) {
+    alert('انجام شد.')
+  } else {
+    alert('خطا داد.')
+  }
 }
 </script>
 
 <template class="full-width">
-    <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
+  <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
     <a :href="'/' + pdf.id">{{ pdf.title }}</a>
   </div>
   <q-bar class="bg-white text-white flex-center">
@@ -382,6 +412,9 @@ function initSearch(){
     </q-card>
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
       <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />
+    </q-card>
+    <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+      <q-btn label="تصویر جلد شود" @click="makeCover" />
     </q-card>
 
     <q-dialog
