@@ -10,13 +10,11 @@ const captchaValue = ref('')
 const verificationCode = ref('')
 const password = ref('')
 const confirmPassword = ref('')
-const firstName = ref('')
-const surName = ref('')
 const loading = ref(false)
 const phase = ref('signup')
 
 onMounted(async () => {
-  document.title = 'نسک‌بان - نام‌نویسی'
+  document.title = 'نسک‌بان - فراموشی گذرواژه'
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/users/captchaimage`)
   loading.value = false
@@ -33,7 +31,7 @@ onMounted(async () => {
 
 async function signUp() {
   loading.value = true
-  const response = await fetch(`https://api.naskban.ir/api/users/signup`, {
+  const response = await fetch(`https://api.naskban.ir/api/users/forgotpassword`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -42,7 +40,7 @@ async function signUp() {
       email: email.value,
       captchaImageId: captchaImageId.value,
       captchaValue: captchaValue.value,
-      callbackUrl: 'https://naskban.ir/signup',
+      callbackUrl: 'https://naskban.ir/password',
       clientAppName: 'Naskban Vue Client',
       language: 'fa-IR'
     })
@@ -68,7 +66,7 @@ function goToSignup() {
 }
 async function verify() {
   loading.value = true
-  const response = await fetch(`https://api.naskban.ir/api/users/verify?type=0&secret=${verificationCode.value}`, {
+  const response = await fetch(`https://api.naskban.ir/api/users/verify?type=1&secret=${verificationCode.value}`, {
     method: 'GET',
   })
   loading.value = false
@@ -110,7 +108,7 @@ async function finalizeSetup(){
     alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژه وارد کنید.');
     return;
   }
-  const response = await fetch(`https://api.naskban.ir/api/users/finalizesignup`, {
+  const response = await fetch(`https://api.naskban.ir/api/users/resetpassword`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -119,8 +117,6 @@ async function finalizeSetup(){
       email: email.value,
       secret: verificationCode.value,
       password: password.value,
-      firstName: firstName.value,
-      sureName: surName.value,
     })
   })
   loading.value = false
@@ -140,7 +136,7 @@ async function finalizeSetup(){
 
   <div class="flex flex-center" v-if="phase == 'signup'">
     <q-card class="q-pa-md shadow-2 login-card" bordered>
-      <div class="text-grey-9 text-h5 text-weight-bold text-center">نام‌نویسی</div>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">فراموشی گذرواژه</div>
       <q-card-section>
         <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی" autocomplete="off"></q-input>
       </q-card-section>
@@ -155,7 +151,7 @@ async function finalizeSetup(){
           color="green"
           rounded
           size="md"
-          label="نام‌نویسی"
+          label="ادامه"
           no-caps
           class="full-width"
           @click="signUp"
@@ -192,11 +188,8 @@ async function finalizeSetup(){
   </div>
   <div class="flex flex-center" v-if="phase == 'final'">
     <q-card class="q-pa-md shadow-2 login-card" bordered>
-      <div class="text-grey-9 text-h5 text-weight-bold text-center">مرحلهٔ پایانی</div>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">تعیین گذرواژهٔ جدید</div>
       <q-card-section>
-        <p>لطفاً نام و نام خانوادگی (واقعی یا مستعار) و گذرواژهٔ مد نظر خود برای ورود را وارد کنید. </p>
-        <q-input dense outlined v-model="firstName" label="نام" autocomplete="off"></q-input>
-        <q-input dense outlined v-model="surName" label="نام خانوادگی" autocomplete="off"></q-input>
         <p>گذرواژه باید دست کم شامل ۶ حرف باشد و از ترکیبی از اعداد و حروف انگلیسی تشکیل شده باشد. </p>
         <p>حروف و اعداد نباید تکراری باشند و وجود حداقل یک عدد و یک حرف کوچک انگلیسی در گذرواژه الزامی است.</p>
         <q-input
