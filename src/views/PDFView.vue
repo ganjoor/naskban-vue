@@ -41,6 +41,7 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
+  if( userInfo.value == null) return;
   loading.value = true
   pdf.value = await (
     await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
