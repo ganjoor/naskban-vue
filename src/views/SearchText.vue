@@ -97,6 +97,9 @@ function goToLogin() {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
+function goToProfile() {
+  window.location.href = '/profile'
+}
 async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
@@ -149,14 +152,14 @@ async function logout() {
       </q-btn>
       <q-separator vertical inset spaced />
       <q-btn
-        v-if="userInfo == null"
+        v-if="userInfo != null"
         dense
         flat
         icon="account_circle"
         class="green"
-        @click="goToLogin"
+        @click="goToProfile"
       >
-        <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
+        <q-tooltip class="bg-green text-white">نمایهٔ کاربر</q-tooltip>
       </q-btn>
       <q-btn
         v-if="userInfo != null"

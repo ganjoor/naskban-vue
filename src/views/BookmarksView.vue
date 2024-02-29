@@ -74,6 +74,9 @@ watchEffect(async () => {
 function goToLogin() {
   window.location.href = '/login'
 }
+function goToProfile() {
+  window.location.href = '/profile'
+}
 async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
@@ -99,14 +102,13 @@ async function logout() {
 <template>
   <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
-      <q-separator vertical inset spaced />
       <q-btn
-        v-if="userInfo == null"
+        v-if="userInfo != null"
         dense
         flat
         icon="account_circle"
         class="green"
-        @click="goToLogin"
+        @click="goToProfile"
       >
         <q-tooltip class="bg-green text-white">ورود یا نام‌نویسی</q-tooltip>
       </q-btn>
