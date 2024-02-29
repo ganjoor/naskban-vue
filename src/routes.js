@@ -9,6 +9,7 @@ import GanjoorReview from './views/GanjoorReview.vue'
 import SearchText from './views/SearchText.vue'
 import BookmarksView from './views/BookmarksView.vue'
 import ProfileView from './views/ProfileView.vue'
+import ResetPassword from './views/ResetPassword.vue'
 
 export const routes = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,7 +74,12 @@ export const routes = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView
-    }
+    },
+    {
+      path: '/password',
+      name: 'password',
+      component: ResetPassword
+    },
   ]
 })
 

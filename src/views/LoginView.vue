@@ -46,6 +46,9 @@ async function signIn() {
 function goToSignup() {
   window.location.href = '/signup'
 }
+function goToResetPassword(){
+  window.location.href = '/password'
+}
 </script>
 <template>
   <div class="flex flex-center">
@@ -77,6 +80,11 @@ function goToSignup() {
       <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
           <a @click="goToSignup" class="text-dark text-weight-bold">نام‌نویسی</a>
+        </div>
+      </q-card-section>
+      <q-card-section class="text-center q-pt-none">
+        <div class="text-grey-8">
+          <a @click="goToResetPassword" class="text-dark text-weight-bold">فراموشی گذرواژه</a>
         </div>
       </q-card-section>
       <q-card-section>
