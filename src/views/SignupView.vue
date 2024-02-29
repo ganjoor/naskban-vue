@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
 import { routes } from './../routes'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const email = ref('')
 const captchaImageId = ref('')
 const captchaValue = ref('')
@@ -23,6 +25,10 @@ onMounted(async () => {
     return
   }
   captchaImageId.value = await response.json()
+  if(route.query.secret != null){
+    verificationCode.value = route.query.secret;
+    phase.value = 'verify';
+  }
 })
 
 async function signUp() {

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
-import { routes } from './../routes'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const userInfo = ref(null)
@@ -34,7 +33,13 @@ onMounted(() => {
   firstName.value = userInfo.value.user.firstName
   sureName.value = userInfo.value.user.sureName
   nickName.value = userInfo.value.user.nickName
+
+  if(route.query.secret != null){
+    verificationCode.value = route.query.secret;
+    phase.value = 'verify';
+  }
 })
+
 
 async function changePassword() {
   if (newPassword.value != confirmPassword.value) {
@@ -128,7 +133,7 @@ async function finalizeDelete() {
 }
 </script>
 <template>
-  <div class="flex flex-center">
+  <div class="flex flex-center" v-if="phase == 'start'">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">تغییر گذرواژه</div>
@@ -171,7 +176,7 @@ async function finalizeDelete() {
       </q-card-section>
     </q-card>
   </div>
-  <div class="flex flex-center">
+  <div class="flex flex-center" v-if="phase == 'start'">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">نمایهٔ کاربر</div>
