@@ -34,6 +34,16 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
+  if (localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+  if (userInfo.value == null) {
+    goToLogin()
+  }
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
