@@ -18,6 +18,8 @@ const phase = ref('start')
 
 const verificationCode = ref('')
 
+const searchTerm = ref('')
+
 const loading = ref(false)
 
 onMounted(() => {
@@ -131,9 +133,111 @@ async function finalizeDelete() {
   bus.emit('user-logged-out')
   window.location.href = '/login'
 }
+function doSearch() {
+  window.location.href = '/?s=' + document.getElementById('s').value
+}
+function fullTextSearch() {
+  window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
+}
+function goToLogin() {
+  window.location.href = '/login'
+}
+function goToProfile() {
+  window.location.href = '/profile'
+}
+function goToBookmarks() {
+  window.location.href = '/bookmarks'
+}
+function goToHistory() {
+  window.location.href = '/visits'
+}
+async function logout() {
+  if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
+    return
+  }
+  loading.value = true
+  await fetch(
+    `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  localStorage.setItem('userInfo', null)
+  bus.emit('user-logged-out')
+  window.location.href = '/login'
+}
 </script>
 <template>
-  <div class="flex flex-center" v-if="phase == 'start'">
+  <q-bar class="bg-white text-white flex-center">
+    <div class="q-pa-lg flex flex-center">
+      <input
+        outlined
+        :value="searchTerm"
+        input-class="text-right"
+        class="q-ml-md"
+        id="s"
+        name="s"
+        type="search"
+        placeholder="جستجو"
+        @keydown.enter.prevent="doSearch"
+      />
+      <q-btn dense flat icon="search" class="green" @click="doSearch">
+        <q-tooltip class="bg-green text-white">جستجو در ابرداده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn dense flat icon="manage_search" class="green" @click="fullTextSearch">
+        <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced v-if="userInfo != null" />
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="bookmarks"
+        class="green"
+        @click="goToBookmarks"
+      >
+        <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="history"
+        class="green"
+        @click="goToHistory"
+      >
+        <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="account_circle"
+        class="green"
+        @click="goToProfile"
+      >
+        <q-tooltip class="bg-green text-white">نمایهٔ کاربر</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="directions_run"
+        class="green flip-horizontal"
+        @click="logout"
+      >
+        <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+    </div>
+  </q-bar>
+
+  <div class="flex flex-center q-pa-lg" v-if="phase == 'start'">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">تغییر گذرواژه</div>
