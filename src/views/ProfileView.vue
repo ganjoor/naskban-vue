@@ -139,9 +139,6 @@ function doSearch() {
 function fullTextSearch() {
   window.location.href = '/text?s=' + encodeURI(document.getElementById('s').value)
 }
-function goToLogin() {
-  window.location.href = '/login'
-}
 function goToProfile() {
   window.location.href = '/profile'
 }
