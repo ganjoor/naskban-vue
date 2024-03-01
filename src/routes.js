@@ -11,6 +11,7 @@ import BookmarksView from './views/BookmarksView.vue'
 import ProfileView from './views/ProfileView.vue'
 import ResetPassword from './views/ResetPassword.vue'
 import VisitTracks from './views/VisitTracks.vue'
+import AboutPage from './views/AboutPage.vue'
 
 export const routes = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -85,6 +86,11 @@ export const routes = createRouter({
       path: '/visits',
       name: 'visits',
       component: VisitTracks
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: AboutPage
     },
   ]
 })
