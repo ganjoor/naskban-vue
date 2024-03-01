@@ -172,7 +172,8 @@ async function logout() {
 <template>
   <q-bar class="bg-white text-white flex-center">
     <div class="q-pa-lg flex flex-center">
-      <input
+      <form>
+        <input
         outlined
         :value="searchTerm"
         input-class="text-right"
@@ -183,6 +184,8 @@ async function logout() {
         placeholder="جستجو"
         @keydown.enter.prevent="doSearch"
       />
+      </form>
+    
       <q-btn dense flat icon="search" class="green" @click="doSearch">
         <q-tooltip class="bg-green text-white">جستجو در ابرداده‌ها</q-tooltip>
       </q-btn>
