@@ -4,6 +4,7 @@ import { ref, watchEffect, onMounted } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
 import { bus } from '../event-bus'
 import { en2fa } from '../en2fa'
+import PermissionChecker from './../utilities/PermissionChecker'
 
 const route = useRoute()
 const loading = ref(false)
@@ -16,6 +17,8 @@ const suggestionResult = ref('')
 const pageInfo = ref(null)
 const ocrText = ref(null)
 const bookmarked = ref(false)
+const canDelete = ref(false)
+
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
 })
@@ -23,6 +26,10 @@ bus.on('user-logged-in', (u) => {
 bus.on('user-logged-out', () => {
   userInfo.value = null
 })
+
+function checkPermission(secShortName, opShortName) {
+  return PermissionChecker.check(userInfo.value, secShortName, opShortName)
+}
 
 onMounted(() => {
   if (localStorage.getItem('userInfo')) {
@@ -49,6 +56,7 @@ watchEffect(async () => {
     }
   }
   if (userInfo.value == null) return
+  canDelete.value = checkPermission('pdf', 'delete')
   loading.value = true
   pdf.value = await (
     await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
@@ -433,7 +441,7 @@ async function makeCover() {
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
       <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />
     </q-card>
-    <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
+    <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
       <q-btn label="تصویر جلد شود" @click="makeCover" />
     </q-card>
 
