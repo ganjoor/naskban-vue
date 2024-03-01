@@ -298,7 +298,7 @@ function copyUrl() {
         id="s"
         name="s"
         type="search"
-        placeholder="جستجو در متن"
+        placeholder="جستجو در متن این کتاب"
         @keydown.enter.prevent="initSearch"
       />
       <q-btn
