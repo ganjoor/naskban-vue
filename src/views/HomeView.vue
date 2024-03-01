@@ -34,7 +34,7 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
-  if (localStorage.getItem('userInfo')) {
+  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
     } catch {

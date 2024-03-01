@@ -41,6 +41,13 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
+  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
   if (userInfo.value == null) return
   loading.value = true
   pdf.value = await (

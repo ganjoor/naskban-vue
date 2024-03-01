@@ -70,6 +70,16 @@ function checkPermission(secShortName, opShortName) {
 }
 
 watchEffect(async () => {
+  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+  if (userInfo.value == null) {
+    goToLogin()
+  }
   if (route.query.s != null) {
     searchTerm.value = route.query.s
   }
