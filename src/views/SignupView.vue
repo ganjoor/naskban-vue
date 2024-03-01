@@ -25,9 +25,9 @@ onMounted(async () => {
     return
   }
   captchaImageId.value = await response.json()
-  if(route.query.secret != null){
-    verificationCode.value = route.query.secret;
-    phase.value = 'verify';
+  if (route.query.secret != null) {
+    verificationCode.value = route.query.secret
+    phase.value = 'verify'
   }
 })
 
@@ -61,24 +61,27 @@ async function signUp() {
     return
   }
 
-  phase.value = 'verify';
+  phase.value = 'verify'
 }
 function goToSignup() {
-  phase.value = 'signup';
+  phase.value = 'signup'
 }
 async function verify() {
   loading.value = true
-  const response = await fetch(`https://api.naskban.ir/api/users/verify?type=0&secret=${verificationCode.value}`, {
-    method: 'GET',
-  })
+  const response = await fetch(
+    `https://api.naskban.ir/api/users/verify?type=0&secret=${verificationCode.value}`,
+    {
+      method: 'GET'
+    }
+  )
   loading.value = false
   if (!response.ok) {
     alert(await response.json())
     return
   }
 
-  email.value = await response.json();
-  phase.value = 'final';
+  email.value = await response.json()
+  phase.value = 'final'
 }
 async function signIn() {
   loading.value = true
@@ -105,10 +108,10 @@ async function signIn() {
   bus.emit('user-logged-in', userInfo)
   routes.push({ path: '/' })
 }
-async function finalizeSetup(){
-  if(password.value != confirmPassword.value){
-    alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژه وارد کنید.');
-    return;
+async function finalizeSetup() {
+  if (password.value != confirmPassword.value) {
+    alert('لطفاً در کادر تکرار گذرواژه، گذرواژه را به درستی و مطابق گذرواژه وارد کنید.')
+    return
   }
   const response = await fetch(`https://api.naskban.ir/api/users/finalizesignup`, {
     method: 'POST',
@@ -120,7 +123,7 @@ async function finalizeSetup(){
       secret: verificationCode.value,
       password: password.value,
       firstName: firstName.value,
-      sureName: surName.value,
+      sureName: surName.value
     })
   })
   loading.value = false
@@ -129,8 +132,7 @@ async function finalizeSetup(){
     return
   }
 
-  await signIn();
-
+  await signIn()
 }
 </script>
 <template>
@@ -142,13 +144,25 @@ async function finalizeSetup(){
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">نام‌نویسی</div>
       <q-card-section>
-        <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی" autocomplete="username"></q-input>
+        <q-input
+          dense
+          outlined
+          v-model="email"
+          label=" (ایمیل) پست الکترونیکی"
+          autocomplete="username"
+        ></q-input>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <img :src="`https://api.naskban.ir/api/rimages/${captchaImageId}.jpg`" />
       </q-card-section>
       <q-card-section>
-        <q-input dense outlined v-model="captchaValue" label="عدد تصویر امنیتی" autocomplete="off"></q-input>
+        <q-input
+          dense
+          outlined
+          v-model="captchaValue"
+          label="عدد تصویر امنیتی"
+          autocomplete="off"
+        ></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
@@ -161,16 +175,45 @@ async function finalizeSetup(){
           @click="signUp"
         ></q-btn>
       </q-card-section>
+      <q-card-section>
+        <p>
+          در نسک‌بان فعالیت‌های کاربر شامل کتاب‌ها و صفحات کتاب‌های مشاهده شده با مقاصد آماری ذخیره
+          و به شکل تجمیعی رصد می‌شود. تاریخچه و کتاب‌ها و صفحات نشان‌شدهٔ کاربر خصوصی هستند و فقط به
+          خود او نمایش داده می‌شوند.
+        </p>
+        <p>
+          کاربر می‌تواند هر زمان که اراده کند حساب کاربری خود را پاک کند. با پاک شدن حساب کاربری،
+          آمار بازدیدهای یک کاربر بی‌نام می‌شوند و سایر اطلاعات خصوصی او پاک می‌شود.
+        </p>
+        <p>
+          نسک‌بان در حال حاضر توسط یک شخص نگهداری می‌شود و اطلاعات کاربران آن در اختیار هیچ سازمانی
+          قرار نمی‌گیرد. این شخص حق پایان دادن به فعالیت نسک‌بان را در موقعیت‌هایی که به هر دلیلی
+          معذوریتی ایجاد شود برای خود محفوظ می‌داند.
+        </p>
+        <p>
+          در صورت نیاز به تماس با نسک‌بان
+          <a href="https://ganjoor.net/contact" target="_blank">این صفحه</a> را ببینید.
+        </p>
+      </q-card-section>
     </q-card>
   </div>
   <div class="flex flex-center" v-if="phase == 'verify'">
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">تأیید نام‌نویسی</div>
       <q-card-section>
-        <p>لطفاً ایمیل خود را بررسی بفرمایید. می‌بایست ایمیلی از نشانی noreply@naskban.ir حاوی یک کد عددی دریافت کرده باشید. ‌آن کد را در کادر زیر وارد کنید:</p>
+        <p>
+          لطفاً ایمیل خود را بررسی بفرمایید. می‌بایست ایمیلی از نشانی noreply@naskban.ir حاوی یک کد
+          عددی دریافت کرده باشید. ‌آن کد را در کادر زیر وارد کنید:
+        </p>
       </q-card-section>
       <q-card-section>
-        <q-input dense outlined v-model="verificationCode" label="کد ۶ رقمی تأیید" autocomplete="off"></q-input>
+        <q-input
+          dense
+          outlined
+          v-model="verificationCode"
+          label="کد ۶ رقمی تأیید"
+          autocomplete="off"
+        ></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
@@ -183,10 +226,10 @@ async function finalizeSetup(){
           @click="verify"
         ></q-btn>
         <q-card-section class="text-center q-pa-md">
-        <div class="text-grey-8">
-          <a @click="goToSignup" class="text-dark text-weight-bold">مرحلهٔ قبل</a>
-        </div>
-      </q-card-section>
+          <div class="text-grey-8">
+            <a @click="goToSignup" class="text-dark text-weight-bold">مرحلهٔ قبل</a>
+          </div>
+        </q-card-section>
       </q-card-section>
     </q-card>
   </div>
@@ -194,11 +237,18 @@ async function finalizeSetup(){
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">مرحلهٔ پایانی</div>
       <q-card-section>
-        <p>لطفاً نام و نام خانوادگی (واقعی یا مستعار) و گذرواژهٔ مد نظر خود برای ورود را وارد کنید. </p>
+        <p>
+          لطفاً نام و نام خانوادگی (واقعی یا مستعار) و گذرواژهٔ مد نظر خود برای ورود را وارد کنید.
+        </p>
         <q-input dense outlined v-model="firstName" label="نام" autocomplete="off"></q-input>
         <q-input dense outlined v-model="surName" label="نام خانوادگی" autocomplete="off"></q-input>
-        <p>گذرواژه باید دست کم شامل ۶ حرف باشد و از ترکیبی از اعداد و حروف انگلیسی تشکیل شده باشد. </p>
-        <p>حروف و اعداد نباید تکراری باشند و وجود حداقل یک عدد و یک حرف کوچک انگلیسی در گذرواژه الزامی است.</p>
+        <p>
+          گذرواژه باید دست کم شامل ۶ حرف باشد و از ترکیبی از اعداد و حروف انگلیسی تشکیل شده باشد.
+        </p>
+        <p>
+          حروف و اعداد نباید تکراری باشند و وجود حداقل یک عدد و یک حرف کوچک انگلیسی در گذرواژه
+          الزامی است.
+        </p>
         <q-input
           dense
           outlined
