@@ -137,6 +137,9 @@ function goToProfile() {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
+function goToHistory() {
+  window.location.href = '/visits'
+}
 async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
@@ -189,6 +192,16 @@ async function logout() {
         @click="goToBookmarks"
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="history"
+        class="green"
+        @click="goToHistory"
+      >
+        <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
       <q-btn

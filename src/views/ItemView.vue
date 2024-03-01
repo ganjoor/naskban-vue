@@ -124,6 +124,9 @@ watchEffect(async () => {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
+function goToHistory() {
+  window.location.href = '/visits'
+}
 async function switchBookmark() {
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
@@ -334,6 +337,16 @@ function copyUrl() {
         @click="goToBookmarks"
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="history"
+        class="green"
+        @click="goToHistory"
+      >
+        <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-btn
         dense
