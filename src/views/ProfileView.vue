@@ -290,6 +290,7 @@ async function logout() {
           outlined
           class="q-mt-md"
           v-model="email"
+          autocomplete="username"
           readonly
           label="پست الکترونیکی"
         ></q-input>

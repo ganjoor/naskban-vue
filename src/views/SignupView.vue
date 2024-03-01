@@ -142,7 +142,7 @@ async function finalizeSetup(){
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">نام‌نویسی</div>
       <q-card-section>
-        <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی" autocomplete="off"></q-input>
+        <q-input dense outlined v-model="email" label=" (ایمیل) پست الکترونیکی" autocomplete="username"></q-input>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
         <img :src="`https://api.naskban.ir/api/rimages/${captchaImageId}.jpg`" />

@@ -56,7 +56,7 @@ function goToResetPassword(){
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">ورود</div>
       <q-card-section>
-        <q-input dense outlined v-model="email" label="پست الکترونیکی"></q-input>
+        <q-input dense outlined v-model="email" label="پست الکترونیکی" autocomplete="username"></q-input>
         <q-input
           dense
           outlined
