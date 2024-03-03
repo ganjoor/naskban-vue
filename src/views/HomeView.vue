@@ -40,7 +40,6 @@ async function renewLogon(){
     {
       method: 'PUT',
       headers: {
-        authorization: 'bearer ' + userInfo.value.token,
         'content-type': 'application/json'
       }
     }
