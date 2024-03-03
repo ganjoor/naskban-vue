@@ -47,6 +47,10 @@ onMounted(() => {
   }
 })
 
+function goToLogin() {
+  window.location.href = '/login'
+}
+
 async function renewSession() {
   loading.value = true
   let response = await fetch(
