@@ -47,8 +47,45 @@ onMounted(() => {
   }
 })
 
+async function renewSession() {
+  loading.value = true
+  let response = await fetch(
+    `https://api.naskban.ir/api/users/relogin/${userInfo.value.sessionid}`,
+    {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  if (response.ok) {
+    userInfo.value = await response.json()
+    localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+  }
+}
+
+async function loadPDF(err403) {
+  let response = await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  if (response.status == 403) {
+    if (err403) {
+      goToLogin()
+    } else {
+      await renewSession()
+      await loadPDF(true)
+      return
+    }
+  }
+  pdf.value = await response.json()
+}
+
 watchEffect(async () => {
-  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+  if (userInfo.value == null && localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
     } catch {
@@ -58,14 +95,7 @@ watchEffect(async () => {
   if (userInfo.value == null) return
   canDelete.value = checkPermission('pdf', 'delete')
   loading.value = true
-  pdf.value = await (
-    await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
-      headers: {
-        authorization: 'bearer ' + userInfo.value.token,
-        'content-type': 'application/json'
-      }
-    })
-  ).json()
+  await loadPDF(false)
   pdfFile.value = usePDF({
     url: pdf.value.externalPDFFileUrl
   })
@@ -337,14 +367,7 @@ async function makeCover() {
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn
-        v-if="userInfo != null"
-        dense
-        flat
-        icon="history"
-        class="green"
-        @click="goToHistory"
-      >
+      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-btn

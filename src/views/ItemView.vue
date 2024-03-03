@@ -130,7 +130,7 @@ watchEffect(async () => {
   }
   canDelete.value = checkPermission('pdf', 'delete')
   loading.value = true
-  await loadPDF();
+  await loadPDF(false);
   bookmarked.value = false
   if (userInfo.value != null) {
     let bookmarkedRes = await (
