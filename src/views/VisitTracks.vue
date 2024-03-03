@@ -48,7 +48,7 @@ watchEffect(async () => {
   
   loading.value = false
   let pageUrl = ''
-  let docTitle = 'نسک‌بان - بازدیدهای اخیر من'
+  let docTitle = 'نسکبان - بازدیدهای اخیر من'
 
   
   window.history.pushState({}, '', pageUrl)

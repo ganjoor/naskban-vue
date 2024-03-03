@@ -112,11 +112,11 @@ watchEffect(async () => {
   }
 
   if (pageNumber.value == 1) {
-    document.title = 'نسک‌بان - ' + pdf.value.title
+    document.title = 'نسکبان - ' + pdf.value.title
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
     document.title =
-      'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+      'نسکبان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
     window.history.pushState(
       {},
       '',
@@ -133,10 +133,10 @@ async function updatePageNumber(value) {
   localStorage.setItem('id', pdf.value.id)
   localStorage.setItem('page', value)
   if (value == 1) {
-    document.title = 'نسک‌بان - ' + pdf.value.title
+    document.title = 'نسکبان - ' + pdf.value.title
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
-    document.title = 'نسک‌بان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
+    document.title = 'نسکبان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
   await loadOCRText(value)

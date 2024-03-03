@@ -27,10 +27,10 @@ onMounted(() => {
 <template>
   <header v-if="$route.name != 'ganjoor' && $route.name != 'pdfframe'">
     <a href="/"
-      ><img alt="نسک‌بان" class="logo" src="@/assets/logo.svg" width="125" height="125"
+      ><img alt="نسکبان" class="logo" src="@/assets/logo.svg" width="125" height="125"
     /></a>
     <div class="wrapper">
-      <a href="/"><h1 class="green">نسک‌بان</h1></a>
+      <a href="/"><h1 class="green">نسکبان</h1></a>
     </div>
   </header>
 

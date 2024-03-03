@@ -14,7 +14,7 @@ const loading = ref(false)
 const phase = ref('signup')
 
 onMounted(async () => {
-  document.title = 'نسک‌بان - فراموشی گذرواژه'
+  document.title = 'نسکبان - فراموشی گذرواژه'
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/users/captchaimage`)
   loading.value = false

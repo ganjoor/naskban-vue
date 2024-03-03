@@ -9,7 +9,7 @@ const loading = ref(false)
 const route = useRoute()
 
 onMounted(() => {
-  document.title = 'نسک‌بان - ورود';
+  document.title = 'نسکبان - ورود';
 })
 
 async function signIn() {
@@ -88,10 +88,10 @@ function goToResetPassword(){
         </div>
       </q-card-section>
       <q-card-section>
-        <p>نسک‌بان یک کتابخانه از فایل‌های PDF کتاب‌های فارسی است که امکان جستجو در متن آنها وجود دارد. برای آشنایی بیشتر با آن <a href="/about">اینجا</a> را ببینید.</p>
+        <p>نسکبان یک کتابخانه از فایل‌های PDF کتاب‌های فارسی است که امکان جستجو در متن آنها وجود دارد. برای آشنایی بیشتر با آن <a href="/about">اینجا</a> را ببینید.</p>
       </q-card-section>
       <q-card-section>
-        <p>برای استفاده از امکانات نسک‌بان باید وارد آن شوید. اگر حساب کاربری ندارید <a href="/signup">نام‌نویسی</a> کنید.</p>
+        <p>برای استفاده از امکانات نسکبان باید وارد آن شوید. اگر حساب کاربری ندارید <a href="/signup">نام‌نویسی</a> کنید.</p>
       </q-card-section>
     </q-card>
   </div>

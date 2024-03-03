@@ -23,7 +23,7 @@ const searchTerm = ref('')
 const loading = ref(false)
 
 onMounted(() => {
-  document.title = 'نسک‌بان - نمایهٔ کاربر'
+  document.title = 'نسکبان - نمایهٔ کاربر'
   if (localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
@@ -316,7 +316,7 @@ async function logout() {
     <q-card class="q-pa-md shadow-2 login-card" bordered>
       <div class="text-grey-9 text-h5 text-weight-bold text-center">حذف حساب کاربری</div>
       <p>
-        حذف حساب کاربری موجب حذف تمام سوابق کاربر در نسک‌بان به صورت غیر قابل برگشت می‌شود. در صورت
+        حذف حساب کاربری موجب حذف تمام سوابق کاربر در نسکبان به صورت غیر قابل برگشت می‌شود. در صورت
         نام‌نویسی دوباره موارد نشان‌شده و سایر اطلاعات برنخواهد گشت.
       </p>
       <p v-if="phase != 'verify'">برای شروع عملیات حذف حساب کاربری گذرواژهٔ خود را وارد کنید.</p>

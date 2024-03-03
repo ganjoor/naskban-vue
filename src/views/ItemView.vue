@@ -45,7 +45,7 @@ onMounted(() => {
 
 async function setUrlAndTitle() {
   let pageUrl = '/' + route.params.id.toString()
-  let docTitle = 'نسک‌بان - ' + pdf.value.title
+  let docTitle = 'نسکبان - ' + pdf.value.title
   if (searchTerm.value != '') {
     pageUrl = '/' + route.params.id.toString() + '?s=' + encodeURI(searchTerm.value)
     docTitle += ' - جستجوی ' + searchTerm.value

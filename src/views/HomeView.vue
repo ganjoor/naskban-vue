@@ -111,7 +111,7 @@ watchEffect(async () => {
   await loadList(false);
 
   let pageUrl = ''
-  let docTitle = 'نسک‌بان'
+  let docTitle = 'نسکبان'
   if (searchTerm.value != '') {
     pageUrl = '/?s=' + encodeURI(searchTerm.value)
     docTitle += ' - جستجوی ' + searchTerm.value

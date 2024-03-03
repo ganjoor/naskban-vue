@@ -55,7 +55,7 @@ watchEffect(async () => {
     searchTerm.value = route.query.s
   }
   let pageUrl = '/text'
-  let docTitle = 'نسک‌بان - جستجو در متن'
+  let docTitle = 'نسکبان - جستجو در متن'
   if (searchTerm.value != '') {
     loading.value = true
     const res = await fetch(
