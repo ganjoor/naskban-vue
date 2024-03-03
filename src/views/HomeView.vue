@@ -33,7 +33,7 @@ onMounted(() => {
   }
 })
 
-async function renewLogon(){
+async function renewSession(){
   loading.value = true
   let response = await fetch(
     `https://api.naskban.ir/api/users/relogin/${userInfo.value.sessionid}`,
@@ -78,8 +78,9 @@ async function loadList(err403) {
     if(err403){
       goToLogin();
     }else{
-      await renewLogon();
+      await renewSession();
       await loadList(true);
+      return;
     }
   }
   pdfs.value = await res.json()

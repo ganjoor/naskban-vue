@@ -69,6 +69,44 @@ function checkPermission(secShortName, opShortName) {
   return PermissionChecker.check(userInfo.value, secShortName, opShortName)
 }
 
+async function renewSession(){
+  loading.value = true
+  let response = await fetch(
+    `https://api.naskban.ir/api/users/relogin/${userInfo.value.sessionid}`,
+    {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  if (response.ok) {
+  userInfo.value = await response.json()
+  localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+  }
+}
+
+async function loadPDF(err403){
+  let response =  await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    });
+  if(response.status == 403){
+    if(err403){
+      goToLogin();
+    }
+    else{
+      await renewSession();
+      await loadPDF(true);
+      return;
+    }
+  }
+  pdf.value = await response.json()
+}
+
 watchEffect(async () => {
   if (userInfo.value == null &&localStorage.getItem('userInfo')) {
     try {
@@ -90,16 +128,9 @@ watchEffect(async () => {
       pageNumber.value = 1
     }
   }
-  loading.value = true
   canDelete.value = checkPermission('pdf', 'delete')
-  pdf.value = await (
-    await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
-      headers: {
-        authorization: 'bearer ' + userInfo.value.token,
-        'content-type': 'application/json'
-      }
-    })
-  ).json()
+  loading.value = true
+  await loadPDF();
   bookmarked.value = false
   if (userInfo.value != null) {
     let bookmarkedRes = await (
