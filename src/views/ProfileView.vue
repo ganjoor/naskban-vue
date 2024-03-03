@@ -86,7 +86,7 @@ async function saveProfile() {
     alert(await response.json())
     return
   }
-  phase.value = 'verify'
+  alert('ذخیره شد.');
 }
 
 async function startDeleteUser() {
