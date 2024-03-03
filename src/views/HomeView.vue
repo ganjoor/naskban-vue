@@ -33,17 +33,27 @@ onMounted(() => {
   }
 })
 
-watchEffect(async () => {
-  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
-    try {
-      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
-    } catch {
-      userInfo.value = null
+async function renewLogon(){
+  loading.value = true
+  let response = await fetch(
+    `https://api.naskban.ir/api/users/relogin/${userInfo.value.sessionid}`,
+    {
+      method: 'PUT',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
     }
+  )
+  loading.value = false
+  if (response.ok) {
+  userInfo.value = await response.json()
+  localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
   }
-  if (userInfo.value == null) {
-    goToLogin()
-  }
+
+}
+
+async function loadList(err403) {
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
@@ -59,9 +69,6 @@ watchEffect(async () => {
   if (searchTerm.value != '') {
     url = `https://api.naskban.ir/api/pdf/search?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=${pageSize}`
   }
-
-  canDelete.value = checkPermission('pdf', 'delete')
-
   loading.value = true
   const res = await fetch(url, {
     headers: {
@@ -69,6 +76,14 @@ watchEffect(async () => {
       'content-type': 'application/json'
     }
   })
+  if(res.status == 403){
+    if(err403){
+      goToLogin();
+    }else{
+      await renewLogon();
+      await loadList(true);
+    }
+  }
   pdfs.value = await res.json()
   for (var pair of res.headers.entries()) {
     if (pair[0] == 'paging-headers') {
@@ -77,6 +92,25 @@ watchEffect(async () => {
     }
   }
   loading.value = false
+}
+
+watchEffect(async () => {
+  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+    try {
+      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+    } catch {
+      userInfo.value = null
+    }
+  }
+  if (userInfo.value == null) {
+    goToLogin()
+  }
+  
+
+  canDelete.value = checkPermission('pdf', 'delete')
+
+  await loadList(false);
+
   let pageUrl = ''
   let docTitle = 'نسک‌بان'
   if (searchTerm.value != '') {
