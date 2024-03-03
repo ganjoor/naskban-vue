@@ -49,7 +49,6 @@ async function renewLogon(){
   userInfo.value = await response.json()
   localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
   }
-
 }
 
 async function loadList(err403) {
@@ -177,6 +176,7 @@ async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
   }
+  localStorage.setItem('userInfo', null)
   loading.value = true
   await fetch(
     `https://api.naskban.ir/api/users/delsession?userId=${userInfo.value.user.id}&sessionId=${userInfo.value.sessionId}`,
@@ -189,7 +189,6 @@ async function logout() {
     }
   )
   loading.value = false
-  localStorage.setItem('userInfo', null)
   bus.emit('user-logged-out')
   window.location.href = '/login'
 }
