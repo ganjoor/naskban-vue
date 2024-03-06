@@ -3,7 +3,6 @@ import { ref, watchEffect, onMounted } from 'vue'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 
-
 const loading = ref(false)
 const visits = ref(null)
 const userInfo = ref(null)
@@ -23,7 +22,7 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
-  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+  if (userInfo.value == null && localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
     } catch {
@@ -33,24 +32,20 @@ watchEffect(async () => {
   if (userInfo.value == null) {
     goToLogin()
   }
-  
+
   loading.value = true
-  const res = await fetch(
-    `https://api.naskban.ir/api/pdf/visits`,
-    {
-      headers: {
-        authorization: 'bearer ' + userInfo.value.token,
-        'content-type': 'application/json'
-      }
+  const res = await fetch(`https://api.naskban.ir/api/pdf/visits`, {
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
     }
-  )
+  })
   visits.value = await res.json()
-  
+
   loading.value = false
   let pageUrl = ''
   let docTitle = 'نسکبان - بازدیدهای اخیر من'
 
-  
   window.history.pushState({}, '', pageUrl)
   document.title = docTitle
 })
@@ -66,6 +61,9 @@ function goToLogin() {
 }
 function goToProfile() {
   window.location.href = '/profile'
+}
+function goTo(url) {
+  window.location.href = url
 }
 function goToBookmarks() {
   window.location.href = '/bookmarks'
@@ -126,14 +124,7 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn
-        v-if="userInfo != null"
-        dense
-        flat
-        icon="history"
-        class="green"
-        @click="goToHistory"
-      >
+      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
@@ -157,9 +148,12 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn v-if="userInfo != null" dense flat icon="help" class="green" @click="goTo('/about')">
+        <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
+      </q-btn>
     </div>
   </q-bar>
-
 
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
@@ -199,8 +193,6 @@ async function logout() {
       </a>
     </div>
   </div>
-
-  
 </template>
 
 <style>

@@ -28,7 +28,7 @@ onMounted(() => {
 })
 
 watchEffect(async () => {
-  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+  if (userInfo.value == null && localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
     } catch {
@@ -93,6 +93,9 @@ function goToLogin() {
 function goToProfile() {
   window.location.href = '/profile'
 }
+function goTo(url) {
+  window.location.href = url
+}
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
@@ -152,14 +155,7 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn
-        v-if="userInfo != null"
-        dense
-        flat
-        icon="history"
-        class="green"
-        @click="goToHistory"
-      >
+      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
@@ -182,6 +178,10 @@ async function logout() {
         @click="logout"
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn v-if="userInfo != null" dense flat icon="help" class="green" @click="goTo('/about')">
+        <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
       </q-btn>
     </div>
   </q-bar>

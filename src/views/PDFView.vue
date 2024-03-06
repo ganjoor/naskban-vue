@@ -258,6 +258,9 @@ async function saveGanjoorLinkSuggestion() {
 function goToProfile() {
   window.location.href = '/profile'
 }
+function goTo(url) {
+  window.location.href = url
+}
 async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
@@ -404,6 +407,10 @@ async function makeCover() {
         @click="logout"
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn v-if="userInfo != null" dense flat icon="help" class="green" @click="goTo('/about')">
+        <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
       </q-btn>
     </div>
   </q-bar>

@@ -36,12 +36,11 @@ onMounted(() => {
   sureName.value = userInfo.value.user.sureName
   nickName.value = userInfo.value.user.nickName
 
-  if(route.query.secret != null){
-    verificationCode.value = route.query.secret;
-    phase.value = 'verify';
+  if (route.query.secret != null) {
+    verificationCode.value = route.query.secret
+    phase.value = 'verify'
   }
 })
-
 
 async function changePassword() {
   if (newPassword.value != confirmPassword.value) {
@@ -86,7 +85,7 @@ async function saveProfile() {
     alert(await response.json())
     return
   }
-  alert('ذخیره شد.');
+  alert('ذخیره شد.')
 }
 
 async function startDeleteUser() {
@@ -142,6 +141,9 @@ function fullTextSearch() {
 function goToProfile() {
   window.location.href = '/profile'
 }
+function goTo(url) {
+  window.location.href = url
+}
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
@@ -174,18 +176,18 @@ async function logout() {
     <div class="q-pa-lg flex flex-center">
       <form>
         <input
-        outlined
-        :value="searchTerm"
-        input-class="text-right"
-        class="q-ml-md"
-        id="s"
-        name="s"
-        type="search"
-        placeholder="جستجو"
-        @keydown.enter.prevent="doSearch"
-      />
+          outlined
+          :value="searchTerm"
+          input-class="text-right"
+          class="q-ml-md"
+          id="s"
+          name="s"
+          type="search"
+          placeholder="جستجو"
+          @keydown.enter.prevent="doSearch"
+        />
       </form>
-    
+
       <q-btn dense flat icon="search" class="green" @click="doSearch">
         <q-tooltip class="bg-green text-white">جستجو در ابرداده‌ها</q-tooltip>
       </q-btn>
@@ -203,14 +205,7 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn
-        v-if="userInfo != null"
-        dense
-        flat
-        icon="history"
-        class="green"
-        @click="goToHistory"
-      >
+      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced />
@@ -233,6 +228,10 @@ async function logout() {
         @click="logout"
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn v-if="userInfo != null" dense flat icon="help" class="green" @click="goTo('/about')">
+        <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
       </q-btn>
     </div>
   </q-bar>
