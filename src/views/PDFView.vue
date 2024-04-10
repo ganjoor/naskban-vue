@@ -116,7 +116,7 @@ watchEffect(async () => {
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
     document.title =
-      'نسکبان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+      'نسکبان - ' + pdf.value.title + ' - تصویر ' + en2fa(pageNumber.value.toString())
     window.history.pushState(
       {},
       '',
@@ -136,7 +136,7 @@ async function updatePageNumber(value) {
     document.title = 'نسکبان - ' + pdf.value.title
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
-    document.title = 'نسکبان - ' + pdf.value.title + ' - صفحهٔ ' + en2fa(value.toString())
+    document.title = 'نسکبان - ' + pdf.value.title + ' - تصویر ' + en2fa(value.toString())
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
   await loadOCRText(value)
@@ -250,7 +250,7 @@ async function saveGanjoorLinkSuggestion() {
     suggestionResult.value = await response.json()
     return
   }
-  suggestionResult.value = `${pdf.value.title} » صفحهٔ ${en2fa(
+  suggestionResult.value = `${pdf.value.title} » تصویر ${en2fa(
     pdfPageNumber.toString()
   )} => ${ganjoorTitle}`
 }

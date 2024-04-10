@@ -67,7 +67,7 @@ watchEffect(async () => {
   let docTitle = 'نسکبان - نشان‌شده‌ها'
 
   if (pageNumber.value > 1) {
-    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+    docTitle += ' - تصویر ' + en2fa(pageNumber.value.toString())
   }
   if (pageNumber.value != 1) {
     if (pageUrl != '') {
@@ -230,7 +230,7 @@ async function logout() {
           </q-img>
           <q-card-section class="text-h6">
             <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber"
-              >{{ bookmark.bookTitle }} - صفحهٔ {{ en2fa(bookmark.pageNumber.toString()) }}
+              >{{ bookmark.bookTitle }} - تصویر {{ en2fa(bookmark.pageNumber.toString()) }}
             </a>
           </q-card-section>
         </q-card>

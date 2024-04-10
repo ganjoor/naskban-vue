@@ -186,7 +186,7 @@ async function logout() {
           </q-img>
           <q-card-section class="text-h6">
             <a :href="'/' + visit.pdfBookId + '/' + visit.pageNumber"
-              >{{ visit.bookTitle }} - صفحهٔ {{ en2fa(visit.pageNumber.toString()) }}
+              >{{ visit.bookTitle }} - تصویر {{ en2fa(visit.pageNumber.toString()) }}
             </a>
           </q-card-section>
         </q-card>

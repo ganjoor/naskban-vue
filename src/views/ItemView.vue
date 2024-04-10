@@ -51,7 +51,7 @@ async function setUrlAndTitle() {
     docTitle += ' - جستجوی ' + searchTerm.value
   }
   if (pageNumber.value > 1) {
-    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
+    docTitle += ' - تصویر ' + en2fa(pageNumber.value.toString())
   }
   if (pageNumber.value != 1) {
     if (pageUrl != '') {
