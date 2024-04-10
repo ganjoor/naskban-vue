@@ -112,7 +112,7 @@ watchEffect(async () => {
   }
 
   if (pageNumber.value == 1) {
-    document.title = 'نسکبان - ' + pdf.value.title
+    document.title = 'نسکبان - ' + pdf.value.title + ' - تصویر ' + en2fa(pageNumber.value.toString())
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
     document.title =

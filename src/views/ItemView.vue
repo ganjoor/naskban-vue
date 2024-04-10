@@ -50,9 +50,7 @@ async function setUrlAndTitle() {
     pageUrl = '/' + route.params.id.toString() + '?s=' + encodeURI(searchTerm.value)
     docTitle += ' - جستجوی ' + searchTerm.value
   }
-  if (pageNumber.value > 1) {
-    docTitle += ' - تصویر ' + en2fa(pageNumber.value.toString())
-  }
+  docTitle += ' - تصویر ' + en2fa(pageNumber.value.toString())
   if (pageNumber.value != 1) {
     if (pageUrl != '') {
       pageUrl += '&'
