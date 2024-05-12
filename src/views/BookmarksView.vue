@@ -67,7 +67,7 @@ watchEffect(async () => {
   let docTitle = 'نسکبان - نشان‌شده‌ها'
 
   if (pageNumber.value > 1) {
-    docTitle += ' - تصویر ' + en2fa(pageNumber.value.toString())
+    docTitle += ' - صفحهٔ ' + en2fa(pageNumber.value.toString())
   }
   if (pageNumber.value != 1) {
     if (pageUrl != '') {
