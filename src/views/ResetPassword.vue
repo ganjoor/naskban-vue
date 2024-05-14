@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
-import { routes } from './../routes'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+
 const route = useRoute()
+const router = useRouter()
 const email = ref('')
 const captchaImageId = ref('')
 const captchaValue = ref('')
@@ -101,7 +102,7 @@ async function signIn() {
   var userInfo = await response.json()
   localStorage.setItem('userInfo', JSON.stringify(userInfo))
   bus.emit('user-logged-in', userInfo)
-  routes.push({ path: '/' })
+  router.push({ path: '/' })
 }
 async function finalizeSetup(){
   if(password.value != confirmPassword.value){

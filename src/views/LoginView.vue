@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { bus } from './../event-bus'
-import { routes } from './../routes'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
+const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
@@ -36,10 +37,10 @@ async function signIn() {
   localStorage.setItem('userInfo', JSON.stringify(userInfo))
   bus.emit('user-logged-in', userInfo)
   if(route.query.redirect != null){
-    routes.push({ path: route.query.redirect })
+    router.push({ path: route.query.redirect })
   }
   else{
-    routes.push({ path: '/' })
+    router.push({ path: '/' })
   }
 
 }

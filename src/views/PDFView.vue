@@ -111,17 +111,19 @@ watchEffect(async () => {
     }
   }
 
+  // NOTE When using vue router, history should not be manipulated manually.
+  // these pushes to history cause a history loop and breaks navigation
   if (pageNumber.value == 1) {
     document.title = 'نسکبان - ' + pdf.value.title + ' - تصویر ' + en2fa(pageNumber.value.toString())
-    window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
+    // window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/1')
   } else {
     document.title =
       'نسکبان - ' + pdf.value.title + ' - تصویر ' + en2fa(pageNumber.value.toString())
-    window.history.pushState(
-      {},
-      '',
-      '/' + pdf.value.id.toString() + '/' + pageNumber.value.toString()
-    )
+    // window.history.pushState(
+    //   {},
+    //   '',
+    //   '/' + pdf.value.id.toString() + '/' + pageNumber.value.toString()
+    // )
   }
   await loadOCRText(pageNumber.value)
 })
