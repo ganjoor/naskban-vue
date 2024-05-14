@@ -43,6 +43,7 @@ onMounted(() => {
   }
 })
 
+// NOTE What is the purpose of this function?
 async function setUrlAndTitle() {
   let pageUrl = '/' + route.params.id.toString()
   let docTitle = 'نسکبان - ' + pdf.value.title
@@ -59,7 +60,9 @@ async function setUrlAndTitle() {
     }
     pageUrl += 'page=' + pageNumber.value.toString()
   }
-  window.history.pushState({}, '', pageUrl)
+  // NOTE this replacepent of history causes a loop, and as a result, the user can't
+  //- go back to the previous history using browser navigation
+  // window.history.pushState({}, '', pageUrl)
   document.title = docTitle
 }
 

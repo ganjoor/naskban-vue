@@ -1,12 +1,12 @@
 <script setup>
 import { ref, watchEffect, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
 
 const route = useRoute()
-
+const router = useRouter()
 const loading = ref(false)
 const pageNumber = ref(null)
 const pdfs = ref(null)
@@ -196,6 +196,11 @@ async function logout() {
   bus.emit('user-logged-out')
   window.location.href = '/login'
 }
+
+function openItem(pdf){
+  router.push({ path: `${pdf.id}`})
+  console.log(router)
+}
 </script>
 
 <template>
@@ -293,8 +298,7 @@ async function logout() {
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="pdf in pdfs" :key="pdf.id">
-      <a :href="'/' + pdf.id">
-        <q-card class="fit">
+        <q-card class="cursor-pointer fit" @click="openItem(pdf)">
           <q-img
             :src="pdf.extenalCoverImageUrl"
             spinner-color="white"
@@ -302,8 +306,8 @@ async function logout() {
             class="rounded-borders"
           >
           </q-img>
-          <q-card-section class="text-h6">
-            <a :href="'/' + pdf.id">{{ pdf.title }} </a>
+          <q-card-section class="text-h6 book-info">
+            <p class="book-title">{{ pdf.title }} </p>
           </q-card-section>
           <q-card-section
             class="text-subtitle2"
@@ -312,7 +316,6 @@ async function logout() {
             {{ pdf.authorsLine }}
           </q-card-section>
         </q-card>
-      </a>
       <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
         <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
       </q-card>

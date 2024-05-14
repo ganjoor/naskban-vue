@@ -13,7 +13,7 @@ import ResetPassword from './views/ResetPassword.vue'
 import VisitTracks from './views/VisitTracks.vue'
 import AboutPage from './views/AboutPage.vue'
 
-export const routes = createRouter({
+export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   linkActiveClass: 'active',
   routes: [
@@ -95,4 +95,4 @@ export const routes = createRouter({
   ]
 })
 
-export default routes
+export default router
