@@ -79,12 +79,12 @@ function goToResetPassword(){
       </q-card-section>
       <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
-          <a @click="goToSignup" class="text-dark text-weight-bold">نام‌نویسی</a>
+          <a @click="goToSignup" class="cursor-pointer text-dark text-weight-bold">نام‌نویسی</a>
         </div>
       </q-card-section>
       <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
-          <a @click="goToResetPassword" class="text-dark text-weight-bold">فراموشی گذرواژه</a>
+          <a @click="goToResetPassword" class="cursor-pointer text-dark text-weight-bold">فراموشی گذرواژه</a>
         </div>
       </q-card-section>
       <q-card-section>
