@@ -43,7 +43,7 @@ async function signUp() {
       email: email.value,
       captchaImageId: captchaImageId.value,
       captchaValue: captchaValue.value,
-      callbackUrl: 'https://naskban.ir/signup',
+      callbackUrl: route.query.redirect != null ? 'https://naskban.ir/signup?redirect=' + route.query.redirect : 'https://naskban.ir/signup',
       clientAppName: 'Naskban Vue Client',
       language: 'fa-IR'
     })
@@ -107,7 +107,12 @@ async function signIn() {
   var userInfo = await response.json()
   localStorage.setItem('userInfo', JSON.stringify(userInfo))
   bus.emit('user-logged-in', userInfo)
-  router.push({ path: '/' })
+  if(route.query.redirect != null){
+    router.push({ path: route.query.redirect })
+  }
+  else{
+    router.push({ path: '/' })
+  }
 }
 async function finalizeSetup() {
   if (password.value != confirmPassword.value) {

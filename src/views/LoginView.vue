@@ -45,10 +45,22 @@ async function signIn() {
 
 }
 function goToSignup() {
-  window.location.href = '/signup?redirect=' + route.query.redirect;
+  if(route.query.redirect != null){
+    window.location.href = '/signup?redirect=' + route.query.redirect;
+  }
+  else{
+    window.location.href = '/signup';
+  }
+  
 }
 function goToResetPassword(){
-  window.location.href = '/password'
+  if(route.query.redirect != null){
+    window.location.href = '/password?redirect=' + route.query.redirect;
+  }
+  else{
+    window.location.href = '/password';
+  }
+  
 }
 </script>
 <template>
