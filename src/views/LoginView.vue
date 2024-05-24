@@ -45,7 +45,7 @@ async function signIn() {
 
 }
 function goToSignup() {
-  window.location.href = '/signup'
+  window.location.href = '/signup?redirect=' + route.query.redirect;
 }
 function goToResetPassword(){
   window.location.href = '/password'
