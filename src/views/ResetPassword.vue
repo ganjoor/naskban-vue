@@ -167,7 +167,7 @@ async function finalizeSetup(){
   </div>
   <div class="flex flex-center" v-if="phase == 'verify'">
     <q-card class="q-pa-md shadow-2 login-card" bordered>
-      <div class="text-grey-9 text-h5 text-weight-bold text-center">تأیید نام‌نویسی</div>
+      <div class="text-grey-9 text-h5 text-weight-bold text-center">تأیید فراموشی گذرواژه</div>
       <q-card-section>
         <p>لطفاً ایمیل خود را بررسی بفرمایید. می‌بایست ایمیلی از نشانی noreply@naskban.ir حاوی یک کد عددی دریافت کرده باشید. ‌آن کد را در کادر زیر وارد کنید:</p>
       </q-card-section>
