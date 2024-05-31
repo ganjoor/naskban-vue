@@ -239,7 +239,7 @@ async function logout() {
     </div>
   </div>
 
-  <div class="q-pa-lg flex flex-center">
+  <div class="q-pa-lg flex flex-center bottom-navbar">
     <q-spinner-hourglass
       v-if="loading && pdfs != null && pdfs.length > 0"
       color="green"
