@@ -416,7 +416,7 @@ async function makeCover() {
       </q-btn>
     </div>
   </q-bar>
-  <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg flex flex-center">
+  <q-card v-if="pdf != null && pdf.title != null" class="q-pa-lg q-ma-lg flex flex-center">
     <q-card-section class="full-width q-pa-lg flex flex-center justify-center centers">
       <q-pagination
         v-if="pdfFile != null"
