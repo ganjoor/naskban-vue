@@ -129,7 +129,7 @@ async function finalizeSetup() {
       secret: verificationCode.value,
       password: password.value,
       firstName: firstName.value,
-      sureName: surName.value
+      surName: surName.value
     })
   })
   loading.value = false

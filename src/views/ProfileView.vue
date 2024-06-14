@@ -11,7 +11,7 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 
 const firstName = ref('')
-const sureName = ref('')
+const surName = ref('')
 const nickName = ref('')
 
 const phase = ref('start')
@@ -33,7 +33,7 @@ onMounted(() => {
   }
   email.value = userInfo.value.user.email
   firstName.value = userInfo.value.user.firstName
-  sureName.value = userInfo.value.user.sureName
+  surName.value = userInfo.value.user.surName
   nickName.value = userInfo.value.user.nickName
 
   if (route.query.secret != null) {
@@ -71,7 +71,7 @@ async function saveProfile() {
   loading.value = true
   userInfo.value.user.nickName = nickName.value
   userInfo.value.user.firstName = firstName.value
-  userInfo.value.user.sureName = sureName.value
+  userInfo.value.user.surName = surName.value
   const response = await fetch(`https://api.naskban.ir/api/users/${userInfo.value.user.id}`, {
     method: 'PUT',
     headers: {
@@ -295,7 +295,7 @@ async function logout() {
         ></q-input>
         <q-input dense outlined class="q-mt-md" v-model="nickName" label="نام مستعار"></q-input>
         <q-input dense outlined class="q-mt-md" v-model="firstName" label="نام"></q-input>
-        <q-input dense outlined class="q-mt-md" v-model="sureName" label="نام خانوادگی"></q-input>
+        <q-input dense outlined class="q-mt-md" v-model="surName" label="نام خانوادگی"></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
