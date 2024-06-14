@@ -322,6 +322,13 @@ async function makeCover() {
     alert('خطا داد.')
   }
 }
+
+function displayInFile(){
+  var link = document.createElement("a")
+  link.href = pdf.value.externalPDFFileUrl + '#page=' + pageNumber.value
+  link.target = "_blank"
+  link.click()
+}
 </script>
 
 <template class="full-width">
@@ -443,6 +450,7 @@ async function makeCover() {
         @loaded="onLoaded"
         v-touch-swipe.mouse="handleSwipe"
         fit-parent
+        v-on:click="displayInFile"
       />
     </div>
     <q-card-section
