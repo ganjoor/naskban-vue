@@ -4,7 +4,7 @@ import { ref, watchEffect, onMounted } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
 import { bus } from '../event-bus'
 import { en2fa } from '../en2fa'
-import PermissionChecker from './../utilities/PermissionChecker'
+import PermissionChecker from '../utilities/PermissionChecker'
 
 const route = useRoute()
 const loading = ref(false)

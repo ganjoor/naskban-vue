@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
 import ItemView from './views/ItemView.vue'
-import PDFView from './views/PDFView.vue'
+import PageView from './views/PageView.vue'
 import LoginView from './views/LoginView.vue'
 import SignupView from './views/SignupView.vue'
 import GanjoorFrame from './views/GanjoorFrame.vue'
@@ -30,12 +30,12 @@ export const router = createRouter({
     {
       path: '/:id/:page',
       name: 'pdf',
-      component: PDFView
+      component: PageView
     },
     {
       path: '/frame/:id/:page',
       name: 'pdfframe',
-      component: PDFView
+      component: PageView
     },
     {
       path: '/p/:page',
