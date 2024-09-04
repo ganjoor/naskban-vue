@@ -159,13 +159,18 @@ function goToHistory() {
   window.location.href = '/visits'
 }
 async function switchBookmark() {
+  var note = '';
+  if(!bookmarked.value){
+    note = prompt('یادداشت');
+  }
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
     method: 'POST',
     headers: {
       authorization: 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
-    }
+    },
+    body: JSON.stringify(note)
   })
   loading.value = false
   if (response.ok) {
