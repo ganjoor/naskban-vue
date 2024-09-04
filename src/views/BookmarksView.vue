@@ -217,6 +217,10 @@ async function logout() {
           <q-card-section class="text-h6">
             <a :href="'/' + bookmark.bookId">{{ bookmark.bookTitle }} </a>
           </q-card-section>
+          <q-card-section v-if="bookmark.note != null && bookmark.note != ''">
+            <p>{{ bookmark.note }}</p>
+          </q-card-section>
+
         </q-card>
       </a>
       <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber" v-if="bookmark.pageNumber != 0">
@@ -232,6 +236,9 @@ async function logout() {
             <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber"
               >{{ bookmark.bookTitle }} - تصویر {{ en2fa(bookmark.pageNumber.toString()) }}
             </a>
+          </q-card-section>
+          <q-card-section v-if="bookmark.note != null && bookmark.note != ''">
+            <p>{{ bookmark.note }}</p>
           </q-card-section>
         </q-card>
       </a>
