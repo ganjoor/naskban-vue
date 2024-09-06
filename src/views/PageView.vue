@@ -335,6 +335,15 @@ function displayInFile(){
   link.target = "_blank"
   link.click()
 }
+
+function saveAsImage() {
+      const canvas = document.querySelectorAll('canvas')[0];
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = `${route.params.id}-${pageNumber.value}.png`;
+      link.click();
+    }
 </script>
 
 <template class="full-width">
@@ -481,6 +490,9 @@ function displayInFile(){
       <a v-if="pdf != null" :href="pdf.externalPDFFileUrl + '#page=' + pageNumber" target="_blank"
         >مشاهده در فایل</a
       >
+    </q-card>
+    <q-card class="full-width q-pa-lg flex flex-center">
+      <q-btn label="ذخیرهٔ تصویر صفحهٔ جاری" @click="saveAsImage" />
     </q-card>
     <q-card v-if="ocrText != null" class="full-width q-pa-lg flex flex-center">
       <q-card-section> متن بازشناسی شده </q-card-section>
