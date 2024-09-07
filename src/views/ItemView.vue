@@ -159,9 +159,9 @@ function goToHistory() {
   window.location.href = '/visits'
 }
 async function switchBookmark() {
-  var note = '';
-  if(!bookmarked.value){
-    note = prompt('یادداشت');
+  var note = ''
+  if (!bookmarked.value) {
+    note = prompt('یادداشت')
   }
   loading.value = true
   const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
@@ -368,6 +368,16 @@ function copyUrl() {
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
       </q-btn>
       <q-btn
+        dense
+        flat
+        v-if="userInfo != null && !bookmarked"
+        icon="bookmark_border"
+        class="green"
+        @click="switchBookmark"
+      >
+        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
+      </q-btn>
+      <q-btn
         v-if="userInfo != null"
         dense
         flat
@@ -380,16 +390,7 @@ function copyUrl() {
       <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
-      <q-btn
-        dense
-        flat
-        v-if="userInfo != null && !bookmarked"
-        icon="bookmark_border"
-        class="green"
-        @click="switchBookmark"
-      >
-        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
-      </q-btn>
+
       <q-separator vertical inset spaced />
       <q-btn
         v-if="userInfo != null"
