@@ -102,6 +102,28 @@ function goToBookmarks() {
 function goToHistory() {
   window.location.href = '/visits'
 }
+async function deleteBookmark(bookmarkId, bookId, pageNumber) {
+  if (!confirm(`از حذف این نشان اطمینان دارید؟`))
+    return;
+  
+  let url = `https://api.naskban.ir/api/pdf/bookmark/${bookId}/${pageNumber}`;
+  if(pageNumber == 0){
+    url = `https://api.naskban.ir/api/pdf/bookmark/${bookId}/null`
+  }
+  loading.value = true
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (response.ok) {
+    const element = document.getElementById(`bookmark-${bookmarkId}`)
+    element.remove()
+  }
+}
 async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
     return
@@ -205,43 +227,57 @@ async function logout() {
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="bookmark in bookmarks" :key="bookmark.id">
-      <a :href="'/' + bookmark.bookId" v-if="bookmark.pageNumber == 0">
-        <q-card class="fit">
-          <q-img
-            :src="bookmark.extenalImageUrl"
-            spinner-color="white"
-            style="max-width: 200px; max-height: 300px"
-            class="rounded-borders"
-          >
-          </q-img>
-          <q-card-section class="text-h6">
-            <a :href="'/' + bookmark.bookId">{{ bookmark.bookTitle }} </a>
-          </q-card-section>
-          <q-card-section v-if="bookmark.note != null && bookmark.note != ''">
-            <p>{{ bookmark.note }}</p>
-          </q-card-section>
-
-        </q-card>
-      </a>
-      <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber" v-if="bookmark.pageNumber != 0">
-        <q-card class="fit">
-          <q-img
-            :src="bookmark.extenalImageUrl"
-            spinner-color="white"
-            style="max-width: 200px; max-height: 300px"
-            class="rounded-borders"
-          >
-          </q-img>
-          <q-card-section class="text-h6">
-            <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber"
-              >{{ bookmark.bookTitle }} - تصویر {{ en2fa(bookmark.pageNumber.toString()) }}
-            </a>
-          </q-card-section>
-          <q-card-section v-if="bookmark.note != null && bookmark.note != ''">
-            <p>{{ bookmark.note }}</p>
-          </q-card-section>
-        </q-card>
-      </a>
+      <div :id="'bookmark-' + bookmark.id" v-if="bookmark.pageNumber == 0" style="display: grid;">
+        <a :href="'/' + bookmark.bookId" >
+          <q-card class="fit">
+            <q-img
+              :src="bookmark.extenalImageUrl"
+              spinner-color="white"
+              style="max-width: 200px; max-height: 300px"
+              class="rounded-borders"
+            >
+            </q-img>
+            <q-card-section class="text-h6">
+              <a :href="'/' + bookmark.bookId">{{ bookmark.bookTitle }} </a>
+            </q-card-section>
+            <q-card-section v-if="bookmark.note != null && bookmark.note != ''">
+              <p>{{ bookmark.note }}</p>
+            </q-card-section>
+          </q-card>
+        </a>
+        <q-btn
+            label="حذف نشان"
+            @click="deleteBookmark(bookmark.id, bookmark.bookId, bookmark.pageNumber)"
+          />
+      </div>
+      <div :id="'bookmark-' + bookmark.id" v-if="bookmark.pageNumber != 0" style="display: grid;">
+        <a
+          :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber"
+          
+        >
+          <q-card class="fit">
+            <q-img
+              :src="bookmark.extenalImageUrl"
+              spinner-color="white"
+              style="max-width: 200px; max-height: 300px"
+              class="rounded-borders"
+            >
+            </q-img>
+            <q-card-section class="text-h6">
+              <a :href="'/' + bookmark.bookId + '/' + bookmark.pageNumber"
+                >{{ bookmark.bookTitle }} - تصویر {{ en2fa(bookmark.pageNumber.toString()) }}
+              </a>
+            </q-card-section>
+            <q-card-section v-if="bookmark.note != null && bookmark.note != ''">
+              <p>{{ bookmark.note }}</p>
+            </q-card-section>
+          </q-card>
+        </a>
+        <q-btn
+            label="حذف نشان"
+            @click="deleteBookmark(bookmark.id, bookmark.bookId, bookmark.pageNumber)"
+          />
+      </div>
     </div>
   </div>
 
