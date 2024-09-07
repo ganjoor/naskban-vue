@@ -389,6 +389,16 @@ function saveAsImage() {
         <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
       </q-btn>
       <q-btn
+        dense
+        flat
+        v-if="userInfo != null && !bookmarked"
+        icon="bookmark_border"
+        class="green"
+        @click="switchBookmark"
+      >
+        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
+      </q-btn>
+      <q-btn
         v-if="userInfo != null"
         dense
         flat
@@ -401,16 +411,7 @@ function saveAsImage() {
       <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
-      <q-btn
-        dense
-        flat
-        v-if="userInfo != null && !bookmarked"
-        icon="bookmark_border"
-        class="green"
-        @click="switchBookmark"
-      >
-        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
-      </q-btn>
+     
       <q-separator vertical inset spaced />
       <q-btn
         v-if="userInfo != null"
