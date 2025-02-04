@@ -64,17 +64,17 @@ async function reviewLink(result) {
     <q-card-section class="row">
       <div class="col">
         <iframe
-          :src="`${ganjoorLink.entityFriendlyUrl.replace('https://naskban.ir', '')}`"
-          style="width: 50vw; height: 70vh"
-        ></iframe>
-      </div>
-      <div class="col">
-        <iframe
           :src="`/ganjoor?url=${ganjoorLink.ganjoorUrl}`"
           id="ganjoorFrame"
           style="width: 50vw; height: 70vh"
         ></iframe>
       </div>
+      <div class="col">
+        <iframe
+          :src="`${ganjoorLink.entityFriendlyUrl.replace('https://naskban.ir', '')}`"
+          style="width: 50vw; height: 70vh"
+        ></iframe>
+      </div>     
     </q-card-section>
   </q-card>
 </template>
