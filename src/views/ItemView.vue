@@ -10,6 +10,7 @@ const route = useRoute()
 const loading = ref(false)
 
 const pdf = ref(null)
+const toc = ref(null)
 
 const searchTerm = ref('')
 const pageNumber = ref(null)
@@ -107,6 +108,26 @@ async function loadPDF(err403) {
   pdf.value = await response.json()
 }
 
+async function loadTOC(err403) {
+  toc.value = null
+  let response = await fetch(`https://api.naskban.ir/api/pdf/toc/${route.params.id}`, {
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  if (response.status == 403) {
+    if (err403) {
+      goToLogin()
+    } else {
+      await renewSession()
+      await loadTOC(true)
+      return
+    }
+  }
+  toc.value = await response.json()
+}
+
 watchEffect(async () => {
   if (userInfo.value == null && localStorage.getItem('userInfo')) {
     try {
@@ -151,6 +172,8 @@ watchEffect(async () => {
   } else {
     await setUrlAndTitle()
   }
+
+  loadTOC()
 })
 function goToBookmarks() {
   window.location.href = '/bookmarks'
@@ -581,6 +604,22 @@ function copyUrl() {
             <td>{{ tag.rTag.name }}</td>
             <td>{{ tag.value }}</td>
           </tr>
+        </table>
+      </q-card-section>
+      <q-card-section v-if="toc != null && toc.length > 0" class="q-pa-lg flex flex-center">
+        <table>
+          <thead>
+            <tr>
+              فهرست بر اساس گنجور
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="t in toc" :key="t.Order">
+              <td>
+                <a :href="'/' + t.itemFriendlyUrl">{{ t.title }}</a>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </q-card-section>
       <q-card-section class="q-pa-lg flex flex-center">
