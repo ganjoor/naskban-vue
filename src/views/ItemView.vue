@@ -105,6 +105,10 @@ async function loadPDF(err401) {
       return
     }
   }
+  if(response.status != 200){
+    alert('فراخوانی سرویس نسکبان موفق نبود. لطفاً در صورت نیاز از نسکبان خارج و مجدداً به آن وارد شوید.');
+  }
+
   pdf.value = await response.json()
 }
 
@@ -124,6 +128,9 @@ async function loadTOC(err401) {
       await loadTOC(true)
       return
     }
+  }
+  if(response.status != 200){
+    alert('فراخوانی سرویس نسکبان موفق نبود. لطفاً در صورت نیاز از نسکبان خارج و مجدداً به آن وارد شوید.');
   }
   toc.value = await response.json()
 }

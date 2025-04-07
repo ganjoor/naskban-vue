@@ -85,6 +85,10 @@ async function loadPDF(err401) {
       return
     }
   }
+  if(response.status != 200){
+    alert('فراخوانی سرویس نسکبان موفق نبود. لطفاً در صورت نیاز از نسکبان خارج و مجدداً به آن وارد شوید.');
+  }
+
   pdf.value = await response.json()
 }
 

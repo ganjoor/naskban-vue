@@ -82,6 +82,9 @@ async function loadList(err401) {
       return;
     }
   }
+  if(res.status != 200){
+    alert('فراخوانی سرویس نسکبان موفق نبود. لطفاً در صورت نیاز از نسکبان خارج و مجدداً به آن وارد شوید.');
+  }
   pdfs.value = await res.json()
   for (var pair of res.headers.entries()) {
     if (pair[0] == 'paging-headers') {
