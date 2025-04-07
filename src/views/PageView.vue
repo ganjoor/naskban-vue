@@ -69,15 +69,15 @@ async function renewSession() {
   }
 }
 
-async function loadPDF(err403) {
+async function loadPDF(err401) {
   let response = await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
     headers: {
       authorization: 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
     }
   })
-  if (response.status == 403) {
-    if (err403) {
+  if (response.status == 401) {
+    if (err401) {
       goToLogin()
     } else {
       await renewSession()

@@ -50,7 +50,7 @@ async function renewSession(){
   }
 }
 
-async function loadList(err403) {
+async function loadList(err401) {
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
@@ -73,8 +73,8 @@ async function loadList(err403) {
       'content-type': 'application/json'
     }
   })
-  if(res.status == 403){
-    if(err403){
+  if(res.status == 401){
+    if(err401){
       goToLogin();
     }else{
       await renewSession();
