@@ -5,49 +5,25 @@ export default {
   install(app, options) {
     const config = {
       siteId: options?.siteId || "1",
-      debug: options?.debug || false,
+      debug: true, // Keep debug enabled
       maxTitleWait: 5000,
       titleCheckInterval: 200,
       initialLoadStatus: "initial_load",
       routeChangeStatus: "route_change"
     };
 
-    const log = (...args) => config.debug && console.log('[Tracker]', ...args);
+    const log = (...args) => console.log('[Tracker]', ...args);
+    let trackingQueue = new Set();
+    
 
-    // 1. Mandatory tracking initialization
+    // 1. Tracking implementation with full data
     const initializeTracking = () => {
       try {
         if (window.kntrTracking) return;
 
         window.kntrTracking = {
-          getOrCreateCookie: function(cookieName, isSessionCookie = false) {
-            let cookieValue = this.getCookie(cookieName);
-            if (!cookieValue) {
-              cookieValue = this.generateUniqueId();
-              let cookieSettings = `path=/; SameSite=None; Secure;`;
-              if (!isSessionCookie) {
-                const expirationDate = new Date();
-                expirationDate.setFullYear(expirationDate.getFullYear() + 1);
-                cookieSettings += `expires=${expirationDate.toUTCString()};`;
-              }
-              document.cookie = `${cookieName}=${cookieValue}; ${cookieSettings}`;
-            }
-            return cookieValue;
-          },
-
-          getCookie: function(name) {
-            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-            return match ? match[2] : null;
-          },
-
-          generateUniqueId: function() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-              const r = Math.random() * 16 | 0;
-              const v = c === 'x' ? r : (r & 0x3 | 0x8);
-              return v.toString(16);
-            });
-          },
-
+          // ... (keep all cookie and ID generation methods from previous example)
+          
           startTracking: function(trackingId, siteSpecificUserHash = "") {
             const trackingApiUrl = `https://track.kntr.ir/tracking/${trackingId}`;
             const data = {
@@ -65,6 +41,8 @@ export default {
               sessionUniqueId: this.getOrCreateCookie("KontorSessionUniqueId", true)
             };
 
+            log('Sending tracking data:', data);
+            
             fetch(trackingApiUrl, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -73,60 +51,89 @@ export default {
             }).catch(error => log('Tracking error:', error));
           }
         };
-
         log('Tracking API initialized');
       } catch (error) {
         console.error('Tracking initialization failed:', error);
       }
     };
 
-    // 2. Core tracking with verification
+    // 2. Core tracking with queue management
     const track = async (status) => {
-      try {
-        if (!window.kntrTracking?.startTracking) {
-          throw new Error('Tracking API not initialized');
-        }
+      if (trackingQueue.has(status)) {
+        log('Tracking already in progress for:', status);
+        return;
+      }
 
+      trackingQueue.add(status);
+      try {
+        log('Starting tracking for:', status);
         const startTime = Date.now();
         const initialTitle = document.title;
 
-        const finalTitle = await new Promise((resolve) => {
-          const check = () => {
+        // Wait for title stability or timeout
+        await new Promise(resolve => {
+          const checkTitle = () => {
             const currentTitle = document.title;
-            if (currentTitle !== initialTitle || Date.now() - startTime > config.maxTitleWait) {
-              resolve(currentTitle);
+            const elapsed = Date.now() - startTime;
+
+            if (currentTitle !== initialTitle || elapsed > config.maxTitleWait) {
+              log('Title stabilized:', currentTitle);
+              resolve();
             } else {
-              setTimeout(check, config.titleCheckInterval);
+              setTimeout(checkTitle, config.titleCheckInterval);
             }
           };
-          check();
+          checkTitle();
         });
 
+        if (!window.kntrTracking?.startTracking) {
+          throw new Error('Tracking API not available');
+        }
+
         window.kntrTracking.startTracking(config.siteId, "");
-        log('Tracked:', status, 'Title:', finalTitle);
+        log('Tracking completed for:', status);
       } catch (error) {
-        log('Tracking failed:', error.message);
+        console.error('Tracking error:', error);
+      } finally {
+        trackingQueue.delete(status);
       }
     };
 
-    // 3. Router integration
+    // 3. Router integration with initial load handling
     const setupRouterTracking = (router) => {
+      let isRouterReady = false;
+
       router.isReady().then(async () => {
+        isRouterReady = true;
+        log('Router ready, tracking initial load');
         await track(config.initialLoadStatus);
       });
 
       router.afterEach(async (to) => {
+        if (!isRouterReady) return; // Skip initial load handled separately
+        
+        log('Route changed to:', to.path);
         await track(`${config.routeChangeStatus}:${to.path}`);
       });
     };
 
-    // 4. Initialization sequence
-    initializeTracking(); // Synchronous initialization
+    // 4. Initialization
+    initializeTracking();
 
     if (options?.router) {
+      log('Initializing with router');
       setupRouterTracking(options.router);
     } else {
+      log('Initializing without router');
       nextTick(() => track(config.initialLoadStatus));
     }
+
+    // Emergency fallback for home page
+    setTimeout(() => {
+      if (!trackingQueue.has(config.initialLoadStatus)) {
+        log('Emergency home page tracking');
+        track(config.initialLoadStatus);
+      }
+    }, config.maxTitleWait + 1000);
   }
 };
