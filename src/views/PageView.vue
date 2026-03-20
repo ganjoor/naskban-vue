@@ -416,7 +416,7 @@ function saveAsImage() {
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
      
-      <q-separator vertical inset spaced />
+      <q-separator vertical inset spaced  v-if="userInfo != null" />
       <q-btn
         v-if="userInfo != null"
         dense
@@ -437,7 +437,7 @@ function saveAsImage() {
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
-      <q-separator vertical inset spaced />
+      <q-separator vertical inset spaced  v-if="userInfo != null" />
       <q-btn v-if="userInfo != null" dense flat icon="help" class="green" @click="goTo('/about')">
         <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
       </q-btn>
