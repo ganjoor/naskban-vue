@@ -196,7 +196,7 @@ async function logout() {
   )
   loading.value = false
   bus.emit('user-logged-out')
-  window.location.href = '/login'
+  window.location.href = '/'
 }
 
 </script>
@@ -265,7 +265,7 @@ async function logout() {
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn
-        v-if="userInfo != null"
+       
         dense
         flat
         icon="help"
@@ -273,6 +273,17 @@ async function logout() {
         @click="goTo('/about')"
       >
         <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
+      </q-btn>
+      <q-separator vertical inset spaced v-if="userInfo == null" />
+      <q-btn
+        v-if="userInfo == null"
+        dense
+        flat
+        icon="login"
+        class="green flip-horizontal"
+        @click="goToLogin"
+      >
+        <q-tooltip class="bg-green text-white">ورود</q-tooltip>
       </q-btn>
     </div>
   </q-bar>
