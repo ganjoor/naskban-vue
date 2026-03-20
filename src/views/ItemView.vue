@@ -37,11 +37,11 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  if (userInfo.value == null) {
+  /*if (userInfo.value == null) {
     window.location.href = `/login?redirect=${window.location.href
       .replace('https://naskban.ir', '')
       .replace('http://localhost:5173', '')}`
-  }
+  }*/
 })
 
 // NOTE What is the purpose of this function?
@@ -92,7 +92,7 @@ async function renewSession() {
 async function loadPDF(err401) {
   let response = await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
     headers: {
-      authorization: 'bearer ' + userInfo.value.token,
+      authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
     }
   })
@@ -116,7 +116,7 @@ async function loadTOC(err401) {
   toc.value = null
   let response = await fetch(`https://api.naskban.ir/api/pdf/toc/${route.params.id}`, {
     headers: {
-      authorization: 'bearer ' + userInfo.value.token,
+      authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
     }
   })
@@ -143,9 +143,9 @@ watchEffect(async () => {
       userInfo.value = null
     }
   }
-  if (userInfo.value == null) {
+  /*if (userInfo.value == null) {
     goToLogin()
-  }
+  }*/
   if (route.query.s != null) {
     searchTerm.value = route.query.s
   }
@@ -164,7 +164,7 @@ watchEffect(async () => {
     let bookmarkedRes = await (
       await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
         headers: {
-          authorization: 'bearer ' + userInfo.value.token,
+          authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
           'content-type': 'application/json'
         }
       })
@@ -221,7 +221,7 @@ async function performSearch() {
     `https://api.naskban.ir/api/pdf/search/pdfbook/${pdf.value.id}/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`,
     {
       headers: {
-        authorization: 'bearer ' + userInfo.value.token,
+        authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
         'content-type': 'application/json'
       }
     }
@@ -421,7 +421,7 @@ function copyUrl() {
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
 
-      <q-separator vertical inset spaced />
+      <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn
         v-if="userInfo != null"
         dense
@@ -442,7 +442,7 @@ function copyUrl() {
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
-      <q-separator vertical inset spaced />
+      <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn v-if="userInfo != null" dense flat icon="help" class="green" @click="goTo('/about')">
         <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
       </q-btn>

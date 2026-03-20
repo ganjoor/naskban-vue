@@ -25,11 +25,11 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  if (userInfo.value == null) {
+  /*(if (userInfo.value == null) {
     window.location.href = `/login?redirect=${window.location.href
       .replace('https://naskban.ir', '')
       .replace('http://localhost:5173', '')}`
-  }
+  }*/
 })
 
 watchEffect(async () => {
@@ -40,9 +40,9 @@ watchEffect(async () => {
       userInfo.value = null
     }
   }
-  if (userInfo.value == null) {
+  /*if (userInfo.value == null) {
     goToLogin()
-  }
+  }*/
   if (pageNumber.value == null) {
     if (route.query.page != null) {
       pageNumber.value = route.query.page
@@ -62,7 +62,7 @@ watchEffect(async () => {
       `https://api.naskban.ir/api/pdf/search/pages/text?term=${searchTerm.value}&PageNumber=${pageNumber.value}&PageSize=20`,
       {
         headers: {
-          authorization: 'bearer ' + userInfo.value.token,
+          authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
           'content-type': 'application/json'
         }
       }

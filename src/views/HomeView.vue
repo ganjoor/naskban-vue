@@ -27,9 +27,9 @@ onMounted(() => {
       userInfo.value = null
     }
   }
-  if (userInfo.value == null) {
+  /*if (userInfo.value == null) {
     goToLogin()
-  }
+  }*/
 })
 
 async function renewSession(){
@@ -69,7 +69,7 @@ async function loadList(err401) {
   loading.value = true
   const res = await fetch(url, {
     headers: {
-      authorization: 'bearer ' + userInfo.value.token,
+      authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
     }
   })
@@ -96,7 +96,7 @@ async function loadList(err401) {
 }
 
 watchEffect(async () => {
-  if (userInfo.value == null &&localStorage.getItem('userInfo')) {
+  /*if (userInfo.value == null &&localStorage.getItem('userInfo')) {
     try {
       userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
     } catch {
@@ -105,7 +105,7 @@ watchEffect(async () => {
   }
   if (userInfo.value == null) {
     goToLogin()
-  }
+  }*/
   
 
   canDelete.value = checkPermission('pdf', 'delete')
@@ -242,7 +242,7 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
-      <q-separator vertical inset spaced />
+      <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn
         v-if="userInfo != null"
         dense
@@ -263,7 +263,7 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
-      <q-separator vertical inset spaced />
+      <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn
         v-if="userInfo != null"
         dense

@@ -40,11 +40,11 @@ onMounted(() => {
     }
   }
 
-  if (userInfo.value == null) {
+  /*if (userInfo.value == null) {
     window.location.href = `/login?redirect=${window.location.href
       .replace('https://naskban.ir', '')
       .replace('http://localhost:5173', '')}`
-  }
+  }*/
 })
 
 function goToLogin() {
@@ -72,7 +72,7 @@ async function renewSession() {
 async function loadPDF(err401) {
   let response = await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}`, {
     headers: {
-      authorization: 'bearer ' + userInfo.value.token,
+      authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
       'content-type': 'application/json'
     }
   })
@@ -100,7 +100,7 @@ watchEffect(async () => {
       userInfo.value = null
     }
   }
-  if (userInfo.value == null) return
+  //if (userInfo.value == null) return
   canDelete.value = checkPermission('pdf', 'delete')
   loading.value = true
   await loadPDF(false)
@@ -165,7 +165,7 @@ async function switchBookmark() {
     {
       method: 'POST',
       headers: {
-        authorization: 'bearer ' + userInfo.value.token,
+        authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
         'content-type': 'application/json'
       },
       body: JSON.stringify(note)
@@ -182,7 +182,7 @@ async function loadOCRText(pageNumber) {
     let bookmarkedRes = await (
       await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/${pageNumber}`, {
         headers: {
-          authorization: 'bearer ' + userInfo.value.token,
+          authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
           'content-type': 'application/json'
         }
       })
@@ -195,7 +195,7 @@ async function loadOCRText(pageNumber) {
     pageInfo.value = await (
       await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}/page/${pageNumber}`, {
         headers: {
-          authorization: 'bearer ' + userInfo.value.token,
+          authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
           'content-type': 'application/json'
         }
       })
