@@ -32,7 +32,7 @@ onMounted(() => {
   }*/
 })
 
-async function renewSession(){
+async function renewSession() {
   loading.value = true
   let response = await fetch(
     `https://api.naskban.ir/api/users/relogin/${userInfo.value.sessionid}`,
@@ -45,8 +45,8 @@ async function renewSession(){
   )
   loading.value = false
   if (response.ok) {
-  userInfo.value = await response.json()
-  localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+    userInfo.value = await response.json()
+    localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
   }
 }
 
@@ -73,17 +73,19 @@ async function loadList(err401) {
       'content-type': 'application/json'
     }
   })
-  if(res.status == 401){
-    if(err401){
-      goToLogin();
-    }else{
-      await renewSession();
-      await loadList(true);
-      return;
+  if (res.status == 401) {
+    if (err401) {
+      goToLogin()
+    } else {
+      await renewSession()
+      await loadList(true)
+      return
     }
   }
-  if(res.status != 200){
-    alert('فراخوانی سرویس نسکبان موفق نبود. لطفاً در صورت نیاز از نسکبان خارج و مجدداً به آن وارد شوید.');
+  if (res.status != 200) {
+    alert(
+      'فراخوانی سرویس نسکبان موفق نبود. لطفاً در صورت نیاز از نسکبان خارج و مجدداً به آن وارد شوید.'
+    )
   }
   pdfs.value = await res.json()
   for (var pair of res.headers.entries()) {
@@ -106,11 +108,10 @@ watchEffect(async () => {
   if (userInfo.value == null) {
     goToLogin()
   }*/
-  
 
   canDelete.value = checkPermission('pdf', 'delete')
 
-  await loadList(false);
+  await loadList(false)
 
   let pageUrl = ''
   let docTitle = 'نسکبان'
@@ -169,7 +170,7 @@ function goToLogin() {
 function goToProfile() {
   window.location.href = '/profile'
 }
-function goTo(url){
+function goTo(url) {
   window.location.href = url
 }
 function goToBookmarks() {
@@ -198,7 +199,6 @@ async function logout() {
   bus.emit('user-logged-out')
   window.location.href = '/'
 }
-
 </script>
 
 <template>
@@ -232,14 +232,7 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn
-        v-if="userInfo != null"
-        dense
-        flat
-        icon="history"
-        class="green"
-        @click="goToHistory"
-      >
+      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
@@ -264,14 +257,7 @@ async function logout() {
         <q-tooltip class="bg-green text-white">خروج</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
-      <q-btn
-       
-        dense
-        flat
-        icon="help"
-        class="green"
-        @click="goTo('/about')"
-      >
+      <q-btn dense flat icon="help" class="green" @click="goTo('/about')">
         <q-tooltip class="bg-green text-white">معرفی</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo == null" />
@@ -307,8 +293,8 @@ async function logout() {
 
   <div class="row justify-center">
     <div class="pdf flex q-ma-sm" v-for="pdf in pdfs" :key="pdf.id">
-        <q-card class="cursor-pointer fit">
-          <a :href="'/'+ pdf.id">
+      <q-card class="cursor-pointer fit">
+        <a :href="'/' + pdf.id">
           <q-img
             :src="pdf.extenalCoverImageUrl"
             spinner-color="white"
@@ -317,18 +303,18 @@ async function logout() {
           >
           </q-img>
         </a>
-          <q-card-section class="text-h6 book-info">
-            <a :href="'/'+ pdf.id" class="book-title">{{ pdf.title }} </a>
-          </q-card-section>
-          <q-card-section
-            class="text-subtitle2"
-            v-if="pdf.authorsLine != null && pdf.authorsLine.length > 1"
-          >
-            {{ pdf.authorsLine }}
-          </q-card-section>
-        </q-card>
-      <q-card v-if="canDelete" class="full-width q-pa-lg flex flex-center">
-        <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
+        <q-card-section class="text-h6 book-info">
+          <a :href="'/' + pdf.id" class="book-title">{{ pdf.title }} </a>
+        </q-card-section>
+        <q-card-section
+          class="text-subtitle2"
+          v-if="pdf.authorsLine != null && pdf.authorsLine.length > 1"
+        >
+          {{ pdf.authorsLine }}
+        </q-card-section>
+        <q-card-section v-if="canDelete" class="full-width q-pa-lg flex flex-center">
+          <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
+        </q-card-section>
       </q-card>
     </div>
   </div>
@@ -372,5 +358,4 @@ h3 {
   text-align: center;
   max-width: 200px;
 }
-
 </style>
