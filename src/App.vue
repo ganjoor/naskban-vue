@@ -1,40 +1,31 @@
-<script setup>
-import { RouterView } from 'vue-router'
-import { ref, onMounted } from 'vue'
-import { bus } from './event-bus'
-
-const userInfo = ref(null)
-
-bus.on('user-logged-in', (u) => {
-  userInfo.value = u
-})
-
-bus.on('user-logged-out', () => {
-  userInfo.value = null
-})
-
-onMounted(() => {
-  if (localStorage.getItem('userInfo')) {
-    try {
-      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
-    } catch {
-      userInfo.value = null
-    }
-  }
-})
-</script>
-
 <template>
   <header v-if="$route.name != 'ganjoor' && $route.name != 'pdfframe'">
-    <a href="/"
-      ><img alt="نسکبان" class="logo" src="@/assets/logo.svg" width="125" height="125"
-    /></a>
+    <a href="/">
+      <img
+        alt="نسکبان"
+        class="logo"
+        src="@/assets/logo.svg"
+        width="125"
+        height="125"
+      />
+    </a>
+
     <div class="wrapper">
-      <a href="/"><h1 class="green">نسکبان</h1></a>
+      <a href="/">
+        <h1 class="green">نسکبان</h1>
+      </a>
     </div>
   </header>
 
   <RouterView />
+
+  <a href="https://myket.ir/app/ir.naskban.app">
+    <img
+      alt="نسکبان برای اندروید"
+      class="android-logo"
+      src="@/assets/app.png"
+    />
+  </a>
 </template>
 
 <style scoped>
@@ -42,9 +33,11 @@ header {
   margin: auto;
   text-align: center;
 }
+
 h1 {
   font-size: 3em;
 }
+
 .wrapper {
   margin: auto;
 }
@@ -52,5 +45,13 @@ h1 {
 .logo {
   display: block;
   margin: auto;
+}
+
+.android-logo {
+  display: block;
+  width: 75%;
+  max-width: 1280px;
+  height: auto;
+  margin: 0 auto;
 }
 </style>
