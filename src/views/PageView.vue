@@ -105,7 +105,15 @@ watchEffect(async () => {
   loading.value = true
   await loadPDF(false)
   pdfFile.value = usePDF({
-    url: pdf.value.externalPDFFileUrl
+    url: pdf.value.externalPDFFileUrl,
+    // forces pdf.js to draw each glyph itself as a vector path instead
+    // of handing off to the browser's own font/text shaping via an
+    // injected @font-face - for Persian/Arabic text specifically, the
+    // browser's contextual ligature shaping can conflict with the exact
+    // per-glyph positions pdf.js already computed from the PDF's own
+    // content stream, which is what produces overlapping/garbled
+    // glyphs. This sidesteps that mismatch entirely.
+    disableFontFace: true
   })
   if (pageNumber.value == null) {
     if (route.params.page != null) {
