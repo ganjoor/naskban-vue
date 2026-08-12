@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watchEffect, onMounted } from 'vue'
+import { ref, computed, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
@@ -14,9 +14,16 @@ const searchTerm = ref('')
 const pageSize = 20
 const userInfo = ref(null)
 const canDelete = ref(false)
+const recentReads = ref([])
+// filtered here, not in the template, so the v-for below never needs a
+// v-if alongside it (mixing the two on one element is an eslint error -
+// vue/no-use-v-if-with-v-for - since Vue evaluates v-if per-iteration
+// there, which is both confusing and wasteful)
+const validRecentReads = computed(() => recentReads.value.filter((v) => v.pageNumber != null))
 
 bus.on('user-logged-out', () => {
   userInfo.value = null
+  recentReads.value = []
 })
 
 onMounted(() => {
@@ -27,10 +34,24 @@ onMounted(() => {
       userInfo.value = null
     }
   }
+  loadRecentReads()
   /*if (userInfo.value == null) {
     goToLogin()
   }*/
 })
+
+async function loadRecentReads() {
+  if (userInfo.value == null) return
+  const res = await fetch(`https://api.naskban.ir/api/pdf/visits`, {
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  if (res.ok) {
+    recentReads.value = await res.json()
+  }
+}
 
 async function renewSession() {
   loading.value = true
@@ -280,6 +301,32 @@ async function logout() {
     </div>
   </q-bar>
 
+  <div
+    class="row justify-center recent-reads"
+    v-if="userInfo != null && validRecentReads.length > 0 && searchTerm == '' && pageNumber == 1"
+  >
+    <div class="full-width q-pl-lg q-pr-lg q-pt-sm">
+      <div class="text-subtitle1 text-weight-bold">آخرین خوانده‌ها</div>
+    </div>
+    <div class="recent-reads-scroller">
+      <a
+        v-for="visit in validRecentReads"
+        :key="visit.pdfBookId"
+        :href="'/' + visit.pdfBookId + '/' + visit.pageNumber"
+        class="recent-read-item"
+      >
+        <q-img
+          :src="visit.externalImageUrl"
+          spinner-color="white"
+          style="width: 110px; height: 150px"
+          class="rounded-borders"
+        />
+        <div class="recent-read-title">{{ visit.bookTitle }}</div>
+        <div class="recent-read-page">صفحهٔ {{ en2fa(visit.pageNumber.toString()) }}</div>
+      </a>
+    </div>
+  </div>
+
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
     <q-pagination
@@ -363,5 +410,31 @@ h3 {
 .pdf {
   text-align: center;
   max-width: 200px;
+}
+.recent-reads {
+  padding-top: 12px;
+}
+.recent-reads-scroller {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 8px 16px 16px 16px;
+  max-width: 100%;
+}
+.recent-read-item {
+  flex: 0 0 auto;
+  width: 110px;
+  text-align: center;
+}
+.recent-read-title {
+  font-size: 0.85em;
+  color: black;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recent-read-page {
+  font-size: 0.75em;
+  color: gray;
 }
 </style>
