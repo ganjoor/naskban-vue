@@ -4,6 +4,7 @@ import { ref, watchEffect, onMounted } from 'vue'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
+import * as ShelfService from '../utilities/ShelfService'
 
 const route = useRoute()
 
@@ -18,8 +19,13 @@ const pageCount = ref(0)
 const pages = ref(null)
 const userInfo = ref(null)
 const editMode = ref(false)
-const bookmarked = ref(false)
+const onAnyShelf = ref(false)
 const canDelete = ref(false)
+
+const shelfDialogOpen = ref(false)
+const allShelves = ref([])
+const selectedShelfIds = ref([])
+const newShelfName = ref('')
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -159,19 +165,10 @@ watchEffect(async () => {
   canDelete.value = checkPermission('pdf', 'delete')
   loading.value = true
   await loadPDF(false)
-  bookmarked.value = false
+  onAnyShelf.value = false
   if (userInfo.value != null) {
-    let bookmarkedRes = await (
-      await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
-        headers: {
-          authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
-          'content-type': 'application/json'
-        }
-      })
-    ).json()
-    if (bookmarkedRes.length > 0) {
-      bookmarked.value = true
-    }
+    const shelfIds = await ShelfService.getShelfIdsForBook(userInfo.value, route.params.id)
+    onAnyShelf.value = shelfIds.length > 0
   }
   loading.value = false
   if (searchTerm.value != '') {
@@ -188,24 +185,43 @@ function goToBookmarks() {
 function goToHistory() {
   window.location.href = '/visits'
 }
-async function switchBookmark() {
-  var note = ''
-  if (!bookmarked.value) {
-    note = prompt('یادداشت')
-  }
+async function openShelfDialog() {
   loading.value = true
-  const response = await fetch(`https://api.naskban.ir/api/pdf/bookmark/${route.params.id}/null`, {
-    method: 'POST',
-    headers: {
-      authorization: 'bearer ' + userInfo.value.token,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify(note)
-  })
+  const [shelves, shelfIds] = await Promise.all([
+    ShelfService.getAllShelves(userInfo.value),
+    ShelfService.getShelfIdsForBook(userInfo.value, route.params.id)
+  ])
+  allShelves.value = shelves
+  selectedShelfIds.value = shelfIds
   loading.value = false
-  if (response.ok) {
-    bookmarked.value = !bookmarked.value
+  shelfDialogOpen.value = true
+}
+
+async function toggleShelf(shelfId, checked) {
+  loading.value = true
+  if (checked) {
+    await ShelfService.addBookToShelf(userInfo.value, shelfId, route.params.id)
+    selectedShelfIds.value.push(shelfId)
+  } else {
+    await ShelfService.removeBookFromShelf(userInfo.value, shelfId, route.params.id)
+    selectedShelfIds.value = selectedShelfIds.value.filter((id) => id !== shelfId)
   }
+  loading.value = false
+  onAnyShelf.value = selectedShelfIds.value.length > 0
+}
+
+async function createShelfFromDialog() {
+  if (!newShelfName.value) return
+  loading.value = true
+  const shelf = await ShelfService.createShelf(userInfo.value, newShelfName.value)
+  if (shelf) {
+    allShelves.value.push(shelf)
+    await ShelfService.addBookToShelf(userInfo.value, shelf.id, route.params.id)
+    selectedShelfIds.value.push(shelf.id)
+    onAnyShelf.value = true
+  }
+  newShelfName.value = ''
+  loading.value = false
 }
 
 async function initSearch() {
@@ -390,22 +406,25 @@ function copyUrl() {
       <q-btn
         dense
         flat
-        v-if="userInfo != null && bookmarked"
+        v-if="userInfo != null && onAnyShelf"
         icon="bookmark"
         class="green"
-        @click="switchBookmark"
+        @click="openShelfDialog"
       >
-        <q-tooltip class="bg-green text-white">نشان شده</q-tooltip>
+        <q-tooltip class="bg-green text-white">در قفسه</q-tooltip>
       </q-btn>
       <q-btn
         dense
         flat
-        v-if="userInfo != null && !bookmarked"
+        v-if="userInfo != null && !onAnyShelf"
         icon="bookmark_border"
         class="green"
-        @click="switchBookmark"
+        @click="openShelfDialog"
       >
-        <q-tooltip class="bg-green text-white">نشان نشده</q-tooltip>
+        <q-tooltip class="bg-green text-white">افزودن به قفسه</q-tooltip>
+      </q-btn>
+      <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goTo('/shelves')">
+        <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>
       </q-btn>
       <q-btn
         v-if="userInfo != null"
@@ -672,6 +691,33 @@ function copyUrl() {
       <q-btn label="حذف کتاب" @click="deletePDFBook" />
     </q-card>
   </div>
+
+  <q-dialog v-model="shelfDialogOpen">
+    <q-card style="min-width: 300px">
+      <q-card-section class="text-h6">افزودن به قفسه</q-card-section>
+      <q-card-section>
+        <div v-for="shelf in allShelves" :key="shelf.id">
+          <q-checkbox
+            :model-value="selectedShelfIds.includes(shelf.id)"
+            :label="shelf.name"
+            @update:model-value="(val) => toggleShelf(shelf.id, val)"
+          />
+        </div>
+        <div v-if="allShelves.length === 0">هنوز قفسه‌ای نساخته‌اید.</div>
+      </q-card-section>
+      <q-card-section>
+        <q-input
+          v-model="newShelfName"
+          label="ساخت قفسهٔ جدید"
+          @keydown.enter.prevent="createShelfFromDialog"
+        />
+        <q-btn label="ساخت و افزودن" class="q-mt-sm" @click="createShelfFromDialog" />
+      </q-card-section>
+      <q-card-actions align="right">
+        <q-btn label="بستن" @click="shelfDialogOpen = false" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <style>

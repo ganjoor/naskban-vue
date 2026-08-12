@@ -12,6 +12,8 @@ import ProfileView from './views/ProfileView.vue'
 import ResetPassword from './views/ResetPassword.vue'
 import VisitTracks from './views/VisitTracks.vue'
 import AboutPage from './views/AboutPage.vue'
+import ShelvesView from './views/ShelvesView.vue'
+import ShelfDetailView from './views/ShelfDetailView.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -91,6 +93,16 @@ export const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutPage
+    },
+    {
+      path: '/shelves',
+      name: 'shelves',
+      component: ShelvesView
+    },
+    {
+      path: '/shelves/:id',
+      name: 'shelfdetail',
+      component: ShelfDetailView
     },
   ]
 })

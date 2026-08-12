@@ -99,6 +99,9 @@ function goTo(url) {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
+function goToShelves() {
+  window.location.href = '/shelves'
+}
 function goToHistory() {
   window.location.href = '/visits'
 }
@@ -176,6 +179,9 @@ async function logout() {
         @click="goToBookmarks"
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goToShelves">
+        <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
