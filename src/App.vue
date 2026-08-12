@@ -1,5 +1,35 @@
+<script setup>
+import { onMounted } from 'vue'
+import { useQuasar } from 'quasar'
+import { getStoredDarkMode, setStoredDarkMode } from './utilities/DarkMode'
+
+const $q = useQuasar()
+
+onMounted(() => {
+  $q.dark.set(getStoredDarkMode())
+})
+
+function toggleDarkMode() {
+  const next = !$q.dark.isActive
+  $q.dark.set(next)
+  setStoredDarkMode(next)
+}
+</script>
+
 <template>
   <header v-if="$route.name != 'ganjoor' && $route.name != 'pdfframe'">
+    <q-btn
+      dense
+      flat
+      round
+      :icon="$q.dark.isActive ? 'light_mode' : 'dark_mode'"
+      class="green dark-mode-toggle"
+      @click="toggleDarkMode"
+    >
+      <q-tooltip class="bg-green text-white">
+        {{ $q.dark.isActive ? 'حالت روشن' : 'حالت تیره' }}
+      </q-tooltip>
+    </q-btn>
     <a href="/">
       <img
         alt="نسکبان"
@@ -32,6 +62,13 @@
 header {
   margin: auto;
   text-align: center;
+  position: relative;
+}
+
+.dark-mode-toggle {
+  position: absolute;
+  top: 8px;
+  left: 8px;
 }
 
 h1 {

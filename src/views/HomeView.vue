@@ -428,7 +428,6 @@ h3 {
 }
 .recent-read-title {
   font-size: 0.85em;
-  color: black;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

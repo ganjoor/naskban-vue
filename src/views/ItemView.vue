@@ -529,7 +529,7 @@ function copyUrl() {
             <q-card-section class="text-h6">
               <a :href="'/' + page.pdfBookId + '/' + page.pageNumber">{{ page.pageNumber }} </a>
             </q-card-section>
-            <q-card-section style="color: black">
+            <q-card-section>
               <div v-html="page.pageText.replace('\n', '<br />')"></div>
             </q-card-section>
           </q-card>
