@@ -86,8 +86,8 @@ function goTo(url) {
         v-if="userInfo != null"
         dense
         flat
-        :icon="pinned ? 'push_pin' : 'push_pin_outlined'"
-        class="green"
+        icon="push_pin"
+        :color="pinned ? 'green' : 'grey-5'"
         @click="togglePin"
       >
         <q-tooltip class="bg-green text-white">

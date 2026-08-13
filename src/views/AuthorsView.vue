@@ -148,7 +148,7 @@ function goTo(url) {
           <q-btn
             dense
             flat
-            round
+            size="sm"
             icon="push_pin"
             @click.stop="togglePin(pinned.authorId)"
           >
@@ -167,21 +167,21 @@ function goTo(url) {
         </q-item-section>
         <q-item-section>{{ author.name }}</q-item-section>
         <q-item-section side>
-          <div class="row items-center">
-            <span class="text-caption text-grey q-ml-sm">{{ author.bookCount }} کتاب</span>
-            <q-btn
-              v-if="userInfo != null"
-              dense
-              flat
-              round
-              :icon="isPinnedId(author.id) ? 'push_pin' : 'push_pin_outlined'"
-              @click.stop="togglePin(author.id)"
-            >
-              <q-tooltip class="bg-green text-white">
-                {{ isPinnedId(author.id) ? 'حذف پین' : 'پین کردن' }}
-              </q-tooltip>
-            </q-btn>
-          </div>
+          <span class="text-caption text-grey">{{ author.bookCount }} کتاب</span>
+        </q-item-section>
+        <q-item-section side v-if="userInfo != null">
+          <q-btn
+            dense
+            flat
+            size="sm"
+            icon="push_pin"
+            :color="isPinnedId(author.id) ? 'green' : 'grey-5'"
+            @click.stop="togglePin(author.id)"
+          >
+            <q-tooltip class="bg-green text-white">
+              {{ isPinnedId(author.id) ? 'حذف پین' : 'پین کردن' }}
+            </q-tooltip>
+          </q-btn>
         </q-item-section>
       </q-item>
       <q-separator v-if="index < authors.length - 1" />
