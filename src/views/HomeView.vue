@@ -2,6 +2,7 @@
 import { ref, computed, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { en2fa } from '../en2fa'
+import { fa2en } from '../fa2en'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
 
@@ -184,6 +185,38 @@ async function deletePDFBook(id, title) {
     return
   }
   alert(`${title} حذف شد!`)
+}
+async function mergePDFBook(id, title) {
+  const raw = prompt(
+    `شناسهٔ کتاب تکراری که در «${title}» ادغام و حذف شود را وارد کنید`
+  )
+  if (!raw) return
+  const duplicateId = fa2en(raw.trim())
+  if (!/^\d+$/.test(duplicateId)) {
+    alert('شناسهٔ کتاب باید یک عدد باشد.')
+    return
+  }
+  if (
+    !confirm(
+      `کتاب با شناسهٔ ${duplicateId} در «${title}» ادغام و حذف شود؟ این عملیات قابل بازگشت نیست.`
+    )
+  ) {
+    return
+  }
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/merge/${id}/${duplicateId}`, {
+    method: 'PUT',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  alert('ادغام با موفقیت انجام شد!')
 }
 function goToLogin() {
   window.location.href = '/login'
@@ -373,6 +406,11 @@ async function logout() {
         </q-card-section>
         <q-card-section v-if="canDelete" class="full-width q-pa-lg flex flex-center">
           <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
+          <q-btn
+            label="ادغام کتاب"
+            class="q-ml-sm"
+            @click="mergePDFBook(pdf.id, pdf.title)"
+          />
         </q-card-section>
       </q-card>
     </div>

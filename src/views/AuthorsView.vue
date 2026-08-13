@@ -1,10 +1,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { bus } from '../event-bus'
 import * as PinnedAuthorService from '../utilities/PinnedAuthorService'
 
-const route = useRoute()
 const loading = ref(false)
 const userInfo = ref(null)
 const authors = ref([])
