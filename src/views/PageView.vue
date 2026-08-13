@@ -158,6 +158,9 @@ async function updatePageNumber(value) {
 function goToBookmarks() {
   window.location.href = '/bookmarks'
 }
+function goToAuthors() {
+  window.location.href = '/authors'
+}
 function goToShelves() {
   window.location.href = '/shelves'
 }
@@ -422,6 +425,9 @@ function saveAsImage() {
         @click="goToBookmarks"
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
+      </q-btn>
+      <q-btn dense flat icon="badge" class="green" @click="goToAuthors">
+        <q-tooltip class="bg-green text-white">نویسندگان</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goToShelves">
         <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>
