@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { fa2en } from '../fa2en'
+import PermissionChecker from '../utilities/PermissionChecker'
 import * as PinnedAuthorService from '../utilities/PinnedAuthorService'
 
 const route = useRoute()
@@ -11,6 +13,11 @@ const pdfs = ref([])
 const pageCount = ref(1)
 const pageNumber = ref(1)
 const pinned = ref(false)
+const canDelete = ref(false)
+
+function checkPermission(secShortName, opShortName) {
+  return PermissionChecker.check(userInfo.value, secShortName, opShortName)
+}
 
 async function loadBooks() {
   loading.value = true
@@ -55,6 +62,59 @@ async function togglePin() {
   pinned.value = !pinned.value
 }
 
+async function deletePDFBook(id, title) {
+  if (!confirm(`آیا از حذف ${title} اطمینان دارید؟`)) {
+    return
+  }
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/${id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(`${title} - ${await response.json()}`)
+    return
+  }
+  alert(`${title} حذف شد!`)
+}
+
+async function mergePDFBook(id, title) {
+  const raw = prompt(
+    `شناسهٔ کتاب تکراری که در «${title}» ادغام و حذف شود را وارد کنید`
+  )
+  if (!raw) return
+  const duplicateId = fa2en(raw.trim())
+  if (!/^\d+$/.test(duplicateId)) {
+    alert('شناسهٔ کتاب باید یک عدد باشد.')
+    return
+  }
+  if (
+    !confirm(
+      `کتاب با شناسهٔ ${duplicateId} در «${title}» ادغام و حذف شود؟ این عملیات قابل بازگشت نیست.`
+    )
+  ) {
+    return
+  }
+  loading.value = true
+  const response = await fetch(`https://api.naskban.ir/api/pdf/merge/${id}/${duplicateId}`, {
+    method: 'PUT',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!response.ok) {
+    alert(await response.json())
+    return
+  }
+  alert('ادغام با موفقیت انجام شد!')
+}
+
 watch(pageNumber, () => loadBooks())
 
 onMounted(() => {
@@ -68,6 +128,7 @@ onMounted(() => {
   loadAuthorName()
   loadBooks()
   loadPinned()
+  canDelete.value = checkPermission('pdf', 'delete')
 })
 
 function goTo(url) {
@@ -117,6 +178,14 @@ function goTo(url) {
         </a>
         <q-card-section class="text-h6 book-info">
           <a :href="'/' + pdf.id" class="book-title">{{ pdf.title }} </a>
+        </q-card-section>
+        <q-card-section v-if="canDelete" class="flex flex-center">
+          <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
+          <q-btn
+            label="ادغام کتاب"
+            class="q-ml-sm"
+            @click="mergePDFBook(pdf.id, pdf.title)"
+          />
         </q-card-section>
       </q-card>
     </div>
