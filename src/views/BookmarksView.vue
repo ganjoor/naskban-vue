@@ -3,6 +3,7 @@ import { ref, watchEffect, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { en2fa } from '../en2fa'
 import { bus } from '../event-bus'
+import * as BookmarkService from '../utilities/BookmarkService'
 
 const route = useRoute()
 
@@ -129,6 +130,24 @@ async function deleteBookmark(bookmarkId, bookId, pageNumber) {
     const element = document.getElementById(`bookmark-${bookmarkId}`)
     element.remove()
   }
+}
+async function editNote(bookmark) {
+  const newNote = prompt('یادداشت', bookmark.note || '')
+  if (newNote == null) return // cancelled
+
+  loading.value = true
+  const ok = await BookmarkService.updateBookmarkNote(
+    userInfo.value,
+    bookmark.bookId,
+    bookmark.pageNumber,
+    newNote
+  )
+  loading.value = false
+  if (!ok) {
+    alert('ثبت یادداشت ناموفق بود.')
+    return
+  }
+  bookmark.note = newNote
 }
 async function logout() {
   if (!confirm(`از حساب کاربری خود بیرون می‌روید؟`)) {
@@ -257,10 +276,13 @@ async function logout() {
             </q-card-section>
           </q-card>
         </a>
-        <q-btn
-            label="حذف نشان"
-            @click="deleteBookmark(bookmark.id, bookmark.bookId, bookmark.pageNumber)"
-          />
+        <div>
+          <q-btn label="ویرایش یادداشت" @click="editNote(bookmark)" />
+          <q-btn
+              label="حذف نشان"
+              @click="deleteBookmark(bookmark.id, bookmark.bookId, bookmark.pageNumber)"
+            />
+        </div>
       </div>
       <div :id="'bookmark-' + bookmark.id" v-if="bookmark.pageNumber != 0" style="display: grid;">
         <a
@@ -285,10 +307,13 @@ async function logout() {
             </q-card-section>
           </q-card>
         </a>
-        <q-btn
-            label="حذف نشان"
-            @click="deleteBookmark(bookmark.id, bookmark.bookId, bookmark.pageNumber)"
-          />
+        <div>
+          <q-btn label="ویرایش یادداشت" @click="editNote(bookmark)" />
+          <q-btn
+              label="حذف نشان"
+              @click="deleteBookmark(bookmark.id, bookmark.bookId, bookmark.pageNumber)"
+            />
+        </div>
       </div>
     </div>
   </div>
