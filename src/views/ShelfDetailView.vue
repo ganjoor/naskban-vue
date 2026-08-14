@@ -48,7 +48,7 @@ function goTo(url) {
 </script>
 
 <template>
-  <q-bar class="bg-white text-white flex-center">
+  <q-bar class="flex-center">
     <div class="q-pa-lg flex flex-center">
       <q-btn dense flat icon="arrow_forward" class="green" @click="goTo('/shelves')">
         <q-tooltip class="bg-green text-white">بازگشت به قفسه‌ها</q-tooltip>

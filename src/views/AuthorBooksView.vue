@@ -22,7 +22,7 @@ function checkPermission(secShortName, opShortName) {
 async function loadBooks() {
   loading.value = true
   const res = await fetch(
-    `https://api.naskban.ir/api/pdf/pdfbook/by/contributer/${route.params.id}?PageNumber=${pageNumber.value}&PageSize=20`,
+    `https://api.naskban.ir/api/pdf/pdfbook/by/contributer/${route.params.id}?PageNumber=${pageNumber.value}&PageSize=21`,
     { headers: { 'content-type': 'application/json' } }
   )
   if (res.ok) {
@@ -137,7 +137,7 @@ function goTo(url) {
 </script>
 
 <template>
-  <q-bar class="bg-white text-white flex-center">
+  <q-bar class="flex-center">
     <div class="q-pa-lg flex flex-center">
       <q-btn dense flat icon="arrow_forward" class="green" @click="goTo('/authors')">
         <q-tooltip class="bg-green text-white">بازگشت به نویسندگان</q-tooltip>

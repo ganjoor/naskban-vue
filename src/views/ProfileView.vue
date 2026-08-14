@@ -178,7 +178,7 @@ async function logout() {
 }
 </script>
 <template>
-  <q-bar class="bg-white text-white flex-center">
+  <q-bar class="flex-center">
     <div class="q-pa-lg flex flex-center">
       <form>
         <input

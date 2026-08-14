@@ -368,7 +368,7 @@ function saveAsImage() {
   <div class="q-pa-lg flex flex-center justify-center centers" v-if="pdf != null">
     <a :href="'/' + pdf.id">{{ pdf.title }}</a>
   </div>
-  <q-bar class="bg-white text-white flex-center">
+  <q-bar class="flex-center">
     <div class="q-pa-lg flex flex-center">
       <input
         v-if="pdf != null && pdf.ocRed == true"
