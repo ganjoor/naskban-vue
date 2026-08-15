@@ -145,6 +145,33 @@ async function onDuplicateAuthorPicked(duplicate) {
   await loadBooks()
 }
 
+async function deleteAuthor() {
+  if (
+    !confirm(
+      `نویسندهٔ «${authorName.value}» حذف شود؟ این نویسنده دیگر در فهرست یا جست‌وجوی نویسندگان نخواهد بود، اما نامش همچنان در قسمت نویسندگان کتاب‌هایی که به آن اشاره دارند باقی می‌ماند. این عملیات قابل بازگشت نیست.`
+    )
+  ) {
+    return
+  }
+  loading.value = true
+  const res = await fetch(`https://api.naskban.ir/api/pdf/author/${route.params.id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!res.ok) {
+    alert(await res.json())
+    return
+  }
+  // the author this screen was showing no longer exists - same reasoning as
+  // deletePDFBook's own navigation elsewhere: staying here would just leave a
+  // stale/broken page
+  goTo('/authors')
+}
+
 watch(pageNumber, () => loadBooks())
 
 onMounted(() => {
@@ -194,6 +221,16 @@ function goTo(url) {
         @click="mergeAuthorDialogOpen = true"
       >
         <q-tooltip class="bg-green text-white">ادغام با نویسندهٔ دیگر</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="canDelete"
+        dense
+        flat
+        icon="delete_outline"
+        class="green"
+        @click="deleteAuthor"
+      >
+        <q-tooltip class="bg-green text-white">حذف نویسنده</q-tooltip>
       </q-btn>
     </div>
   </q-bar>

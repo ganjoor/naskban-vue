@@ -122,6 +122,31 @@ async function onDuplicatePicked(duplicate) {
   await loadAuthors()
 }
 
+async function deleteAuthor(author) {
+  if (
+    !confirm(
+      `نویسندهٔ «${author.name}» (${author.bookCount} کتاب) حذف شود؟ این نویسنده دیگر در فهرست یا جست‌وجوی نویسندگان نخواهد بود، اما نامش همچنان در قسمت نویسندگان کتاب‌هایی که به آن اشاره دارند باقی می‌ماند. این عملیات قابل بازگشت نیست.`
+    )
+  ) {
+    return
+  }
+  loading.value = true
+  const res = await fetch(`https://api.naskban.ir/api/pdf/author/${author.id}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    }
+  })
+  loading.value = false
+  if (!res.ok) {
+    alert(await res.json())
+    return
+  }
+  alert('نویسنده حذف شد!')
+  await loadAuthors()
+}
+
 watch(pageNumber, () => loadAuthors())
 
 onMounted(() => {
@@ -237,6 +262,17 @@ function goTo(url) {
             @click.stop="openMergeDialog(author)"
           >
             <q-tooltip class="bg-green text-white">ادغام با نویسندهٔ دیگر</q-tooltip>
+          </q-btn>
+        </q-item-section>
+        <q-item-section side v-if="canDelete">
+          <q-btn
+            dense
+            flat
+            size="sm"
+            icon="delete_outline"
+            @click.stop="deleteAuthor(author)"
+          >
+            <q-tooltip class="bg-green text-white">حذف نویسنده</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
