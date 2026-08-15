@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { fa2en } from '../fa2en'
 import PermissionChecker from '../utilities/PermissionChecker'
 import * as PinnedAuthorService from '../utilities/PinnedAuthorService'
+import AuthorPickerDialog from '../components/AuthorPickerDialog.vue'
 
 const route = useRoute()
 const loading = ref(true)
@@ -14,6 +15,7 @@ const pageCount = ref(1)
 const pageNumber = ref(1)
 const pinned = ref(false)
 const canDelete = ref(false)
+const mergeAuthorDialogOpen = ref(false)
 
 function checkPermission(secShortName, opShortName) {
   return PermissionChecker.check(userInfo.value, secShortName, opShortName)
@@ -115,6 +117,34 @@ async function mergePDFBook(id, title) {
   alert('ادغام با موفقیت انجام شد!')
 }
 
+async function onDuplicateAuthorPicked(duplicate) {
+  if (
+    !confirm(
+      `نویسندهٔ «${duplicate.name}» (${duplicate.bookCount} کتاب) در «${authorName.value}» ادغام و حذف شود؟ همهٔ کتاب‌های آن به «${authorName.value}» منتقل می‌شوند. این عملیات قابل بازگشت نیست.`
+    )
+  ) {
+    return
+  }
+  loading.value = true
+  const res = await fetch(
+    `https://api.naskban.ir/api/pdf/author/merge/${route.params.id}/${duplicate.id}`,
+    {
+      method: 'PUT',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  if (!res.ok) {
+    alert(await res.json())
+    return
+  }
+  alert('ادغام با موفقیت انجام شد!')
+  await loadBooks()
+}
+
 watch(pageNumber, () => loadBooks())
 
 onMounted(() => {
@@ -155,8 +185,25 @@ function goTo(url) {
           {{ pinned ? 'حذف سنجاق این نویسنده' : 'سنجاق کردن این نویسنده' }}
         </q-tooltip>
       </q-btn>
+      <q-btn
+        v-if="canDelete"
+        dense
+        flat
+        icon="merge_type"
+        class="green"
+        @click="mergeAuthorDialogOpen = true"
+      >
+        <q-tooltip class="bg-green text-white">ادغام با نویسندهٔ دیگر</q-tooltip>
+      </q-btn>
     </div>
   </q-bar>
+
+  <AuthorPickerDialog
+    v-model="mergeAuthorDialogOpen"
+    title="ادغام با نویسندهٔ دیگر"
+    :exclude-author-id="route.params.id"
+    @picked="onDuplicateAuthorPicked"
+  />
 
   <h3 v-if="authorName">{{ authorName }}</h3>
 

@@ -2,6 +2,8 @@
 import { ref, onMounted, watch } from 'vue'
 import { bus } from '../event-bus'
 import * as PinnedAuthorService from '../utilities/PinnedAuthorService'
+import PermissionChecker from '../utilities/PermissionChecker'
+import AuthorPickerDialog from '../components/AuthorPickerDialog.vue'
 
 const loading = ref(false)
 const userInfo = ref(null)
@@ -11,13 +13,22 @@ const pageNumber = ref(1)
 const searchTerm = ref('')
 const sortByBookCount = ref(true)
 const pinnedAuthors = ref([])
+const canDelete = ref(false)
+const mergeDialogOpen = ref(false)
+const mergeSurvivor = ref(null)
+
+function checkPermission(secShortName, opShortName) {
+  return PermissionChecker.check(userInfo.value, secShortName, opShortName)
+}
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
+  canDelete.value = checkPermission('pdf', 'delete')
   loadPinned()
 })
 bus.on('user-logged-out', () => {
   userInfo.value = null
+  canDelete.value = false
   pinnedAuthors.value = []
 })
 
@@ -76,6 +87,41 @@ function openAuthor(authorId) {
   window.location.href = '/authors/' + authorId
 }
 
+function openMergeDialog(author) {
+  mergeSurvivor.value = author
+  mergeDialogOpen.value = true
+}
+
+async function onDuplicatePicked(duplicate) {
+  const survivor = mergeSurvivor.value
+  if (!survivor) return
+  if (
+    !confirm(
+      `نویسندهٔ «${duplicate.name}» (${duplicate.bookCount} کتاب) در «${survivor.name}» ادغام و حذف شود؟ همهٔ کتاب‌های آن به «${survivor.name}» منتقل می‌شوند. این عملیات قابل بازگشت نیست.`
+    )
+  ) {
+    return
+  }
+  loading.value = true
+  const res = await fetch(
+    `https://api.naskban.ir/api/pdf/author/merge/${survivor.id}/${duplicate.id}`,
+    {
+      method: 'PUT',
+      headers: {
+        authorization: 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  loading.value = false
+  if (!res.ok) {
+    alert(await res.json())
+    return
+  }
+  alert('ادغام با موفقیت انجام شد!')
+  await loadAuthors()
+}
+
 watch(pageNumber, () => loadAuthors())
 
 onMounted(() => {
@@ -86,6 +132,7 @@ onMounted(() => {
       userInfo.value = null
     }
   }
+  canDelete.value = checkPermission('pdf', 'delete')
   document.title = 'نسکبان - نویسندگان'
   loadAuthors()
   loadPinned()
@@ -181,6 +228,17 @@ function goTo(url) {
             </q-tooltip>
           </q-btn>
         </q-item-section>
+        <q-item-section side v-if="canDelete">
+          <q-btn
+            dense
+            flat
+            size="sm"
+            icon="merge_type"
+            @click.stop="openMergeDialog(author)"
+          >
+            <q-tooltip class="bg-green text-white">ادغام با نویسندهٔ دیگر</q-tooltip>
+          </q-btn>
+        </q-item-section>
       </q-item>
       <q-separator v-if="index < authors.length - 1" />
     </template>
@@ -188,6 +246,13 @@ function goTo(url) {
       نویسنده‌ای یافت نشد.
     </div>
   </q-list>
+
+  <AuthorPickerDialog
+    v-model="mergeDialogOpen"
+    title="ادغام با نویسندهٔ دیگر"
+    :exclude-author-id="mergeSurvivor?.id"
+    @picked="onDuplicatePicked"
+  />
 
   <div class="q-pa-lg flex flex-center">
     <q-pagination
