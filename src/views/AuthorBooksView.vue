@@ -152,7 +152,7 @@ function goTo(url) {
         @click="togglePin"
       >
         <q-tooltip class="bg-green text-white">
-          {{ pinned ? 'حذف پین این نویسنده' : 'پین کردن این نویسنده' }}
+          {{ pinned ? 'حذف سنجاق این نویسنده' : 'سنجاق کردن این نویسنده' }}
         </q-tooltip>
       </q-btn>
     </div>

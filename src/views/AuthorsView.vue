@@ -150,7 +150,7 @@ function goTo(url) {
             icon="push_pin"
             @click.stop="togglePin(pinned.authorId)"
           >
-            <q-tooltip class="bg-green text-white">حذف پین</q-tooltip>
+            <q-tooltip class="bg-green text-white">حذف سنجاق</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
@@ -177,7 +177,7 @@ function goTo(url) {
             @click.stop="togglePin(author.id)"
           >
             <q-tooltip class="bg-green text-white">
-              {{ isPinnedId(author.id) ? 'حذف پین' : 'پین کردن' }}
+              {{ isPinnedId(author.id) ? 'حذف سنجاق' : 'سنجاق کردن' }}
             </q-tooltip>
           </q-btn>
         </q-item-section>
