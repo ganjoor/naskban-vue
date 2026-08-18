@@ -17,14 +17,30 @@ const pinned = ref(false)
 const canDelete = ref(false)
 const mergeAuthorDialogOpen = ref(false)
 
+// the only three roles AuthorRole.Role ever holds - hardcoded rather than
+// fetched, since there's no listing endpoint for this and the set is
+// small and effectively fixed
+const authorRoles = ['نویسنده', 'مترجم', 'مصحح']
+const selectedRole = ref(null) // null means "همه" - every role
+
 function checkPermission(secShortName, opShortName) {
   return PermissionChecker.check(userInfo.value, secShortName, opShortName)
 }
 
+function selectRole(role) {
+  if (role === selectedRole.value) return
+  selectedRole.value = role
+  pageNumber.value = 1
+  loadBooks()
+}
+
 async function loadBooks() {
   loading.value = true
+  const roleQuery = selectedRole.value
+    ? `&role=${encodeURIComponent(selectedRole.value)}`
+    : ''
   const res = await fetch(
-    `https://api.naskban.ir/api/pdf/pdfbook/by/contributer/${route.params.id}?PageNumber=${pageNumber.value}&PageSize=21`,
+    `https://api.naskban.ir/api/pdf/pdfbook/by/contributer/${route.params.id}?PageNumber=${pageNumber.value}&PageSize=21${roleQuery}`,
     { headers: { 'content-type': 'application/json' } }
   )
   if (res.ok) {
@@ -120,7 +136,7 @@ async function mergePDFBook(id, title) {
 async function onDuplicateAuthorPicked(duplicate) {
   if (
     !confirm(
-      `نویسندهٔ «${duplicate.name}» (${duplicate.bookCount} کتاب) در «${authorName.value}» ادغام و حذف شود؟ همهٔ کتاب‌های آن به «${authorName.value}» منتقل می‌شوند. این عملیات قابل بازگشت نیست.`
+      `پدیدآورندهٔ «${duplicate.name}» (${duplicate.bookCount} کتاب) در «${authorName.value}» ادغام و حذف شود؟ همهٔ کتاب‌های آن به «${authorName.value}» منتقل می‌شوند. این عملیات قابل بازگشت نیست.`
     )
   ) {
     return
@@ -148,7 +164,7 @@ async function onDuplicateAuthorPicked(duplicate) {
 async function deleteAuthor() {
   if (
     !confirm(
-      `نویسندهٔ «${authorName.value}» حذف شود؟ این نویسنده دیگر در فهرست یا جست‌وجوی نویسندگان نخواهد بود، اما نامش همچنان در قسمت نویسندگان کتاب‌هایی که به آن اشاره دارند باقی می‌ماند. این عملیات قابل بازگشت نیست.`
+      `پدیدآورندهٔ «${authorName.value}» حذف شود؟ این پدیدآورنده دیگر در فهرست یا جست‌وجوی پدیدآورندگان نخواهد بود، اما نامش همچنان در قسمت پدیدآورندگان کتاب‌هایی که به آن اشاره دارند باقی می‌ماند. این عملیات قابل بازگشت نیست.`
     )
   ) {
     return
@@ -197,7 +213,7 @@ function goTo(url) {
   <q-bar class="flex-center">
     <div class="q-pa-lg flex flex-center">
       <q-btn dense flat icon="arrow_forward" class="green" @click="goTo('/authors')">
-        <q-tooltip class="bg-green text-white">بازگشت به نویسندگان</q-tooltip>
+        <q-tooltip class="bg-green text-white">بازگشت به پدیدآورندگان</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn
@@ -209,7 +225,7 @@ function goTo(url) {
         @click="togglePin"
       >
         <q-tooltip class="bg-green text-white">
-          {{ pinned ? 'حذف سنجاق این نویسنده' : 'سنجاق کردن این نویسنده' }}
+          {{ pinned ? 'حذف سنجاق این پدیدآورنده' : 'سنجاق کردن این پدیدآورنده' }}
         </q-tooltip>
       </q-btn>
       <q-btn
@@ -220,7 +236,7 @@ function goTo(url) {
         class="green"
         @click="mergeAuthorDialogOpen = true"
       >
-        <q-tooltip class="bg-green text-white">ادغام با نویسندهٔ دیگر</q-tooltip>
+        <q-tooltip class="bg-green text-white">ادغام با پدیدآورندهٔ دیگر</q-tooltip>
       </q-btn>
       <q-btn
         v-if="canDelete"
@@ -230,19 +246,42 @@ function goTo(url) {
         class="green"
         @click="deleteAuthor"
       >
-        <q-tooltip class="bg-green text-white">حذف نویسنده</q-tooltip>
+        <q-tooltip class="bg-green text-white">حذف پدیدآورنده</q-tooltip>
       </q-btn>
     </div>
   </q-bar>
 
   <AuthorPickerDialog
     v-model="mergeAuthorDialogOpen"
-    title="ادغام با نویسندهٔ دیگر"
+    title="ادغام با پدیدآورندهٔ دیگر"
     :exclude-author-id="route.params.id"
     @picked="onDuplicateAuthorPicked"
   />
 
   <h3 v-if="authorName">{{ authorName }}</h3>
+
+  <div class="row justify-center q-pa-sm">
+    <q-chip
+      clickable
+      :outline="selectedRole !== null"
+      color="green"
+      text-color="white"
+      @click="selectRole(null)"
+    >
+      همه
+    </q-chip>
+    <q-chip
+      v-for="role in authorRoles"
+      :key="role"
+      clickable
+      :outline="selectedRole !== role"
+      color="green"
+      text-color="white"
+      @click="selectRole(role)"
+    >
+      {{ role }}
+    </q-chip>
+  </div>
 
   <div class="q-pa-lg flex flex-center">
     <q-spinner-hourglass v-if="loading" color="green" size="4em" />
@@ -274,7 +313,7 @@ function goTo(url) {
       </q-card>
     </div>
     <div v-if="pdfs.length === 0" class="text-center full-width q-pa-lg">
-      کتابی از این نویسنده یافت نشد.
+      کتابی از این پدیدآورنده یافت نشد.
     </div>
   </div>
 

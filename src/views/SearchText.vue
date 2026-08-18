@@ -173,7 +173,7 @@ async function logout() {
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
       <q-btn dense flat icon="badge" class="green" @click="goToAuthors">
-        <q-tooltip class="bg-green text-white">نویسندگان</q-tooltip>
+        <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goToShelves">
         <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>

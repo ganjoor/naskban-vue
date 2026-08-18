@@ -97,7 +97,7 @@ async function onDuplicatePicked(duplicate) {
   if (!survivor) return
   if (
     !confirm(
-      `نویسندهٔ «${duplicate.name}» (${duplicate.bookCount} کتاب) در «${survivor.name}» ادغام و حذف شود؟ همهٔ کتاب‌های آن به «${survivor.name}» منتقل می‌شوند. این عملیات قابل بازگشت نیست.`
+      `پدیدآورندهٔ «${duplicate.name}» (${duplicate.bookCount} کتاب) در «${survivor.name}» ادغام و حذف شود؟ همهٔ کتاب‌های آن به «${survivor.name}» منتقل می‌شوند. این عملیات قابل بازگشت نیست.`
     )
   ) {
     return
@@ -125,7 +125,7 @@ async function onDuplicatePicked(duplicate) {
 async function deleteAuthor(author) {
   if (
     !confirm(
-      `نویسندهٔ «${author.name}» (${author.bookCount} کتاب) حذف شود؟ این نویسنده دیگر در فهرست یا جست‌وجوی نویسندگان نخواهد بود، اما نامش همچنان در قسمت نویسندگان کتاب‌هایی که به آن اشاره دارند باقی می‌ماند. این عملیات قابل بازگشت نیست.`
+      `پدیدآورندهٔ «${author.name}» (${author.bookCount} کتاب) حذف شود؟ این پدیدآورنده دیگر در فهرست یا جست‌وجوی پدیدآورندگان نخواهد بود، اما نامش همچنان در قسمت پدیدآورندگان کتاب‌هایی که به آن اشاره دارند باقی می‌ماند. این عملیات قابل بازگشت نیست.`
     )
   ) {
     return
@@ -143,7 +143,7 @@ async function deleteAuthor(author) {
     alert(await res.json())
     return
   }
-  alert('نویسنده حذف شد!')
+  alert('پدیدآورنده حذف شد!')
   await loadAuthors()
 }
 
@@ -158,7 +158,7 @@ onMounted(() => {
     }
   }
   canDelete.value = checkPermission('pdf', 'delete')
-  document.title = 'نسکبان - نویسندگان'
+  document.title = 'نسکبان - پدیدآورندگان'
   loadAuthors()
   loadPinned()
 })
@@ -177,12 +177,12 @@ function goTo(url) {
     </div>
   </q-bar>
 
-  <h3>نویسندگان</h3>
+  <h3>پدیدآورندگان</h3>
 
   <div class="row justify-center q-pa-sm">
     <q-input
       v-model="searchTerm"
-      label="جستجوی نام نویسنده"
+      label="جستجوی نام پدیدآورنده"
       style="width: 300px"
       @keydown.enter.prevent="search"
     >
@@ -261,7 +261,7 @@ function goTo(url) {
             icon="merge_type"
             @click.stop="openMergeDialog(author)"
           >
-            <q-tooltip class="bg-green text-white">ادغام با نویسندهٔ دیگر</q-tooltip>
+            <q-tooltip class="bg-green text-white">ادغام با پدیدآورندهٔ دیگر</q-tooltip>
           </q-btn>
         </q-item-section>
         <q-item-section side v-if="canDelete">
@@ -272,20 +272,20 @@ function goTo(url) {
             icon="delete_outline"
             @click.stop="deleteAuthor(author)"
           >
-            <q-tooltip class="bg-green text-white">حذف نویسنده</q-tooltip>
+            <q-tooltip class="bg-green text-white">حذف پدیدآورنده</q-tooltip>
           </q-btn>
         </q-item-section>
       </q-item>
       <q-separator v-if="index < authors.length - 1" />
     </template>
     <div v-if="authors.length === 0 && pinnedAuthors.length === 0" class="text-center q-pa-lg">
-      نویسنده‌ای یافت نشد.
+      پدیدآورنده‌ای یافت نشد.
     </div>
   </q-list>
 
   <AuthorPickerDialog
     v-model="mergeDialogOpen"
-    title="ادغام با نویسندهٔ دیگر"
+    title="ادغام با پدیدآورندهٔ دیگر"
     :exclude-author-id="mergeSurvivor?.id"
     @picked="onDuplicatePicked"
   />

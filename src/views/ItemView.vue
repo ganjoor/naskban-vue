@@ -461,7 +461,7 @@ function copyUrl() {
         <q-tooltip class="bg-green text-white">افزودن به قفسه</q-tooltip>
       </q-btn>
       <q-btn dense flat icon="badge" class="green" @click="goTo('/authors')">
-        <q-tooltip class="bg-green text-white">نویسندگان</q-tooltip>
+        <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goTo('/shelves')">
         <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>

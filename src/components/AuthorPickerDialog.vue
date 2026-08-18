@@ -4,7 +4,7 @@ import { ref, watch } from 'vue'
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
   excludeAuthorId: { type: [Number, String], default: null },
-  title: { type: String, default: 'انتخاب نویسنده' }
+  title: { type: String, default: 'انتخاب پدیدآورنده' }
 })
 const emit = defineEmits(['update:modelValue', 'picked'])
 
@@ -64,7 +64,7 @@ watch(
         <q-input
           v-model="searchTerm"
           autofocus
-          label="جست‌وجوی نام نویسنده"
+          label="جست‌وجوی نام پدیدآورنده"
           @update:model-value="onInput"
         >
           <template v-slot:prepend>
@@ -77,7 +77,7 @@ watch(
           <q-spinner-hourglass color="green" size="2em" />
         </div>
         <div v-else-if="results.length === 0" class="text-center text-grey q-pa-md">
-          {{ searchTerm.trim() === '' ? 'نام نویسنده را جست‌وجو کنید' : 'نویسنده‌ای یافت نشد.' }}
+          {{ searchTerm.trim() === '' ? 'نام پدیدآورنده را جست‌وجو کنید' : 'پدیدآورنده‌ای یافت نشد.' }}
         </div>
         <q-list v-else>
           <q-item v-for="author in results" :key="author.id" clickable @click="pick(author)">
