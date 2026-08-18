@@ -5,6 +5,7 @@ import { en2fa } from '../en2fa'
 import { fa2en } from '../fa2en'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
+import * as NotificationService from '../utilities/NotificationService'
 
 const route = useRoute()
 const loading = ref(false)
@@ -16,6 +17,12 @@ const pageSize = 21
 const userInfo = ref(null)
 const canDelete = ref(false)
 const canReviewReports = ref(false)
+const unreadNotificationCount = ref(null)
+
+async function loadUnreadNotificationCount() {
+  if (userInfo.value == null) return
+  unreadNotificationCount.value = await NotificationService.getUnreadCount(userInfo.value)
+}
 const recentReads = ref([])
 // filtered here, not in the template, so the v-for below never needs a
 // v-if alongside it (mixing the two on one element is an eslint error -
@@ -134,6 +141,7 @@ watchEffect(async () => {
 
   canDelete.value = checkPermission('pdf', 'delete')
   canReviewReports.value = checkPermission('pdfreport', 'moderate')
+  loadUnreadNotificationCount()
 
   await loadList(false)
 
@@ -296,6 +304,19 @@ async function logout() {
       </q-btn>
       <q-btn dense flat icon="badge" class="green" @click="goToAuthors">
         <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="notifications"
+        class="green"
+        @click="goTo('/notifications')"
+      >
+        <q-badge v-if="unreadNotificationCount > 0" color="red" floating rounded>
+          {{ unreadNotificationCount > 9 ? '۹+' : unreadNotificationCount }}
+        </q-badge>
+        <q-tooltip class="bg-green text-white">اعلان‌ها</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goToShelves">
         <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>

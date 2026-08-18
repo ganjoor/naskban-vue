@@ -17,6 +17,7 @@ import ShelfDetailView from './views/ShelfDetailView.vue'
 import AuthorsView from './views/AuthorsView.vue'
 import AuthorBooksView from './views/AuthorBooksView.vue'
 import PDFBookReportsView from './views/PDFBookReportsView.vue'
+import NotificationsView from './views/NotificationsView.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -121,6 +122,11 @@ export const router = createRouter({
       path: '/reports',
       name: 'bookreports',
       component: PDFBookReportsView
+    },
+    {
+      path: '/notifications',
+      name: 'notifications',
+      component: NotificationsView
     },
   ]
 })
