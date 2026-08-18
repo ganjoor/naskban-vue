@@ -28,6 +28,31 @@ const allShelves = ref([])
 const selectedShelfIds = ref([])
 const newShelfName = ref('')
 
+const canReviewReports = ref(false)
+const reportDialogOpen = ref(false)
+const reportCategory = ref('Copyright')
+const reportDescription = ref('')
+const reportSubmitting = ref(false)
+const reportError = ref('')
+// keys sent to the server verbatim; the Persian text is display-only -
+// same fixed set as the Flutter client's kBookReportCategories
+const bookReportCategories = {
+  Copyright: 'نقض حق نشر',
+  IncorrectMetadata: 'اطلاعات نادرست',
+  Other: 'سایر'
+}
+// shown only when Copyright is selected - worded by the site's
+// maintainer, kept verbatim rather than paraphrased since it's precise
+// policy/liability language
+const copyrightNotice =
+  'لطفاً توجه داشته باشید که هیچ‌یک از کتابها توسط نسکبان اسکن و نشر اولیه نشده و ' +
+  'کتابها عموماً بازنشر کتابهای منتشر شده در وبگاههای سها و کتابخانهٔ ادبیات هستند. ' +
+  'از این جهت گزارش حق نقض در صورت پذیرش صرفاً منتهی به حذف آن از نسکبان می‌شود و ' +
+  'نسکبان مسئولیتی در قبال نشر آن در وبگاههای مبدأ و دیگر وبگاهها ندارد. برای گزارش ' +
+  'حق نشر می‌بایست صاحب این حق باشید و از طریق لینک یا توضیحات مشخصات کتاب منتشره را ' +
+  'ارائه فرمایید. همچنان که مستحضرید بازنشر کاغذی یا دیجیتال کتابهای بدون صاحب نشر ' +
+  'صاحب حقوق آن را تغییر نمی‌دهد.'
+
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
 })
@@ -164,6 +189,7 @@ watchEffect(async () => {
     }
   }
   canDelete.value = checkPermission('pdf', 'delete')
+  canReviewReports.value = checkPermission('pdfreport', 'moderate')
   loading.value = true
   await loadPDF(false)
   onAnyShelf.value = false
@@ -223,6 +249,40 @@ async function createShelfFromDialog() {
   }
   newShelfName.value = ''
   loading.value = false
+}
+
+function openReportDialog() {
+  reportCategory.value = 'Copyright'
+  reportDescription.value = ''
+  reportError.value = ''
+  reportDialogOpen.value = true
+}
+
+async function submitReport() {
+  if (!reportDescription.value.trim()) {
+    reportError.value = 'توضیحات را وارد کنید.'
+    return
+  }
+  reportSubmitting.value = true
+  reportError.value = ''
+  const res = await fetch(`https://api.naskban.ir/api/pdf/${route.params.id}/report`, {
+    method: 'POST',
+    headers: {
+      authorization: 'bearer ' + userInfo.value.token,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      category: reportCategory.value,
+      description: reportDescription.value.trim()
+    })
+  })
+  reportSubmitting.value = false
+  if (!res.ok) {
+    reportError.value = await res.json()
+    return
+  }
+  reportDialogOpen.value = false
+  alert('گزارش شما ثبت شد. سپاسگزاریم.')
 }
 
 async function initSearch() {
@@ -478,6 +538,26 @@ function copyUrl() {
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="flag"
+        class="green"
+        @click="openReportDialog"
+      >
+        <q-tooltip class="bg-green text-white">گزارش این کتاب</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="canReviewReports"
+        dense
+        flat
+        icon="outlined_flag"
+        class="green"
+        @click="goTo('/reports')"
+      >
+        <q-tooltip class="bg-green text-white">گزارش‌های کاربران</q-tooltip>
       </q-btn>
 
       <q-separator vertical inset spaced v-if="userInfo != null" />
@@ -756,6 +836,44 @@ function copyUrl() {
       </q-card-section>
       <q-card-actions align="right">
         <q-btn label="بستن" @click="shelfDialogOpen = false" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog v-model="reportDialogOpen">
+    <q-card style="min-width: 320px">
+      <q-card-section class="text-h6">گزارش این کتاب</q-card-section>
+      <q-card-section>
+        <q-select
+          v-model="reportCategory"
+          label="دلیل گزارش"
+          :options="Object.keys(bookReportCategories)"
+          :option-label="(key) => bookReportCategories[key]"
+          emit-value
+          map-options
+        />
+        <q-banner v-if="reportCategory === 'Copyright'" class="bg-amber-2 q-mt-sm" dense>
+          <template v-slot:avatar>
+            <q-icon name="info" color="amber-9" />
+          </template>
+          <span class="text-caption">{{ copyrightNotice }}</span>
+        </q-banner>
+        <q-input
+          v-model="reportDescription"
+          label="توضیحات"
+          type="textarea"
+          class="q-mt-sm"
+        />
+        <div v-if="reportError" class="text-red q-mt-sm">{{ reportError }}</div>
+      </q-card-section>
+      <q-card-actions align="right">
+        <q-btn label="انصراف" :disable="reportSubmitting" @click="reportDialogOpen = false" />
+        <q-btn
+          label="ثبت گزارش"
+          color="primary"
+          :loading="reportSubmitting"
+          @click="submitReport"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

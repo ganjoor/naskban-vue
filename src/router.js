@@ -16,6 +16,7 @@ import ShelvesView from './views/ShelvesView.vue'
 import ShelfDetailView from './views/ShelfDetailView.vue'
 import AuthorsView from './views/AuthorsView.vue'
 import AuthorBooksView from './views/AuthorBooksView.vue'
+import PDFBookReportsView from './views/PDFBookReportsView.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -115,6 +116,11 @@ export const router = createRouter({
       path: '/authors/:id',
       name: 'authorbooks',
       component: AuthorBooksView
+    },
+    {
+      path: '/reports',
+      name: 'bookreports',
+      component: PDFBookReportsView
     },
   ]
 })

@@ -15,6 +15,7 @@ const searchTerm = ref('')
 const pageSize = 21
 const userInfo = ref(null)
 const canDelete = ref(false)
+const canReviewReports = ref(false)
 const recentReads = ref([])
 // filtered here, not in the template, so the v-for below never needs a
 // v-if alongside it (mixing the two on one element is an eslint error -
@@ -132,6 +133,7 @@ watchEffect(async () => {
   }*/
 
   canDelete.value = checkPermission('pdf', 'delete')
+  canReviewReports.value = checkPermission('pdfreport', 'moderate')
 
   await loadList(false)
 
@@ -300,6 +302,16 @@ async function logout() {
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
         <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="canReviewReports"
+        dense
+        flat
+        icon="outlined_flag"
+        class="green"
+        @click="goTo('/reports')"
+      >
+        <q-tooltip class="bg-green text-white">گزارش‌های کاربران</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn
