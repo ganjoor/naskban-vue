@@ -6,6 +6,7 @@ import { fa2en } from '../fa2en'
 import { bus } from '../event-bus'
 import PermissionChecker from './../utilities/PermissionChecker'
 import * as ShelfService from '../utilities/ShelfService'
+import * as NotificationService from '../utilities/NotificationService'
 
 const route = useRoute()
 
@@ -29,6 +30,12 @@ const selectedShelfIds = ref([])
 const newShelfName = ref('')
 
 const canReviewReports = ref(false)
+const unreadNotificationCount = ref(null)
+
+async function loadUnreadNotificationCount() {
+  if (userInfo.value == null) return
+  unreadNotificationCount.value = await NotificationService.getUnreadCount(userInfo.value)
+}
 const reportDialogOpen = ref(false)
 const reportCategory = ref('Copyright')
 const reportDescription = ref('')
@@ -190,6 +197,7 @@ watchEffect(async () => {
   }
   canDelete.value = checkPermission('pdf', 'delete')
   canReviewReports.value = checkPermission('pdfreport', 'moderate')
+  loadUnreadNotificationCount()
   loading.value = true
   await loadPDF(false)
   onAnyShelf.value = false
@@ -522,6 +530,19 @@ function copyUrl() {
       </q-btn>
       <q-btn dense flat icon="badge" class="green" @click="goTo('/authors')">
         <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="userInfo != null"
+        dense
+        flat
+        icon="notifications"
+        class="green"
+        @click="goTo('/notifications')"
+      >
+        <q-badge v-if="unreadNotificationCount > 0" color="red" floating rounded>
+          {{ unreadNotificationCount > 9 ? '۹+' : unreadNotificationCount }}
+        </q-badge>
+        <q-tooltip class="bg-green text-white">اعلان‌ها</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goTo('/shelves')">
         <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>
