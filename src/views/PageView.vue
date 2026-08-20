@@ -5,6 +5,7 @@ import { VuePDF, usePDF } from '@tato30/vue-pdf'
 import { bus } from '../event-bus'
 import { en2fa } from '../en2fa'
 import PermissionChecker from '../utilities/PermissionChecker'
+import * as PDFPageCommentService from '../utilities/PDFPageCommentService'
 
 const route = useRoute()
 const loading = ref(false)
@@ -18,6 +19,14 @@ const pageInfo = ref(null)
 const ocrText = ref(null)
 const bookmarked = ref(false)
 const canDelete = ref(false)
+const canModerateComments = ref(false)
+
+const comments = ref([])
+const loadingComments = ref(false)
+const commentsError = ref('')
+const newCommentText = ref('')
+const replyingTo = ref(null)
+const submittingComment = ref(false)
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -102,6 +111,7 @@ watchEffect(async () => {
   }
   //if (userInfo.value == null) return
   canDelete.value = checkPermission('pdf', 'delete')
+  canModerateComments.value = checkPermission('pdfcomment', 'moderate')
   loading.value = true
   await loadPDF(false)
   pdfFile.value = usePDF({
@@ -138,6 +148,7 @@ watchEffect(async () => {
     // )
   }
   await loadOCRText(pageNumber.value)
+  await loadComments()
 })
 
 function onLoaded() {
@@ -154,6 +165,7 @@ async function updatePageNumber(value) {
     window.history.pushState({}, '', '/' + pdf.value.id.toString() + '/' + value.toString())
   }
   await loadOCRText(value)
+  await loadComments()
 }
 function goToBookmarks() {
   window.location.href = '/bookmarks'
@@ -221,6 +233,107 @@ async function loadOCRText(pageNumber) {
     }
   }
 }
+
+// pageInfo is only fetched above when the book has been OCR'd (pdf.ocRed)
+// - comments need to work on every page regardless, so this fetches page
+// info independently when it isn't already available, but reuses it when
+// loadOCRText already populated it for the current page (avoids a
+// redundant round-trip on OCR'd books).
+async function ensurePageInfoForComments() {
+  if (pageInfo.value != null && pageInfo.value.pageNumber === pageNumber.value) {
+    return pageInfo.value
+  }
+  const res = await fetch(
+    `https://api.naskban.ir/api/pdf/${route.params.id}/page/${pageNumber.value}`,
+    {
+      headers: {
+        authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
+        'content-type': 'application/json'
+      }
+    }
+  )
+  if (!res.ok) return null
+  const info = await res.json()
+  pageInfo.value = info
+  return info
+}
+
+async function loadComments() {
+  loadingComments.value = true
+  commentsError.value = ''
+  const info = await ensurePageInfoForComments()
+  if (info == null) {
+    loadingComments.value = false
+    commentsError.value = 'خطا در دریافت اطلاعات صفحه'
+    return
+  }
+  try {
+    comments.value = (await PDFPageCommentService.getComments(userInfo.value, info.id)) || []
+  } catch (e) {
+    commentsError.value = e.message
+  }
+  loadingComments.value = false
+}
+
+function startReply(comment) {
+  replyingTo.value = comment
+}
+function cancelReply() {
+  replyingTo.value = null
+}
+
+async function submitComment() {
+  const text = newCommentText.value.trim()
+  if (!text || pageInfo.value == null) return
+  submittingComment.value = true
+  try {
+    await PDFPageCommentService.submitComment(
+      userInfo.value,
+      pageInfo.value.id,
+      text,
+      replyingTo.value ? replyingTo.value.id : null
+    )
+    newCommentText.value = ''
+    replyingTo.value = null
+    await loadComments()
+  } catch (e) {
+    alert(e.message)
+  }
+  submittingComment.value = false
+}
+
+async function removeComment(comment) {
+  if (!confirm('این دیدگاه حذف شود؟')) return
+  try {
+    await PDFPageCommentService.deleteComment(userInfo.value, comment.id)
+    await loadComments()
+  } catch (e) {
+    alert(e.message)
+  }
+}
+
+// comments come back flat from the server (each reply's inReplyToId
+// pointing at its parent, at any depth) - grouped into a simple
+// depth-first, indented list here, matching the Flutter client's own
+// _buildCommentTree
+function commentTree(all) {
+  const byParent = {}
+  for (const c of all) {
+    const key = c.inReplyToId || 'root'
+    if (!byParent[key]) byParent[key] = []
+    byParent[key].push(c)
+  }
+  const result = []
+  function addLevel(parentKey, depth) {
+    for (const c of byParent[parentKey] || []) {
+      result.push({ comment: c, depth })
+      addLevel(c.id, depth + 1)
+    }
+  }
+  addLevel('root', 0)
+  return result
+}
+
 async function handleSwipe(swipeInfo) {
   if (swipeInfo.direction == 'right' && pageNumber.value < pdfFile.value.pages) {
     pageNumber.value += 1
@@ -537,6 +650,78 @@ function saveAsImage() {
         <div v-html="ocrText"></div>
       </q-card-section>
     </q-card>
+
+    <q-card class="full-width q-pa-lg" style="max-width: 700px">
+      <q-card-section class="text-h6">دیدگاه‌های این صفحه</q-card-section>
+
+      <q-card-section v-if="loadingComments" class="flex flex-center">
+        <q-spinner-hourglass color="green" size="3em" />
+      </q-card-section>
+
+      <q-card-section v-else-if="commentsError">
+        <div class="text-red">{{ commentsError }}</div>
+        <q-btn flat label="تلاش مجدد" @click="loadComments" />
+      </q-card-section>
+
+      <q-card-section v-else>
+        <div v-if="comments.length === 0" class="text-grey-7 text-center">
+          هنوز دیدگاهی برای این صفحه ثبت نشده است.
+        </div>
+        <div
+          v-for="{ comment, depth } in commentTree(comments)"
+          :key="comment.id"
+          :style="{ marginRight: depth * 20 + 'px' }"
+          class="q-mb-sm"
+        >
+          <q-card flat bordered>
+            <q-card-section class="q-pb-none">
+              <div class="row items-center">
+                <div class="text-bold">{{ comment.userName }}</div>
+                <q-space />
+                <div class="text-caption text-grey-7">{{ comment.createdAt }}</div>
+              </div>
+            </q-card-section>
+            <q-card-section class="q-pt-sm">
+              {{ comment.text }}
+            </q-card-section>
+            <q-card-actions>
+              <q-btn v-if="userInfo != null" flat dense label="پاسخ" @click="startReply(comment)" />
+              <q-btn
+                v-if="comment.myComment || canModerateComments"
+                flat
+                dense
+                color="red"
+                label="حذف"
+                @click="removeComment(comment)"
+              />
+            </q-card-actions>
+          </q-card>
+        </div>
+      </q-card-section>
+
+      <q-card-section v-if="userInfo != null">
+        <div v-if="replyingTo != null" class="row items-center q-mb-xs">
+          <div class="text-caption text-grey-7">در پاسخ به {{ replyingTo.userName }}</div>
+          <q-btn dense flat round icon="close" size="sm" @click="cancelReply" />
+        </div>
+        <q-input
+          v-model="newCommentText"
+          type="textarea"
+          label="دیدگاه خود را بنویسید..."
+          :disable="submittingComment"
+        />
+        <div class="row justify-end q-mt-sm">
+          <q-btn
+            color="primary"
+            label="ارسال"
+            :loading="submittingComment"
+            @click="submitComment"
+          />
+        </div>
+      </q-card-section>
+      <q-card-section v-else class="text-grey-7"> برای ثبت دیدگاه وارد حساب کاربری‌تان شوید. </q-card-section>
+    </q-card>
+
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
       <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />
     </q-card>
