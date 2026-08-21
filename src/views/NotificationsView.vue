@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import * as NotificationService from '../utilities/NotificationService'
+import { formatWithTime } from '../utilities/JalaliDate'
 
 const loading = ref(true)
 const userInfo = ref(null)
@@ -114,7 +115,7 @@ function goTo(url) {
         </q-item-section>
         <q-item-section>
           <q-item-label :class="isUnread(n) ? 'text-bold' : ''">{{ n.subject }}</q-item-label>
-          <q-item-label caption>{{ n.dateTime }}</q-item-label>
+          <q-item-label caption>{{ formatWithTime(n.dateTime) }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-separator v-if="index < notifications.length - 1" />

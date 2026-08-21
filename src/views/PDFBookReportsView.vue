@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import PermissionChecker from '../utilities/PermissionChecker'
+import { formatWithTime } from '../utilities/JalaliDate'
 
 const loading = ref(true)
 const userInfo = ref(null)
@@ -145,7 +146,7 @@ function goTo(url) {
           </q-item-label>
           <q-item-label caption>دلیل: {{ categoryLabel(report.category) }}</q-item-label>
           <q-item-label caption lines="2">{{ report.description }}</q-item-label>
-          <q-item-label caption>{{ report.reporterName }} · {{ report.createdAt }}</q-item-label>
+          <q-item-label caption>{{ report.reporterName }} · {{ formatWithTime(report.createdAt) }}</q-item-label>
         </q-item-section>
         <q-item-section side>
           <q-btn dense flat round icon="reply" @click="openRespondDialog(report)">

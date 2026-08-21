@@ -6,6 +6,7 @@ import { bus } from '../event-bus'
 import { en2fa } from '../en2fa'
 import PermissionChecker from '../utilities/PermissionChecker'
 import * as PDFPageCommentService from '../utilities/PDFPageCommentService'
+import { formatWithTime } from '../utilities/JalaliDate'
 
 const route = useRoute()
 const loading = ref(false)
@@ -678,7 +679,7 @@ function saveAsImage() {
               <div class="row items-center">
                 <div class="text-bold">{{ comment.userName }}</div>
                 <q-space />
-                <div class="text-caption text-grey-7">{{ comment.createdAt }}</div>
+                <div class="text-caption text-grey-7">{{ formatWithTime(comment.createdAt) }}</div>
               </div>
             </q-card-section>
             <q-card-section class="q-pt-sm">
