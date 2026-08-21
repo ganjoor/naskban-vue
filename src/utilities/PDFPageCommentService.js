@@ -1,5 +1,6 @@
-// Submitting, listing, and deleting page comments (Phase 1 - plain text,
-// threaded replies, no highlight/image yet). See the Flutter client's
+// Submitting, listing, and deleting page comments - Phase 1 (plain text,
+// threaded replies) plus Phase 2 (an optional highlighted-region image +
+// fractional coordinates). See the Flutter client's own
 // PDFPageCommentService for the same shape.
 const API_ROOT = 'https://api.naskban.ir'
 
@@ -21,12 +22,33 @@ export async function getComments(userInfo, pdfPageId) {
   return await res.json()
 }
 
-// POST api/pdf/page/{pdfPageId}/comment - any authenticated user.
-export async function submitComment(userInfo, pdfPageId, text, inReplyToId) {
+// POST api/pdf/page/{pdfPageId}/comment - any authenticated user. Sent as
+// multipart form data, not JSON, even for a plain comment with no image -
+// the server endpoint moved to Request.Form-based binding entirely once
+// it needed to also accept a file (matching the sibling Ganjoor project's
+// own mixed file+field upload convention). [highlight], if given, is
+// { x, y, width, height, imageBlob } - all four coordinates plus the
+// cropped image, or omit it entirely for a plain comment.
+//
+// Content-Type is deliberately NOT set here (unlike every other call in
+// this file) - the browser sets multipart/form-data with the correct
+// boundary itself when the body is a FormData object, and setting it
+// manually would override that with the wrong value.
+export async function submitComment(userInfo, pdfPageId, text, inReplyToId, highlight) {
+  const form = new FormData()
+  form.append('text', text)
+  if (inReplyToId) form.append('inReplyToId', inReplyToId)
+  if (highlight) {
+    form.append('highlightX', highlight.x)
+    form.append('highlightY', highlight.y)
+    form.append('highlightWidth', highlight.width)
+    form.append('highlightHeight', highlight.height)
+    form.append('image', highlight.imageBlob, 'highlight.png')
+  }
   const res = await fetch(`${API_ROOT}/api/pdf/page/${pdfPageId}/comment`, {
     method: 'POST',
-    headers: headers(userInfo),
-    body: JSON.stringify({ text, inReplyToId: inReplyToId || null })
+    headers: { authorization: 'bearer ' + userInfo.token },
+    body: form
   })
   if (res.ok) return true
   throw new Error(await res.json())
