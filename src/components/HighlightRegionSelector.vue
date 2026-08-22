@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onUnmounted } from 'vue'
 
 // Renders the current page to its own <canvas> via pdf.js's standard
 // getViewport/render API (page.render), rather than touching the live
@@ -29,7 +29,17 @@ async function renderPage() {
   dragStart.value = null
   dragCurrent.value = null
   try {
-    const page = await props.pdf.getPage(props.pageNumber)
+    // props.pdf (passed as pdfFile.pdf from PageView.vue) is a
+    // PDFDocumentLoadingTask, not a PDFDocumentProxy - confirmed from
+    // @tato30/vue-pdf's own composable.ts source: usePDF() only exposes
+    // the loading task via its returned `pdf` ref, keeping the actual
+    // resolved PDFDocumentProxy (which has getPage) in a separate,
+    // fully internal `pdfDoc` ref that's never returned at all. Their
+    // own getPDFDestination function reveals the correct pattern for
+    // getting the real document from what IS exposed: awaiting the
+    // loading task's own .promise property.
+    const document = await props.pdf.promise
+    const page = await document.getPage(props.pageNumber)
     // fixed target width, same reasoning as the Flutter client's own
     // selector - legible enough for a crop, small enough to keep
     // memory/upload size sane
@@ -64,17 +74,30 @@ function pointFromEvent(event) {
 
 function onPointerDown(event) {
   if (loading.value) return
+  // Track the rest of the drag on window, not the container element's
+  // own pointermove/pointerup listeners - attempting this with
+  // setPointerCapture on the container first didn't hold up in testing
+  // (Firefox and Chrome both), most likely because the overlay div's
+  // style is being reactively re-rendered on every single pointermove,
+  // and something about that interacting with element-scoped pointer
+  // capture was breaking the drag mid-gesture. Window-level listeners
+  // sidestep the question entirely - they don't care what's re-rendering
+  // underneath them, so this is robust regardless of the exact
+  // mechanism that was actually happening.
+  event.preventDefault()
   dragStart.value = pointFromEvent(event)
   dragCurrent.value = dragStart.value
+  window.addEventListener('pointermove', onWindowPointerMove)
+  window.addEventListener('pointerup', onWindowPointerUp)
 }
 
-function onPointerMove(event) {
-  if (dragStart.value == null) return
+function onWindowPointerMove(event) {
   dragCurrent.value = pointFromEvent(event)
 }
 
-function onPointerUp() {
-  // kept as-is on release - onPointerDown starts the next selection fresh
+function onWindowPointerUp() {
+  window.removeEventListener('pointermove', onWindowPointerMove)
+  window.removeEventListener('pointerup', onWindowPointerUp)
 }
 
 function currentRect() {
@@ -147,6 +170,15 @@ watch(
     if (open) renderPage()
   }
 )
+
+// belt-and-suspenders - onWindowPointerUp already removes these on a
+// normal release, but a drag left mid-gesture when the dialog closes
+// (or the whole component unmounts) shouldn't leave dangling listeners
+// on window
+onUnmounted(() => {
+  window.removeEventListener('pointermove', onWindowPointerMove)
+  window.removeEventListener('pointerup', onWindowPointerUp)
+})
 </script>
 
 <template>
@@ -169,10 +201,8 @@ watch(
           ref="containerEl"
           style="position: relative; width: 100%; user-select: none; cursor: crosshair"
           @pointerdown="onPointerDown"
-          @pointermove="onPointerMove"
-          @pointerup="onPointerUp"
         >
-          <canvas ref="canvasEl" style="width: 100%; display: block" />
+          <canvas ref="canvasEl" draggable="false" style="width: 100%; display: block; -webkit-user-drag: none" />
           <div
             :style="{
               position: 'absolute',
