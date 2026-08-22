@@ -7,6 +7,7 @@ import { en2fa } from '../en2fa'
 import PermissionChecker from '../utilities/PermissionChecker'
 import * as PDFPageCommentService from '../utilities/PDFPageCommentService'
 import { formatWithTime } from '../utilities/JalaliDate'
+import HighlightRegionSelector from '../components/HighlightRegionSelector.vue'
 
 const route = useRoute()
 const loading = ref(false)
@@ -28,6 +29,36 @@ const commentsError = ref('')
 const newCommentText = ref('')
 const replyingTo = ref(null)
 const submittingComment = ref(false)
+const commentCount = ref(null)
+
+const showHighlightSelector = ref(false)
+const pendingHighlight = ref(null)
+const pendingHighlightPreviewUrl = ref(null)
+
+function openHighlightSelector() {
+  showHighlightSelector.value = true
+}
+
+function onHighlightSelected(selection) {
+  clearPendingHighlight()
+  pendingHighlight.value = selection
+  pendingHighlightPreviewUrl.value = URL.createObjectURL(selection.blob)
+}
+
+function clearPendingHighlight() {
+  if (pendingHighlightPreviewUrl.value) {
+    URL.revokeObjectURL(pendingHighlightPreviewUrl.value)
+  }
+  pendingHighlight.value = null
+  pendingHighlightPreviewUrl.value = null
+}
+
+async function loadCommentCount() {
+  commentCount.value = await PDFPageCommentService.getCommentCount(
+    route.params.id,
+    pageNumber.value
+  )
+}
 
 bus.on('user-logged-in', (u) => {
   userInfo.value = u
@@ -150,6 +181,7 @@ watchEffect(async () => {
   }
   await loadOCRText(pageNumber.value)
   await loadComments()
+  await loadCommentCount()
 })
 
 function onLoaded() {
@@ -167,6 +199,9 @@ async function updatePageNumber(value) {
   }
   await loadOCRText(value)
   await loadComments()
+  await loadCommentCount()
+  clearPendingHighlight()
+  replyingTo.value = null
 }
 function goToBookmarks() {
   window.location.href = '/bookmarks'
@@ -235,41 +270,16 @@ async function loadOCRText(pageNumber) {
   }
 }
 
-// pageInfo is only fetched above when the book has been OCR'd (pdf.ocRed)
-// - comments need to work on every page regardless, so this fetches page
-// info independently when it isn't already available, but reuses it when
-// loadOCRText already populated it for the current page (avoids a
-// redundant round-trip on OCR'd books).
-async function ensurePageInfoForComments() {
-  if (pageInfo.value != null && pageInfo.value.pageNumber === pageNumber.value) {
-    return pageInfo.value
-  }
-  const res = await fetch(
-    `https://api.naskban.ir/api/pdf/${route.params.id}/page/${pageNumber.value}`,
-    {
-      headers: {
-        authorization: userInfo.value == null ? null : 'bearer ' + userInfo.value.token,
-        'content-type': 'application/json'
-      }
-    }
-  )
-  if (!res.ok) return null
-  const info = await res.json()
-  pageInfo.value = info
-  return info
-}
-
 async function loadComments() {
   loadingComments.value = true
   commentsError.value = ''
-  const info = await ensurePageInfoForComments()
-  if (info == null) {
-    loadingComments.value = false
-    commentsError.value = 'خطا در دریافت اطلاعات صفحه'
-    return
-  }
   try {
-    comments.value = (await PDFPageCommentService.getComments(userInfo.value, info.id)) || []
+    comments.value =
+      (await PDFPageCommentService.getComments(
+        userInfo.value,
+        route.params.id,
+        pageNumber.value
+      )) || []
   } catch (e) {
     commentsError.value = e.message
   }
@@ -285,22 +295,38 @@ function cancelReply() {
 
 async function submitComment() {
   const text = newCommentText.value.trim()
-  if (!text || pageInfo.value == null) return
+  if (!text) return
   submittingComment.value = true
   try {
     await PDFPageCommentService.submitComment(
       userInfo.value,
-      pageInfo.value.id,
+      route.params.id,
+      pageNumber.value,
       text,
-      replyingTo.value ? replyingTo.value.id : null
+      replyingTo.value ? replyingTo.value.id : null,
+      pendingHighlight.value
+        ? {
+            x: pendingHighlight.value.x,
+            y: pendingHighlight.value.y,
+            width: pendingHighlight.value.width,
+            height: pendingHighlight.value.height,
+            imageBlob: pendingHighlight.value.blob
+          }
+        : null
     )
     newCommentText.value = ''
     replyingTo.value = null
+    clearPendingHighlight()
     await loadComments()
+    await loadCommentCount()
   } catch (e) {
     alert(e.message)
   }
   submittingComment.value = false
+}
+
+function viewHighlightImage(comment) {
+  window.open(`https://api.naskban.ir/${comment.imageUrl}`, '_blank')
 }
 
 async function removeComment(comment) {
@@ -308,6 +334,7 @@ async function removeComment(comment) {
   try {
     await PDFPageCommentService.deleteComment(userInfo.value, comment.id)
     await loadComments()
+    await loadCommentCount()
   } catch (e) {
     alert(e.message)
   }
@@ -653,7 +680,10 @@ function saveAsImage() {
     </q-card>
 
     <q-card class="full-width q-pa-lg" style="max-width: 700px">
-      <q-card-section class="text-h6">دیدگاه‌های این صفحه</q-card-section>
+      <q-card-section class="text-h6 row items-center">
+        <span>دیدگاه‌های این صفحه</span>
+        <q-badge v-if="commentCount > 0" color="green" class="q-mr-sm">{{ commentCount }}</q-badge>
+      </q-card-section>
 
       <q-card-section v-if="loadingComments" class="flex flex-center">
         <q-spinner-hourglass color="green" size="3em" />
@@ -684,6 +714,20 @@ function saveAsImage() {
             </q-card-section>
             <q-card-section class="q-pt-sm">
               {{ comment.text }}
+              <div v-if="comment.imageUrl" class="q-mt-sm" style="position: relative; display: inline-block">
+                <img
+                  :src="`https://api.naskban.ir/${comment.imageUrl}`"
+                  style="max-height: 100px; border-radius: 4px; cursor: pointer"
+                  @click="viewHighlightImage(comment)"
+                />
+                <q-icon
+                  name="zoom_in"
+                  color="white"
+                  size="18px"
+                  style="position: absolute; left: 4px; bottom: 4px; cursor: pointer"
+                  @click="viewHighlightImage(comment)"
+                />
+              </div>
             </q-card-section>
             <q-card-actions>
               <q-btn v-if="userInfo != null" flat dense label="پاسخ" @click="startReply(comment)" />
@@ -705,12 +749,27 @@ function saveAsImage() {
           <div class="text-caption text-grey-7">در پاسخ به {{ replyingTo.userName }}</div>
           <q-btn dense flat round icon="close" size="sm" @click="cancelReply" />
         </div>
+        <div v-if="pendingHighlightPreviewUrl" class="row items-center q-mb-sm">
+          <img :src="pendingHighlightPreviewUrl" style="max-height: 48px; border-radius: 4px" />
+          <div class="text-caption text-grey-7 q-mx-sm">ناحیهٔ انتخاب‌شده به دیدگاه پیوست می‌شود</div>
+          <q-btn dense flat round icon="close" size="sm" @click="clearPendingHighlight" />
+        </div>
         <q-input
           v-model="newCommentText"
           type="textarea"
           label="دیدگاه خود را بنویسید..."
           :disable="submittingComment"
-        />
+        >
+          <template v-slot:prepend>
+            <q-icon
+              name="crop"
+              class="cursor-pointer"
+              @click="openHighlightSelector"
+            >
+              <q-tooltip>انتخاب ناحیه‌ای از تصویر صفحه برای هایلایت</q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
         <div class="row justify-end q-mt-sm">
           <q-btn
             color="primary"
@@ -722,6 +781,13 @@ function saveAsImage() {
       </q-card-section>
       <q-card-section v-else class="text-grey-7"> برای ثبت دیدگاه وارد حساب کاربری‌تان شوید. </q-card-section>
     </q-card>
+
+    <HighlightRegionSelector
+      v-model="showHighlightSelector"
+      :pdf="pdfFile ? pdfFile.pdf : null"
+      :page-number="pageNumber"
+      @selected="onHighlightSelected"
+    />
 
     <q-card v-if="userInfo != null" class="full-width q-pa-lg flex flex-center">
       <q-btn label="پیشنهاد شعر مرتبط در گنجور" @click="ganjoorLink = true" />

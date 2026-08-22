@@ -12,29 +12,36 @@ function headers(userInfo) {
   return h
 }
 
-// GET api/pdf/page/{pdfPageId}/comments - public, no login required;
-// a logged-in caller's own comments come back with myComment set.
-export async function getComments(userInfo, pdfPageId) {
-  const res = await fetch(`${API_ROOT}/api/pdf/page/${pdfPageId}/comments`, {
+// GET api/pdf/{bookId}/page/{pageNumber}/comments - public, no login
+// required; a logged-in caller's own comments come back with myComment
+// set. Keyed by (bookId, pageNumber), not an internal page id - the
+// server moved to this shape so a caller never needs a separate
+// round-trip just to resolve an id first (see the Flutter client's own
+// PDFPageCommentService for the identical change, made at the same
+// time this should have been - this file was missed then).
+export async function getComments(userInfo, bookId, pageNumber) {
+  const res = await fetch(`${API_ROOT}/api/pdf/${bookId}/page/${pageNumber}/comments`, {
     headers: headers(userInfo)
   })
   if (!res.ok) return null
   return await res.json()
 }
 
-// POST api/pdf/page/{pdfPageId}/comment - any authenticated user. Sent as
-// multipart form data, not JSON, even for a plain comment with no image -
-// the server endpoint moved to Request.Form-based binding entirely once
-// it needed to also accept a file (matching the sibling Ganjoor project's
-// own mixed file+field upload convention). [highlight], if given, is
-// { x, y, width, height, imageBlob } - all four coordinates plus the
-// cropped image, or omit it entirely for a plain comment.
+// POST api/pdf/{bookId}/page/{pageNumber}/comment - any authenticated
+// user. Sent as multipart form data, not JSON, even for a plain comment
+// with no image - the server endpoint moved to Request.Form-based
+// binding entirely once it needed to also accept a file (matching the
+// sibling Ganjoor project's own mixed file+field upload convention).
+// Keyed by (bookId, pageNumber), same reasoning as getComments above.
+// [highlight], if given, is { x, y, width, height, imageBlob } - all
+// four coordinates plus the cropped image, or omit it entirely for a
+// plain comment.
 //
 // Content-Type is deliberately NOT set here (unlike every other call in
 // this file) - the browser sets multipart/form-data with the correct
 // boundary itself when the body is a FormData object, and setting it
 // manually would override that with the wrong value.
-export async function submitComment(userInfo, pdfPageId, text, inReplyToId, highlight) {
+export async function submitComment(userInfo, bookId, pageNumber, text, inReplyToId, highlight) {
   const form = new FormData()
   form.append('text', text)
   if (inReplyToId) form.append('inReplyToId', inReplyToId)
@@ -45,7 +52,7 @@ export async function submitComment(userInfo, pdfPageId, text, inReplyToId, high
     form.append('highlightHeight', highlight.height)
     form.append('image', highlight.imageBlob, 'highlight.png')
   }
-  const res = await fetch(`${API_ROOT}/api/pdf/page/${pdfPageId}/comment`, {
+  const res = await fetch(`${API_ROOT}/api/pdf/${bookId}/page/${pageNumber}/comment`, {
     method: 'POST',
     headers: { authorization: 'bearer ' + userInfo.token },
     body: form
@@ -63,4 +70,60 @@ export async function deleteComment(userInfo, commentId) {
   })
   if (res.ok) return true
   throw new Error(await res.json())
+}
+
+// GET api/pdf/{bookId}/page/{pageNumber}/comments/count - public, no
+// login required. Meant to be called silently in the background as
+// someone pages through a book, so failures of every kind (no network,
+// server error) are swallowed and just return null - this never
+// throws, unlike every other function in this file, since a background
+// prefetch has no business interrupting the reading experience with an
+// error the person never asked to see. See the Flutter client's own
+// getCommentCount for the identical reasoning.
+export async function getCommentCount(bookId, pageNumber) {
+  try {
+    const res = await fetch(`${API_ROOT}/api/pdf/${bookId}/page/${pageNumber}/comments/count`)
+    if (!res.ok) return null
+    const count = await res.json()
+    return typeof count === 'number' ? count : null
+  } catch {
+    return null
+  }
+}
+
+// GET api/pdf/{bookId}/comments - one specific book's own comment hub,
+// paginated, public, no login required (MyComment isn't populated by
+// this endpoint - there's no delete action in a hub - so nothing here
+// depends on who's asking).
+export async function getBookComments(bookId, pageNumber = 1, pageSize = 20) {
+  const res = await fetch(
+    `${API_ROOT}/api/pdf/${bookId}/comments?PageNumber=${pageNumber}&PageSize=${pageSize}`
+  )
+  if (!res.ok) return null
+  const items = await res.json()
+  let pageCount = 1
+  for (const pair of res.headers.entries()) {
+    if (pair[0] == 'paging-headers') {
+      pageCount = JSON.parse(pair[1]).totalPages
+    }
+  }
+  return { items, pageCount }
+}
+
+// GET api/pdf/comments/recent - the site-wide comment hub, across every
+// book. Same shape as getBookComments above (same server-side query,
+// just without a book filter), public, no login required.
+export async function getRecentComments(pageNumber = 1, pageSize = 20) {
+  const res = await fetch(
+    `${API_ROOT}/api/pdf/comments/recent?PageNumber=${pageNumber}&PageSize=${pageSize}`
+  )
+  if (!res.ok) return null
+  const items = await res.json()
+  let pageCount = 1
+  for (const pair of res.headers.entries()) {
+    if (pair[0] == 'paging-headers') {
+      pageCount = JSON.parse(pair[1]).totalPages
+    }
+  }
+  return { items, pageCount }
 }
