@@ -17,6 +17,7 @@ const pageSize = 21
 const userInfo = ref(null)
 const canDelete = ref(false)
 const canReviewReports = ref(false)
+const canManageUsers = ref(false)
 const unreadNotificationCount = ref(null)
 
 async function loadUnreadNotificationCount() {
@@ -141,6 +142,7 @@ watchEffect(async () => {
 
   canDelete.value = checkPermission('pdf', 'delete')
   canReviewReports.value = checkPermission('pdfreport', 'moderate')
+  canManageUsers.value = checkPermission('user', 'view')
   loadUnreadNotificationCount()
 
   await loadList(false)
@@ -336,6 +338,12 @@ async function logout() {
         @click="goTo('/reports')"
       >
         <q-tooltip class="bg-green text-white">گزارش‌های کاربران</q-tooltip>
+      </q-btn>
+      <q-btn v-if="canManageUsers" dense flat icon="group" class="green" @click="goTo('/admin/users')">
+        <q-tooltip class="bg-green text-white">مدیریت کاربران</q-tooltip>
+      </q-btn>
+      <q-btn v-if="canManageUsers" dense flat icon="admin_panel_settings" class="green" @click="goTo('/admin/roles')">
+        <q-tooltip class="bg-green text-white">مدیریت نقش‌ها</q-tooltip>
       </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
       <q-btn

@@ -20,6 +20,8 @@ import PDFBookReportsView from './views/PDFBookReportsView.vue'
 import NotificationsView from './views/NotificationsView.vue'
 import PDFBookCommentsHubView from './views/PDFBookCommentsHubView.vue'
 import CommentsHubView from './views/CommentsHubView.vue'
+import UsersView from './views/UsersView.vue'
+import RolesView from './views/RolesView.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -139,6 +141,16 @@ export const router = createRouter({
       path: '/comments/:id',
       name: 'bookcommentshub',
       component: PDFBookCommentsHubView
+    },
+    {
+      path: '/admin/users',
+      name: 'users',
+      component: UsersView
+    },
+    {
+      path: '/admin/roles',
+      name: 'roles',
+      component: RolesView
     },
   ]
 })
