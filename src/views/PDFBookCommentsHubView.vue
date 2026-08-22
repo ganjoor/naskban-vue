@@ -111,19 +111,47 @@ function goTo(url) {
     </q-card>
   </div>
 
-  <div class="q-pa-lg flex flex-center">
-    <q-pagination
-      v-model="pageNumber"
-      v-if="!loading && pageCount > 1"
-      :max="pageCount"
-      :max-pages="7"
-      direction-links
-      boundary-links
-      color="green"
-      icon-last="skip_previous"
-      icon-first="skip_next"
-      icon-next="fast_rewind"
-      icon-prev="fast_forward"
-    />
+  <div class="q-pa-lg flex flex-center items-center" v-if="!loading && pageCount > 1">
+    <q-btn
+      dense
+      flat
+      round
+      icon="skip_previous"
+      :disable="pageNumber >= pageCount"
+      @click="pageNumber = pageCount"
+    >
+      <q-tooltip>آخرین صفحه</q-tooltip>
+    </q-btn>
+    <q-btn
+      dense
+      flat
+      round
+      icon="fast_rewind"
+      :disable="pageNumber >= pageCount"
+      @click="pageNumber++"
+    >
+      <q-tooltip>صفحهٔ بعد</q-tooltip>
+    </q-btn>
+    <div class="q-px-md">{{ pageNumber }} / {{ pageCount }}</div>
+    <q-btn
+      dense
+      flat
+      round
+      icon="fast_forward"
+      :disable="pageNumber <= 1"
+      @click="pageNumber--"
+    >
+      <q-tooltip>صفحهٔ قبل</q-tooltip>
+    </q-btn>
+    <q-btn
+      dense
+      flat
+      round
+      icon="skip_next"
+      :disable="pageNumber <= 1"
+      @click="pageNumber = 1"
+    >
+      <q-tooltip>اولین صفحه</q-tooltip>
+    </q-btn>
   </div>
 </template>

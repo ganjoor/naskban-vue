@@ -220,6 +220,50 @@ onMounted(() => {
           </q-td>
         </q-tr>
       </template>
+
+      <template v-slot:pagination="scope">
+        <q-btn
+          dense
+          flat
+          round
+          icon="skip_previous"
+          :disable="scope.isLastPage"
+          @click="scope.lastPage"
+        >
+          <q-tooltip>آخرین صفحه</q-tooltip>
+        </q-btn>
+        <q-btn
+          dense
+          flat
+          round
+          icon="fast_rewind"
+          :disable="scope.isLastPage"
+          @click="scope.nextPage"
+        >
+          <q-tooltip>صفحهٔ بعد</q-tooltip>
+        </q-btn>
+        <div class="q-px-md">{{ scope.pagination.page }} / {{ scope.pagesNumber }}</div>
+        <q-btn
+          dense
+          flat
+          round
+          icon="fast_forward"
+          :disable="scope.isFirstPage"
+          @click="scope.prevPage"
+        >
+          <q-tooltip>صفحهٔ قبل</q-tooltip>
+        </q-btn>
+        <q-btn
+          dense
+          flat
+          round
+          icon="skip_next"
+          :disable="scope.isFirstPage"
+          @click="scope.firstPage"
+        >
+          <q-tooltip>اولین صفحه</q-tooltip>
+        </q-btn>
+      </template>
     </q-table>
   </div>
 
