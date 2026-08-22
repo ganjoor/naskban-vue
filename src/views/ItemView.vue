@@ -531,6 +531,9 @@ function copyUrl() {
       <q-btn dense flat icon="badge" class="green" @click="goTo('/authors')">
         <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
       </q-btn>
+      <q-btn dense flat icon="forum" class="green" @click="goTo(`/comments/${route.params.id}`)">
+        <q-tooltip class="bg-green text-white">دیدگاه‌های این کتاب</q-tooltip>
+      </q-btn>
       <q-btn
         v-if="userInfo != null"
         dense

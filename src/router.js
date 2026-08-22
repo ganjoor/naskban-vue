@@ -18,6 +18,8 @@ import AuthorsView from './views/AuthorsView.vue'
 import AuthorBooksView from './views/AuthorBooksView.vue'
 import PDFBookReportsView from './views/PDFBookReportsView.vue'
 import NotificationsView from './views/NotificationsView.vue'
+import PDFBookCommentsHubView from './views/PDFBookCommentsHubView.vue'
+import CommentsHubView from './views/CommentsHubView.vue'
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -127,6 +129,16 @@ export const router = createRouter({
       path: '/notifications',
       name: 'notifications',
       component: NotificationsView
+    },
+    {
+      path: '/comments',
+      name: 'commentshub',
+      component: CommentsHubView
+    },
+    {
+      path: '/comments/:id',
+      name: 'bookcommentshub',
+      component: PDFBookCommentsHubView
     },
   ]
 })
