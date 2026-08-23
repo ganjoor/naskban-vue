@@ -310,6 +310,9 @@ async function logout() {
       <q-btn dense flat icon="forum" class="green" @click="goTo('/comments')">
         <q-tooltip class="bg-green text-white">دیدگاه‌های کاربران</q-tooltip>
       </q-btn>
+      <q-btn v-if="userInfo != null" dense flat icon="comment" class="green" @click="goTo('/mycomments')">
+        <q-tooltip class="bg-green text-white">دیدگاه‌های من</q-tooltip>
+      </q-btn>
       <q-btn
         v-if="userInfo != null"
         dense

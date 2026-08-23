@@ -42,6 +42,10 @@ function viewHighlightImage(comment) {
   window.open(`https://api.naskban.ir/${comment.imageUrl}`, '_blank')
 }
 
+function openUserComments(comment) {
+  window.location.href = `/usercomments/${comment.userId}?name=${encodeURIComponent(comment.userName)}`
+}
+
 function openBookAtPage(comment) {
   window.location.href = `/${bookId}/${comment.pageNumber}`
 }
@@ -83,7 +87,9 @@ function goTo(url) {
     <q-card v-for="comment in comments" :key="comment.id" flat bordered class="q-ma-sm">
       <q-card-section class="q-pb-none">
         <div class="row items-center">
-          <div class="text-bold">{{ comment.userName }}</div>
+          <div class="text-bold" style="cursor: pointer" @click="openUserComments(comment)">
+            {{ comment.userName }}
+          </div>
           <q-space />
           <div class="text-caption text-grey-7">{{ formatWithTime(comment.createdAt) }}</div>
         </div>

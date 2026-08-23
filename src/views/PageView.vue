@@ -28,6 +28,7 @@ const loadingComments = ref(false)
 const commentsError = ref('')
 const newCommentText = ref('')
 const replyingTo = ref(null)
+const editingComment = ref(null)
 const submittingComment = ref(false)
 const commentCount = ref(null)
 
@@ -202,6 +203,8 @@ async function updatePageNumber(value) {
   await loadCommentCount()
   clearPendingHighlight()
   replyingTo.value = null
+  editingComment.value = null
+  newCommentText.value = ''
 }
 function goToBookmarks() {
   window.location.href = '/bookmarks'
@@ -286,17 +289,53 @@ async function loadComments() {
   loadingComments.value = false
 }
 
+function openUserComments(comment) {
+  window.location.href = `/usercomments/${comment.userId}?name=${encodeURIComponent(comment.userName)}`
+}
+
 function startReply(comment) {
   replyingTo.value = comment
+  // mutually exclusive with editing - only one composer, can't be both
+  // replying to something and editing something else at once
+  editingComment.value = null
+  newCommentText.value = ''
 }
 function cancelReply() {
   replyingTo.value = null
+}
+
+function startEdit(comment) {
+  editingComment.value = comment
+  replyingTo.value = null
+  clearPendingHighlight()
+  newCommentText.value = comment.text
+}
+function cancelEdit() {
+  editingComment.value = null
+  newCommentText.value = ''
 }
 
 async function submitComment() {
   const text = newCommentText.value.trim()
   if (!text) return
   submittingComment.value = true
+
+  if (editingComment.value != null) {
+    // editing never touches the comment count, so no loadCommentCount
+    // here - unlike a new submission or a delete, the number of
+    // comments on this page doesn't change
+    try {
+      await PDFPageCommentService.editComment(userInfo.value, editingComment.value.id, text)
+      newCommentText.value = ''
+      editingComment.value = null
+      await loadComments()
+    } catch (e) {
+      alert(e.message)
+    }
+    submittingComment.value = false
+    return
+  }
+
   try {
     await PDFPageCommentService.submitComment(
       userInfo.value,
@@ -707,9 +746,13 @@ function saveAsImage() {
           <q-card flat bordered>
             <q-card-section class="q-pb-none">
               <div class="row items-center">
-                <div class="text-bold">{{ comment.userName }}</div>
+                <div class="text-bold" style="cursor: pointer" @click="openUserComments(comment)">
+                  {{ comment.userName }}
+                </div>
                 <q-space />
-                <div class="text-caption text-grey-7">{{ formatWithTime(comment.createdAt) }}</div>
+                <div class="text-caption text-grey-7">
+                  {{ formatWithTime(comment.createdAt) }}<span v-if="comment.editedAt"> (ویرایش‌شده)</span>
+                </div>
               </div>
             </q-card-section>
             <q-card-section class="q-pt-sm">
@@ -731,6 +774,7 @@ function saveAsImage() {
             </q-card-section>
             <q-card-actions>
               <q-btn v-if="userInfo != null" flat dense label="پاسخ" @click="startReply(comment)" />
+              <q-btn v-if="comment.myComment" flat dense label="ویرایش" @click="startEdit(comment)" />
               <q-btn
                 v-if="comment.myComment || canModerateComments"
                 flat
@@ -745,11 +789,15 @@ function saveAsImage() {
       </q-card-section>
 
       <q-card-section v-if="userInfo != null">
-        <div v-if="replyingTo != null" class="row items-center q-mb-xs">
+        <div v-if="editingComment != null" class="row items-center q-mb-xs">
+          <div class="text-caption text-grey-7">در حال ویرایش دیدگاه</div>
+          <q-btn dense flat round icon="close" size="sm" @click="cancelEdit" />
+        </div>
+        <div v-if="editingComment == null && replyingTo != null" class="row items-center q-mb-xs">
           <div class="text-caption text-grey-7">در پاسخ به {{ replyingTo.userName }}</div>
           <q-btn dense flat round icon="close" size="sm" @click="cancelReply" />
         </div>
-        <div v-if="pendingHighlightPreviewUrl" class="row items-center q-mb-sm">
+        <div v-if="editingComment == null && pendingHighlightPreviewUrl" class="row items-center q-mb-sm">
           <img :src="pendingHighlightPreviewUrl" style="max-height: 48px; border-radius: 4px" />
           <div class="text-caption text-grey-7 q-mx-sm">ناحیهٔ انتخاب‌شده به دیدگاه پیوست می‌شود</div>
           <q-btn dense flat round icon="close" size="sm" @click="clearPendingHighlight" />
@@ -760,7 +808,7 @@ function saveAsImage() {
           label="دیدگاه خود را بنویسید..."
           :disable="submittingComment"
         >
-          <template v-slot:prepend>
+          <template v-if="editingComment == null" v-slot:prepend>
             <q-icon
               name="crop"
               class="cursor-pointer"
@@ -773,7 +821,7 @@ function saveAsImage() {
         <div class="row justify-end q-mt-sm">
           <q-btn
             color="primary"
-            label="ارسال"
+            :label="editingComment != null ? 'ذخیرهٔ ویرایش' : 'ارسال'"
             :loading="submittingComment"
             @click="submitComment"
           />

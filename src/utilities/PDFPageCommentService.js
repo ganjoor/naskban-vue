@@ -72,6 +72,20 @@ export async function deleteComment(userInfo, commentId) {
   throw new Error(await res.json())
 }
 
+// PUT api/pdf/comment/{commentId} - own comment's author only, no
+// moderator override even with pdfcomment:moderate (see the server's
+// own EditPDFPageCommentAsync doc comment on why this differs from
+// delete). Only the text can change - no highlight/image editing.
+export async function editComment(userInfo, commentId, text) {
+  const res = await fetch(`${API_ROOT}/api/pdf/comment/${commentId}`, {
+    method: 'PUT',
+    headers: headers(userInfo),
+    body: JSON.stringify({ text })
+  })
+  if (res.ok) return true
+  throw new Error(await res.json())
+}
+
 // GET api/pdf/{bookId}/page/{pageNumber}/comments/count - public, no
 // login required. Meant to be called silently in the background as
 // someone pages through a book, so failures of every kind (no network,
@@ -116,6 +130,50 @@ export async function getBookComments(bookId, pageNumber = 1, pageSize = 20) {
 export async function getRecentComments(pageNumber = 1, pageSize = 20) {
   const res = await fetch(
     `${API_ROOT}/api/pdf/comments/recent?PageNumber=${pageNumber}&PageSize=${pageSize}`
+  )
+  if (!res.ok) return null
+  const items = await res.json()
+  let pageCount = 1
+  for (const pair of res.headers.entries()) {
+    if (pair[0] == 'paging-headers') {
+      pageCount = JSON.parse(pair[1]).totalPages
+    }
+  }
+  return { items, pageCount }
+}
+
+// GET api/pdf/comments/mine - every comment the caller has ever posted,
+// across every book. Requires login (the server derives the filter from
+// the caller's own JWT claim, never a client-supplied id - see the
+// server's own GetMyPDFPageCommentsAsync doc comment).
+export async function getMyComments(userInfo, pageNumber = 1, pageSize = 20) {
+  const res = await fetch(
+    `${API_ROOT}/api/pdf/comments/mine?PageNumber=${pageNumber}&PageSize=${pageSize}`,
+    { headers: headers(userInfo) }
+  )
+  if (!res.ok) return null
+  const items = await res.json()
+  let pageCount = 1
+  for (const pair of res.headers.entries()) {
+    if (pair[0] == 'paging-headers') {
+      pageCount = JSON.parse(pair[1]).totalPages
+    }
+  }
+  return { items, pageCount }
+}
+
+// GET api/pdf/comments/by/{userId} - every comment a specific user has
+// ever posted, across every book. Public, no login required - lets
+// anyone see "all of this person's comments" from tapping a name
+// anywhere a comment appears. [userInfo] is still passed through
+// (sending the caller's own token if logged in, not tied to [userId] at
+// all) purely so the caller's own comments come back editable/deletable
+// if they happen to be viewing their own history through this same
+// endpoint.
+export async function getCommentsByUser(userInfo, userId, pageNumber = 1, pageSize = 20) {
+  const res = await fetch(
+    `${API_ROOT}/api/pdf/comments/by/${userId}?PageNumber=${pageNumber}&PageSize=${pageSize}`,
+    { headers: headers(userInfo) }
   )
   if (!res.ok) return null
   const items = await res.json()
