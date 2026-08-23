@@ -116,23 +116,12 @@ function goTo(url) {
       dense
       flat
       round
-      icon="skip_previous"
-      :disable="pageNumber >= pageCount"
-      @click="pageNumber = pageCount"
+      icon="skip_next"
+      :disable="pageNumber <= 1"
+      @click="pageNumber = 1"
     >
-      <q-tooltip>آخرین صفحه</q-tooltip>
+      <q-tooltip>اولین صفحه</q-tooltip>
     </q-btn>
-    <q-btn
-      dense
-      flat
-      round
-      icon="fast_rewind"
-      :disable="pageNumber >= pageCount"
-      @click="pageNumber++"
-    >
-      <q-tooltip>صفحهٔ بعد</q-tooltip>
-    </q-btn>
-    <div class="q-px-md">{{ pageNumber }} / {{ pageCount }}</div>
     <q-btn
       dense
       flat
@@ -143,15 +132,26 @@ function goTo(url) {
     >
       <q-tooltip>صفحهٔ قبل</q-tooltip>
     </q-btn>
+    <div class="q-px-md">{{ pageNumber }} / {{ pageCount }}</div>
     <q-btn
       dense
       flat
       round
-      icon="skip_next"
-      :disable="pageNumber <= 1"
-      @click="pageNumber = 1"
+      icon="fast_rewind"
+      :disable="pageNumber >= pageCount"
+      @click="pageNumber++"
     >
-      <q-tooltip>اولین صفحه</q-tooltip>
+      <q-tooltip>صفحهٔ بعد</q-tooltip>
+    </q-btn>
+    <q-btn
+      dense
+      flat
+      round
+      icon="skip_previous"
+      :disable="pageNumber >= pageCount"
+      @click="pageNumber = pageCount"
+    >
+      <q-tooltip>آخرین صفحه</q-tooltip>
     </q-btn>
   </div>
 </template>
