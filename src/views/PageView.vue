@@ -15,6 +15,25 @@ const pdf = ref(null)
 const pdfFile = ref(null)
 const pageNumber = ref(null)
 const userInfo = ref(null)
+// Restored synchronously here, at setup time - not inside onMounted or
+// the watchEffect below. This must happen before the watchEffect's
+// first run: an async watchEffect only tracks dependencies read
+// synchronously before its first await, so if this restoration lived
+// inside that effect and wrote userInfo.value there, it would
+// retrigger the whole effect (a second, redundant usePDF() call whose
+// .pages starts back at its initial/loading value - which q-pagination's
+// own min|max watcher then sees as a change, re-clamping whatever
+// pageNumber currently holds against that temporarily-low max and
+// firing updatePageNumber with the clamped result, rewriting the URL
+// to page 1). See PageView.vue's own investigation notes for the full
+// trace - this single line is the actual fix.
+if (localStorage.getItem('userInfo')) {
+  try {
+    userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+  } catch {
+    userInfo.value = null
+  }
+}
 const ganjoorLink = ref(false)
 const suggestionResult = ref('')
 const pageInfo = ref(null)
@@ -74,14 +93,6 @@ function checkPermission(secShortName, opShortName) {
 }
 
 onMounted(() => {
-  if (localStorage.getItem('userInfo')) {
-    try {
-      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
-    } catch {
-      userInfo.value = null
-    }
-  }
-
   /*if (userInfo.value == null) {
     window.location.href = `/login?redirect=${window.location.href
       .replace('https://naskban.ir', '')
@@ -135,13 +146,6 @@ async function loadPDF(err401) {
 }
 
 watchEffect(async () => {
-  if (userInfo.value == null && localStorage.getItem('userInfo')) {
-    try {
-      userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
-    } catch {
-      userInfo.value = null
-    }
-  }
   //if (userInfo.value == null) return
   canDelete.value = checkPermission('pdf', 'delete')
   canModerateComments.value = checkPermission('pdfcomment', 'moderate')
