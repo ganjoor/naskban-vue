@@ -254,6 +254,8 @@ async function createShelfFromDialog() {
     await ShelfService.addBookToShelf(userInfo.value, shelf.id, route.params.id)
     selectedShelfIds.value.push(shelf.id)
     onAnyShelf.value = true
+  } else {
+    alert('قفسه‌ای با این نام از قبل وجود دارد.')
   }
   newShelfName.value = ''
   loading.value = false

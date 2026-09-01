@@ -67,7 +67,16 @@ async function pushShelfBooks(userInfo, items) {
   return res.ok
 }
 
+// Returns null if a non-deleted shelf with this exact (trimmed) name
+// already exists - a client-side nicety, not a hard data-integrity
+// rule enforced server-side. This app is online-only for shelves (see
+// this file's own top-of-file doc comment), so the check is a fresh
+// getAllShelves() call right before creating, not a cached lookup.
 export async function createShelf(userInfo, name) {
+  const trimmedName = name.trim()
+  const existing = await getAllShelves(userInfo)
+  if (existing.some((s) => s.name.trim() === trimmedName)) return null
+
   const now = new Date().toISOString()
   const shelf = {
     id: crypto.randomUUID(),
@@ -80,7 +89,15 @@ export async function createShelf(userInfo, name) {
   return ok ? shelf : null
 }
 
+// Returns false (without renaming anything) if some other, different
+// shelf already has this exact (trimmed) name - same reasoning as
+// createShelf above.
 export async function renameShelf(userInfo, shelf, newName) {
+  const trimmedName = newName.trim()
+  const existing = await getAllShelves(userInfo)
+  const collides = existing.some((s) => s.id !== shelf.id && s.name.trim() === trimmedName)
+  if (collides) return false
+
   return pushShelves(userInfo, [
     {
       id: shelf.id,

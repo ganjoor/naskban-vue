@@ -47,7 +47,12 @@ async function createShelf() {
   const name = prompt('نام قفسهٔ جدید')
   if (!name) return
   loading.value = true
-  await ShelfService.createShelf(userInfo.value, name)
+  const shelf = await ShelfService.createShelf(userInfo.value, name)
+  if (shelf == null) {
+    loading.value = false
+    alert('قفسه‌ای با این نام از قبل وجود دارد.')
+    return
+  }
   await loadShelves()
 }
 
@@ -55,7 +60,12 @@ async function renameShelf(shelf) {
   const name = prompt('نام جدید', shelf.name)
   if (!name || name === shelf.name) return
   loading.value = true
-  await ShelfService.renameShelf(userInfo.value, shelf, name)
+  const success = await ShelfService.renameShelf(userInfo.value, shelf, name)
+  if (!success) {
+    loading.value = false
+    alert('قفسه‌ای با این نام از قبل وجود دارد.')
+    return
+  }
   await loadShelves()
 }
 
