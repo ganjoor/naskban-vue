@@ -293,7 +293,25 @@ async function logout() {
       <q-btn dense flat icon="manage_search" class="green" @click="fullTextSearch">
         <q-tooltip class="bg-green text-white">جستجو در متن</q-tooltip>
       </q-btn>
+      <q-separator vertical inset spaced />
+      <q-btn dense flat icon="badge" class="green" @click="goToAuthors">
+        <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
+      </q-btn>
+      <q-btn dense flat icon="forum" class="green" @click="goTo('/comments')">
+        <q-tooltip class="bg-green text-white">دیدگاه‌های کاربران</q-tooltip>
+      </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
+      <!--
+        "کتابخانهٔ من" (my library) group - shelves, bookmarks, history,
+        my comments - kept adjacent and in this order to match the
+        Flutter client's own drawer grouping under that same heading
+        (pdf_book_list_view.dart), so the two clients' menus are
+        guessable from one another rather than each having their own,
+        unrelated ordering.
+      -->
+      <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goToShelves">
+        <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>
+      </q-btn>
       <q-btn
         v-if="userInfo != null"
         dense
@@ -304,11 +322,8 @@ async function logout() {
       >
         <q-tooltip class="bg-green text-white">نشان‌شده‌ها</q-tooltip>
       </q-btn>
-      <q-btn dense flat icon="badge" class="green" @click="goToAuthors">
-        <q-tooltip class="bg-green text-white">پدیدآورندگان</q-tooltip>
-      </q-btn>
-      <q-btn dense flat icon="forum" class="green" @click="goTo('/comments')">
-        <q-tooltip class="bg-green text-white">دیدگاه‌های کاربران</q-tooltip>
+      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
+        <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="comment" class="green" @click="goTo('/mycomments')">
         <q-tooltip class="bg-green text-white">دیدگاه‌های من</q-tooltip>
@@ -326,12 +341,7 @@ async function logout() {
         </q-badge>
         <q-tooltip class="bg-green text-white">اعلان‌ها</q-tooltip>
       </q-btn>
-      <q-btn v-if="userInfo != null" dense flat icon="collections_bookmark" class="green" @click="goToShelves">
-        <q-tooltip class="bg-green text-white">قفسه‌های من</q-tooltip>
-      </q-btn>
-      <q-btn v-if="userInfo != null" dense flat icon="history" class="green" @click="goToHistory">
-        <q-tooltip class="bg-green text-white">بازدیدهای اخیر من</q-tooltip>
-      </q-btn>
+      <q-separator vertical inset spaced v-if="canReviewReports || canManageUsers" />
       <q-btn
         v-if="canReviewReports"
         dense
