@@ -691,6 +691,15 @@ function copyUrl() {
         </a>
       </q-card-section>
 
+      <q-card-section class="q-pa-none flex flex-center" style="cursor: pointer" @click="goTo(`/reviews/${pdf.id}`)">
+        <div v-if="pdf.averageRating != null" class="row items-center">
+          <span class="text-h6 q-ml-sm">{{ pdf.averageRating.toFixed(1) }}</span>
+          <q-rating :model-value="pdf.averageRating" max="5" readonly icon-half="star_half" color="amber" size="20px" />
+          <span class="text-caption text-grey-7 q-mr-sm">({{ pdf.ratingCount }})</span>
+        </div>
+        <div v-else class="text-caption text-grey-7">ثبت نقد</div>
+      </q-card-section>
+
       <q-card-section v-if="pdf.subTitle != null" class="q-pa-lg flex flex-center">
         {{ pdf.subTitle }}
       </q-card-section>
