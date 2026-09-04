@@ -494,6 +494,9 @@ async function logout() {
         >
           {{ pdf.authorsLine }}
         </q-card-section>
+        <q-card-section v-if="pdf.pageFetchCount > 0" class="text-caption text-grey-7 q-py-none">
+          <q-icon name="visibility" size="14px" /> {{ en2fa(pdf.pageFetchCount.toString()) }}
+        </q-card-section>
         <q-card-section v-if="canDelete" class="full-width q-pa-lg flex flex-center">
           <q-btn label="حذف کتاب" @click="deletePDFBook(pdf.id, pdf.title)" />
           <q-btn
