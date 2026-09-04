@@ -13,6 +13,12 @@ const pageNumber = ref(null)
 const pdfs = ref(null)
 const pageCount = ref(1)
 const searchTerm = ref('')
+// Only meaningful in browse-all mode - the search endpoint has its
+// own fixed ordering server-side and was never given a sort
+// parameter, so this is ignored whenever searchTerm is non-empty
+// (see loadList below) - same reasoning as the Flutter client's own
+// _sort field.
+const sort = ref('Newest')
 const pageSize = 21
 const userInfo = ref(null)
 const canDelete = ref(false)
@@ -81,6 +87,13 @@ async function renewSession() {
   }
 }
 
+function changeSort(newSort) {
+  if (newSort === sort.value) return
+  sort.value = newSort
+  pageNumber.value = 1
+  loadList(false)
+}
+
 async function loadList(err401) {
   if (pageNumber.value == null) {
     if (route.query.page != null) {
@@ -89,7 +102,7 @@ async function loadList(err401) {
       pageNumber.value = 1
     }
   }
-  let url = `https://api.naskban.ir/api/pdf?PageNumber=${pageNumber.value}&PageSize=${pageSize}`
+  let url = `https://api.naskban.ir/api/pdf?PageNumber=${pageNumber.value}&PageSize=${pageSize}&sort=${sort.value}`
 
   if (route.query.s != null) {
     searchTerm.value = route.query.s
@@ -443,6 +456,20 @@ async function logout() {
       icon-first="skip_next"
       icon-next="fast_rewind"
       icon-prev="fast_forward"
+    />
+  </div>
+
+  <div v-if="searchTerm == ''" class="row justify-center items-center q-pb-sm">
+    <span class="q-mr-sm">مرتب‌سازی:</span>
+    <q-select
+      :model-value="sort"
+      dense
+      :options="['Newest', 'MostPopular']"
+      :option-label="(key) => (key === 'Newest' ? 'جدیدترین' : 'محبوب‌ترین')"
+      emit-value
+      map-options
+      style="min-width: 140px"
+      @update:model-value="changeSort"
     />
   </div>
 
