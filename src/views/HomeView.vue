@@ -300,12 +300,15 @@ async function logout() {
       <q-btn dense flat icon="forum" class="green" @click="goTo('/comments')">
         <q-tooltip class="bg-green text-white">دیدگاه‌های کاربران</q-tooltip>
       </q-btn>
+      <q-btn dense flat icon="star" class="green" @click="goTo('/reviews')">
+        <q-tooltip class="bg-green text-white">نقدهای کاربران</q-tooltip>
+      </q-btn>
       <q-separator vertical inset spaced v-if="userInfo != null" />
       <!--
         "کتابخانهٔ من" (my library) group - shelves, bookmarks, history,
-        my comments - kept adjacent and in this order to match the
-        Flutter client's own drawer grouping under that same heading
-        (pdf_book_list_view.dart), so the two clients' menus are
+        my comments, my reviews - kept adjacent and in this order to
+        match the Flutter client's own drawer grouping under that same
+        heading (pdf_book_list_view.dart), so the two clients' menus are
         guessable from one another rather than each having their own,
         unrelated ordering.
       -->
@@ -327,6 +330,9 @@ async function logout() {
       </q-btn>
       <q-btn v-if="userInfo != null" dense flat icon="comment" class="green" @click="goTo('/mycomments')">
         <q-tooltip class="bg-green text-white">دیدگاه‌های من</q-tooltip>
+      </q-btn>
+      <q-btn v-if="userInfo != null" dense flat icon="star_border" class="green" @click="goTo('/myreviews')">
+        <q-tooltip class="bg-green text-white">نقدهای من</q-tooltip>
       </q-btn>
       <q-btn
         v-if="userInfo != null"

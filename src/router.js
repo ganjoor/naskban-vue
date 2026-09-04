@@ -20,6 +20,8 @@ import PDFBookReportsView from './views/PDFBookReportsView.vue'
 import NotificationsView from './views/NotificationsView.vue'
 import PDFBookCommentsHubView from './views/PDFBookCommentsHubView.vue'
 import PDFBookReviewsView from './views/PDFBookReviewsView.vue'
+import ReviewsHubView from './views/ReviewsHubView.vue'
+import UserReviewsView from './views/UserReviewsView.vue'
 import CommentsHubView from './views/CommentsHubView.vue'
 import UsersView from './views/UsersView.vue'
 import RolesView from './views/RolesView.vue'
@@ -145,6 +147,11 @@ export const router = createRouter({
       component: PDFBookCommentsHubView
     },
     {
+      path: '/reviews',
+      name: 'reviewshub',
+      component: ReviewsHubView
+    },
+    {
       path: '/reviews/:id',
       name: 'bookreviews',
       component: PDFBookReviewsView
@@ -168,6 +175,16 @@ export const router = createRouter({
       path: '/usercomments/:id',
       name: 'usercomments',
       component: UserCommentsView
+    },
+    {
+      path: '/myreviews',
+      name: 'myreviews',
+      component: UserReviewsView
+    },
+    {
+      path: '/userreviews/:id',
+      name: 'userreviews',
+      component: UserReviewsView
     },
   ]
 })
