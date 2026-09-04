@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import * as PDFBookReviewService from '../utilities/PDFBookReviewService'
+import * as PDFBookReviewReportService from '../utilities/PDFBookReviewReportService'
 import { formatWithTime } from '../utilities/JalaliDate'
 
 // "my reviews" (route name 'myreviews') vs a specific user's reviews
@@ -29,6 +30,19 @@ const draftRating = ref(0)
 const draftText = ref('')
 const writeSubmitting = ref(false)
 const writeError = ref('')
+
+const reportDialogOpen = ref(false)
+const reportingReview = ref(null)
+const reportCategory = ref('Spam')
+const reportDescription = ref('')
+const reportSubmitting = ref(false)
+const reportError = ref('')
+const reviewReportCategories = {
+  Spam: 'هرزنامه',
+  Offensive: 'توهین‌آمیز',
+  Harassment: 'آزار و اذیت',
+  Other: 'سایر'
+}
 
 async function loadReviews() {
   loading.value = true
@@ -70,6 +84,35 @@ async function submitWrite() {
     writeError.value = e.message
   }
   writeSubmitting.value = false
+}
+
+function openReportDialog(review) {
+  reportingReview.value = review
+  reportCategory.value = 'Spam'
+  reportDescription.value = ''
+  reportError.value = ''
+  reportDialogOpen.value = true
+}
+
+async function submitReport() {
+  if (!reportDescription.value.trim()) {
+    reportError.value = 'توضیحات را وارد کنید.'
+    return
+  }
+  reportSubmitting.value = true
+  reportError.value = ''
+  try {
+    await PDFBookReviewReportService.submitReport(
+      userInfo.value,
+      reportingReview.value.id,
+      reportCategory.value,
+      reportDescription.value.trim()
+    )
+    reportDialogOpen.value = false
+  } catch (e) {
+    reportError.value = e.message
+  }
+  reportSubmitting.value = false
 }
 
 async function removeReview(review) {
@@ -227,6 +270,13 @@ function goTo(url) {
             @click="removeReview(review)"
           />
         </template>
+        <q-btn
+          v-if="userInfo != null && !review.myReview"
+          flat
+          dense
+          label="گزارش"
+          @click="openReportDialog(review)"
+        />
       </q-card-actions>
     </q-card>
   </div>
@@ -266,6 +316,38 @@ function goTo(url) {
       <q-card-actions align="right">
         <q-btn label="انصراف" :disable="writeSubmitting" @click="writeDialogOpen = false" />
         <q-btn label="ذخیره" color="primary" :loading="writeSubmitting" @click="submitWrite" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog v-model="reportDialogOpen">
+    <q-card style="min-width: 320px">
+      <q-card-section class="text-h6">گزارش این نقد</q-card-section>
+      <q-card-section>
+        <q-select
+          v-model="reportCategory"
+          label="دلیل گزارش"
+          :options="Object.keys(reviewReportCategories)"
+          :option-label="(key) => reviewReportCategories[key]"
+          emit-value
+          map-options
+        />
+        <q-input
+          v-model="reportDescription"
+          label="توضیحات"
+          type="textarea"
+          class="q-mt-sm"
+        />
+        <div v-if="reportError" class="text-red q-mt-sm">{{ reportError }}</div>
+      </q-card-section>
+      <q-card-actions align="right">
+        <q-btn label="انصراف" :disable="reportSubmitting" @click="reportDialogOpen = false" />
+        <q-btn
+          label="ثبت گزارش"
+          color="primary"
+          :loading="reportSubmitting"
+          @click="submitReport"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

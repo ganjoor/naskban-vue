@@ -30,6 +30,7 @@ const selectedShelfIds = ref([])
 const newShelfName = ref('')
 
 const canReviewReports = ref(false)
+const canReviewReviewReports = ref(false)
 const unreadNotificationCount = ref(null)
 
 async function loadUnreadNotificationCount() {
@@ -197,6 +198,7 @@ watchEffect(async () => {
   }
   canDelete.value = checkPermission('pdf', 'delete')
   canReviewReports.value = checkPermission('pdfreport', 'moderate')
+  canReviewReviewReports.value = checkPermission('pdfbookreviewreport', 'moderate')
   loadUnreadNotificationCount()
   loading.value = true
   await loadPDF(false)
@@ -584,6 +586,16 @@ function copyUrl() {
         @click="goTo('/reports')"
       >
         <q-tooltip class="bg-green text-white">گزارش‌های کاربران</q-tooltip>
+      </q-btn>
+      <q-btn
+        v-if="canReviewReviewReports"
+        dense
+        flat
+        icon="outlined_flag"
+        class="green"
+        @click="goTo('/reviewreports')"
+      >
+        <q-tooltip class="bg-green text-white">گزارش‌های نقدها</q-tooltip>
       </q-btn>
 
       <q-separator vertical inset spaced v-if="userInfo != null" />

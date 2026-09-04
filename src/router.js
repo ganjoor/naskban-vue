@@ -17,6 +17,7 @@ import ShelfDetailView from './views/ShelfDetailView.vue'
 import AuthorsView from './views/AuthorsView.vue'
 import AuthorBooksView from './views/AuthorBooksView.vue'
 import PDFBookReportsView from './views/PDFBookReportsView.vue'
+import PDFBookReviewReportsView from './views/PDFBookReviewReportsView.vue'
 import NotificationsView from './views/NotificationsView.vue'
 import PDFBookCommentsHubView from './views/PDFBookCommentsHubView.vue'
 import PDFBookReviewsView from './views/PDFBookReviewsView.vue'
@@ -130,6 +131,11 @@ export const router = createRouter({
       path: '/reports',
       name: 'bookreports',
       component: PDFBookReportsView
+    },
+    {
+      path: '/reviewreports',
+      name: 'reviewreports',
+      component: PDFBookReviewReportsView
     },
     {
       path: '/notifications',
